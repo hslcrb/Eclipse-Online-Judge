@@ -1,0 +1,40 @@
+# Target directories (Build outputs)
+**/target/
+**/bin/
+**/out/
+
+# Eclipse project files
+.metadata/
+.recommenders/
+RemoteSystemsTempFiles/
+.project
+.classpath
+.settings/
+
+# IntelliJ / VS Code files
+.idea/
+*.iml
+*.iws
+.vscode/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and databases
+*.log
+*.sqlite
+
+# Dependency directories (Node.js / Web apps)
+node_modules/
+dist/
+build/
+.next/
+.nuxt/
+
+# Local configuration files
+.env
+.env.local
+.env.*.local

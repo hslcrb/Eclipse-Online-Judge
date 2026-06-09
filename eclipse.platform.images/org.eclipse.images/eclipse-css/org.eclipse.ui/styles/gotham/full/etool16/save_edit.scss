@@ -1,0 +1,40 @@
+@import "gotham";
+
+#disk-base {
+	fill: $gotham-background-dark;
+	fill-opacity: 1;
+	stroke: $gotham-background-dark;
+	stroke-opacity: 1;
+}
+
+#io-slider {
+	display: inline;
+	fill: $gotham-background-accent-purple-bright;
+	fill-opacity: 1;
+	stroke: $gotham-background-accent-purple-bright;
+	stroke-opacity: 1;
+	stroke-width: 1;
+}
+
+#io-slider-slot {
+	display: inline;
+	fill: $gotham-background-accent-green;
+	fill-opacity: 1;
+	stroke-width: 1;
+}
+
+#label-base {
+	display: inline;
+	fill: $gotham-background-very-light;
+	fill-opacity: 1;
+	stroke: $gotham-background-very-light;
+	stroke-opacity: 1;
+}
+
+#label-lines {
+	display: inline;
+	opacity: 1;
+	fill: $gotham-background-accent-purple;
+	fill-opacity: 0.25;
+	stroke: none;
+}

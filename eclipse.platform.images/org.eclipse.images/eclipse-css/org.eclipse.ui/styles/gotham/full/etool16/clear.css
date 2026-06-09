@@ -1,0 +1,51 @@
+/*
+ * gotham.scss test theme for experimenting with icon themes
+ */
+/** Cross theme styles */
+/*
+ * Global.scss provides styles and configuration
+ * all themes.
+ *
+ */
+/** Global styles and values */
+/** styles and values */
+/** Global Styles */
+/** Navigation Elements (Back, Forward, Stop, etc)*/
+/** UI Trim (Popup menu buttons, close buttons, etc)*/
+#line {
+  fill: none;
+  stroke: #f12424;
+  stroke-width: 1px;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  stroke-opacity: 1; }
+
+#lightarea {
+  fill: #9c3f3f;
+  fill-opacity: 1;
+  stroke: none;
+  display: inline; }
+
+#darkarea {
+  fill: #841414;
+  fill-opacity: 1;
+  stroke: none;
+  display: inline; }
+
+#divider {
+  fill: none;
+  stroke: #841414;
+  stroke-width: 1px;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  stroke-opacity: 0.5;
+  display: inline; }
+
+#eraser {
+  display: inline;
+  fill: none;
+  stroke: #f12424;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-opacity: 1; }

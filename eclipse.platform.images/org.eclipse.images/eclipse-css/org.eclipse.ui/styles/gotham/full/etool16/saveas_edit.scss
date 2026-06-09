@@ -1,0 +1,82 @@
+@import "gotham";
+
+#dot1 {
+	opacity: 1;
+	fill: $gotham-background-accent-blue-ultra;
+	fill-opacity: 1;
+	fill-rule: nonzero;
+	stroke: none;
+	stroke-width: 0.80000001;
+	marker: none;
+	visibility: visible;
+	display: inline;
+	overflow: visible;
+	enable-background: accumulate;
+}
+
+#dot2 {
+	opacity: 1;
+	fill: $gotham-background-accent-blue-ultra;
+	fill-opacity: 1;
+	fill-rule: nonzero;
+	stroke: none;
+	stroke-width: 0.80000001;
+	marker: none;
+	visibility: visible;
+	display: inline;
+	overflow: visible;
+	enable-background: accumulate;
+}
+
+#dot3 {
+	opacity: 1;
+	fill: $gotham-background-accent-blue-ultra;
+	fill-opacity: 1;
+	fill-rule: nonzero;
+	stroke: none;
+	stroke-width: 0.80000001;
+	marker: none;
+	visibility: visible;
+	display: inline;
+	overflow: visible;
+	enable-background: accumulate;
+}
+
+#disk-base {
+	fill: $gotham-background-dark;
+	fill-opacity: 1;
+	stroke: $gotham-background-dark;
+	stroke-opacity: 1;
+}
+
+#io-slider {
+	display: inline;
+	fill: $gotham-background-accent-purple-bright;
+	fill-opacity: 1;
+	stroke: $gotham-background-accent-purple-bright;
+	stroke-opacity: 1;
+	stroke-width: 1;
+}
+
+#io-slider-slot {
+	display: none;
+	fill: $gotham-background-accent-green;
+	fill-opacity: 1;
+	stroke-width: 1;
+}
+
+#label-base {
+	display: inline;
+	fill: $gotham-background-very-light;
+	fill-opacity: 1;
+	stroke: $gotham-background-very-light;
+	stroke-opacity: 1;
+}
+
+#label-lines {
+	display: none;
+	opacity: 1;
+	fill: $gotham-background-accent-purple;
+	fill-opacity: 1;
+	stroke: none;
+}

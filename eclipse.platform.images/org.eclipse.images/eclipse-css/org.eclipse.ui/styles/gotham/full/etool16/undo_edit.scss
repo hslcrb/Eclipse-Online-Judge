@@ -1,0 +1,9 @@
+@import "gotham";
+
+#undo-arrow {
+	display: inline;
+	fill: $gotham-background-accent-yellow;
+	fill-opacity: 1;
+	stroke: $gotham-background-accent-yellow-bright;
+	stroke-width: 1;
+}

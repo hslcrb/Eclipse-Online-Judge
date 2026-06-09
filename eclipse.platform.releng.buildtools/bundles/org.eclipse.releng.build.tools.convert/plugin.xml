@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+
+    <extension point="org.eclipse.ant.core.extraClasspathEntries">
+        <extraClasspathEntry library="convert.jar">
+        </extraClasspathEntry>
+    </extension>
+
+    <extension point="org.eclipse.ant.core.antTasks">
+        <antTask
+            name="eclipse.convert"
+            class="org.eclipse.releng.build.tools.convert.ant.LogConverterTask"
+            library="convert.jar">
+        </antTask>
+    </extension>
+
+
+</plugin>

@@ -1,0 +1,15 @@
+@import "gotham";
+
+#x {
+	fill: $gotham-background-accent-red;
+	fill-opacity: 1;
+	stroke: $gotham-background-accent-red-bright;
+	stroke-width: 1;
+	stroke-linecap: round;
+	stroke-linejoin: miter;
+	stroke-miterlimit: 4;
+	stroke-opacity: 1;
+	stroke-dasharray: none;
+	stroke-dashoffset: 0;
+}
+

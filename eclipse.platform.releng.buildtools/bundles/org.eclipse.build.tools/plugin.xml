@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+    <extension
+         point="org.eclipse.ant.core.extraClasspathEntries">
+      <extraClasspathEntry
+            library="buildTools.jar">
+      </extraClasspathEntry>
+   </extension>
+	<!-- Tasks -->
+   <extension point="org.eclipse.ant.core.antTasks">
+
+
+      <antTask
+            library="buildTools.jar"
+            name="unpackUpdateJars"
+            class="org.eclipse.releng.UnpackUpdateJars">
+      </antTask>
+
+    </extension>
+</plugin>

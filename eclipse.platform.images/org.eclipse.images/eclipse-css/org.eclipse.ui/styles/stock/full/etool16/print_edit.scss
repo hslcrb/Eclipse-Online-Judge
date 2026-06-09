@@ -1,0 +1,143 @@
+@import "stock";
+
+#printer-footer-stroke-stop0 {
+	stop-color: #5978ab;
+	stop-opacity: 1;
+}
+
+#printer-footer-stroke-stop1 {
+	stop-color: #5373a7;
+	stop-opacity: 1;
+}
+
+#printer-body-fill-stop0 {
+	stop-color: #8daad3;
+	stop-opacity: 1;
+}
+
+#printer-body-fill-stop1 {
+	stop-color: #f3f5f6;
+	stop-opacity: 1;
+}
+
+#printer-body-stroke-stop0 {
+	stop-color: #607fb0;
+	stop-opacity: 1;
+}
+
+#printer-body-stroke-stop1 {
+	stop-color: #7593c1;
+	stop-opacity: 1;
+}
+
+#paper-fold-stop0 {
+	stop-color: #e4cf9d;
+	stop-opacity: 1;
+}
+
+#paper-fold-stop1 {
+	stop-color: #d0ab5b;
+	stop-opacity: 1;
+}
+
+#paper-lines-stop0 {
+	stop-color: #91a5c7;
+	stop-opacity: 1;
+}
+
+#paper-lines-stop1 {
+	stop-color: #637aa7;
+	stop-opacity: 1;
+}
+
+#body-shadow-right-stop0 {
+	stop-color: #000000;
+	stop-opacity: 0;
+}
+
+#body-shadow-right-stop1 {
+	stop-color: #000000;
+	stop-opacity: 1;
+}
+
+#paper-bg-stop0 {
+	stop-color: #f9fafc;
+	stop-opacity: 1;
+}
+
+#paper-bg-stop1 {
+	stop-color: #dce7f8;
+	stop-opacity: 1;
+}
+
+#paper-stroke-stop0 {
+	stop-color: #c7b571;
+	stop-opacity: 1;
+}
+
+#paper-stroke-stop1 {
+	stop-color: #788dae;
+	stop-opacity: 1;
+}
+
+#layer1 {
+	display: inline;
+}
+
+#printer-footer {
+	display: inline;
+	fill: #89a8d6;
+	fill-opacity: 1;
+	stroke: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//print_edit.svg#printer-footer-stroke);
+	stroke-opacity: 1;
+}
+
+#printer-body {
+	fill: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//print_edit.svg#printer-body-fill);
+	fill-opacity: 1;
+	stroke: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//print_edit.svg#printer-body-stroke);
+	stroke-opacity: 1;
+}
+
+#paper-base {
+	display: inline;
+	fill: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//print_edit.svg#paper-bg);
+	fill-opacity: 1;
+	stroke: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//print_edit.svg#paper-stroke);
+	stroke-width: 1;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-miterlimit: 4;
+	stroke-dashoffset: 0;
+	stroke-opacity: 1;
+}
+
+#paper-fold {
+	fill: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//print_edit.svg#paper-fold);
+	fill-opacity: 1;
+	stroke: none;
+}
+
+#paper-lines {
+	display: inline;
+	fill: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//print_edit.svg#paper-lines);
+	fill-opacity: 1;
+	stroke: none;
+}
+
+#body-shadow-left {
+	display: inline;
+	opacity: 0.36500005;
+	fill: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//print_edit.svg#body-shadow-right);
+	fill-opacity: 1;
+	stroke: none;
+}
+
+#body-shadow-right {
+	display: inline;
+	opacity: 0.23000004;
+	fill: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//print_edit.svg#linearGradient6209);
+	fill-opacity: 1.0;
+	stroke: none;
+}
+

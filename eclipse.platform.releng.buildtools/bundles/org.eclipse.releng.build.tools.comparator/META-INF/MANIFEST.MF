@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: org.eclipse.releng.build.tools.comparator;singleton:=true
+Bundle-Version: 1.3.0.qualifier
+Bundle-Vendor: %Bundle-Vendor
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Require-Bundle: org.apache.ant
+Bundle-ClassPath: comparatorSummary.jar
+Export-Package: org.eclipse.releng.build.tools.comparator,
+ org.eclipse.releng.build.tools.comparator.ant
+Automatic-Module-Name: org.eclipse.releng.build.tools.comparator

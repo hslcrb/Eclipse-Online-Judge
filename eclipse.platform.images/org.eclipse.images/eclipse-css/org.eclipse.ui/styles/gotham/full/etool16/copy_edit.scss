@@ -1,0 +1,97 @@
+@import "gotham";
+
+#backpaper {
+	color: #000000;
+	display: inline;
+	overflow: visible;
+	visibility: visible;
+	fill: $gotham-background-accent-blue-ultra;
+	fill-opacity: 1;
+	stroke: $gotham-background-accent-blue-ultra;
+	stroke-width: 1;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-miterlimit: 4;
+	stroke-dasharray: none;
+	stroke-dashoffset: 0;
+	stroke-opacity: 1;
+	marker: none;
+	enable-background: accumulate;
+}
+
+#page-lines-back {
+	color: #000000;
+	display: inline;
+	overflow: visible;
+	visibility: visible;
+	fill: $gotham-background-accent-purple;
+	fill-opacity: 1;
+	stroke: none;
+	stroke-width: 1;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-miterlimit: 4;
+	stroke-dasharray: none;
+	stroke-dashoffset: 0;
+	stroke-opacity: 1;
+	marker: none;
+	enable-background: accumulate;
+}
+
+#frontpaper {
+	color: #000000;
+	display: inline;
+	overflow: visible;
+	visibility: visible;
+	fill: $gotham-background-accent-purple;
+	fill-opacity: 1;
+	stroke: $gotham-background-accent-purple;
+	stroke-width: 1;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-miterlimit: 4;
+	stroke-dasharray: none;
+	stroke-dashoffset: 0;
+	stroke-opacity: 1;
+	marker: none;
+	enable-background: accumulate;
+}
+
+#page-lines {
+	color: #000000;
+	display: inline;
+	overflow: visible;
+	visibility: visible;
+	fill: $gotham-background-accent-green;
+	fill-opacity: 1;
+	stroke: none;
+	stroke-width: 1;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-miterlimit: 4;
+	stroke-dasharray: none;
+	stroke-dashoffset: 0;
+	stroke-opacity: 1;
+	marker: none;
+	enable-background: accumulate;
+}
+
+#fold {
+	color: #000000;
+	display: inline;
+	overflow: visible;
+	visibility: visible;
+	fill: $gotham-background-dark;
+	fill-opacity: 1;
+	stroke: none;
+	stroke-width: 1;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-miterlimit: 4;
+	stroke-dasharray: none;
+	stroke-dashoffset: 0;
+	stroke-opacity: 1;
+	marker: none;
+	enable-background: accumulate;
+}
+

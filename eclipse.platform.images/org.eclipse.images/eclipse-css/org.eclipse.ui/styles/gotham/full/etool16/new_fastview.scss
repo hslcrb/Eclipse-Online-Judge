@@ -1,0 +1,155 @@
+@import "gotham";
+
+#winframe {
+	color: #000000;
+	display: inline;
+	overflow: visible;
+	visibility: visible;
+	fill: $gotham-background-very-light;
+	fill-opacity: 1;
+	stroke: $gotham-background-very-light;
+	stroke-width: 1;
+	stroke-miterlimit: 4;
+	stroke-dasharray: none;
+	stroke-opacity: 1;
+	marker: none;
+	enable-background: accumulate;
+}
+
+#header {
+	color: #000000;
+	display: inline;
+	overflow: visible;
+	visibility: visible;
+	fill: $gotham-background-accent-purple-bright;
+	fill-opacity: 1;
+	fill-rule: nonzero;
+	stroke: none;
+	stroke-width: 0.89999998;
+	marker: none;
+	enable-background: accumulate;
+}
+
+#stripe {
+	color: #000000;
+	display: inline;
+	overflow: visible;
+	visibility: visible;
+	fill: $gotham-background-accent-purple-bright;
+	fill-opacity: 1;
+	fill-rule: nonzero;
+	stroke: none;
+	stroke-width: 0.89999998;
+	marker: none;
+	enable-background: accumulate;
+}
+
+#starshadow4 {
+	display: inline;
+	opacity: 0.85;
+	fill: $gotham-background-accent-yellow-dark;
+	fill-opacity: 1;
+	stroke: none;
+}
+
+#starshadow3 {
+	display: inline;
+	opacity: 0.85;
+	fill: $gotham-background-accent-yellow-dark;
+	fill-opacity: 1;
+	stroke: none;
+}
+
+#starshadow2 {
+	display: inline;
+	opacity: 0.85;
+	fill: $gotham-background-accent-yellow-dark;
+	fill-opacity: 1;
+	stroke: none;
+}
+
+#starshadow1 {
+	display: inline;
+	opacity: 0.85;
+	fill: $gotham-background-accent-yellow-dark;
+	fill-opacity: 1;
+	stroke: none;
+}
+
+#starshadow5 {
+	display: inline;
+	opacity: 0.85;
+	fill: $gotham-background-accent-yellow-dark;
+	fill-opacity: 1;
+	stroke: none;
+}
+
+#star4 {
+	display: inline;
+	opacity: 0.85;
+	fill: $gotham-background-accent-yellow-ultra;
+	fill-opacity: 0.96862745;
+	stroke: none;
+}
+
+#star3 {
+	display: inline;
+	opacity: 0.85;
+	fill: $gotham-background-accent-yellow-ultra;
+	fill-opacity: 0.96862745;
+	stroke: none;
+}
+
+#star2 {
+	display: inline;
+	opacity: 0.85;
+	fill: $gotham-background-accent-yellow-ultra;
+	fill-opacity: 0.96862745;
+	stroke: none;
+}
+
+#star1 {
+	display: inline;
+	opacity: 0.85;
+	fill: $gotham-background-accent-yellow-ultra;
+	fill-opacity: 0.96862745;
+	stroke: none;
+}
+
+#star5 {
+	display: inline;
+	opacity: 0.85;
+	fill: $gotham-background-accent-yellow-ultra;
+	fill-opacity: 0.96862745;
+	stroke: none;
+}
+
+#starinterior {
+	display: inline;
+	fill: $gotham-background-accent-yellow-dark;
+	fill-opacity: 1;
+	stroke: none;
+	stroke-width: 1.03243756;
+	stroke-miterlimit: 4;
+	stroke-dasharray: none;
+	stroke-opacity: 1;
+}
+
+#starcross {
+	display: inline;
+	fill: $gotham-background-accent-yellow-ultra;
+	fill-opacity: 1;
+	stroke: none;
+}
+
+#starexterior {
+	display: inline;
+	fill: none;
+	fill-opacity: 1;
+	stroke: $gotham-background-accent-yellow-dark;
+	stroke-width: 1.03243756;
+	stroke-miterlimit: 4;
+	stroke-dasharray: none;
+	stroke-opacity: 1;
+}
+

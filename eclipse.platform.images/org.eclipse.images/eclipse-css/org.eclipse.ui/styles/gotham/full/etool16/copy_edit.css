@@ -1,0 +1,103 @@
+/*
+ * gotham.scss test theme for experimenting with icon themes
+ */
+/** Cross theme styles */
+/*
+ * Global.scss provides styles and configuration
+ * all themes.
+ *
+ */
+/** Global styles and values */
+/** styles and values */
+/** Global Styles */
+/** Navigation Elements (Back, Forward, Stop, etc)*/
+/** UI Trim (Popup menu buttons, close buttons, etc)*/
+#backpaper {
+  color: #000000;
+  display: inline;
+  overflow: visible;
+  visibility: visible;
+  fill: #07c3ff;
+  fill-opacity: 1;
+  stroke: #07c3ff;
+  stroke-width: 1;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  stroke-miterlimit: 4;
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+  stroke-opacity: 1;
+  marker: none;
+  enable-background: accumulate; }
+
+#page-lines-back {
+  color: #000000;
+  display: inline;
+  overflow: visible;
+  visibility: visible;
+  fill: #491adc;
+  fill-opacity: 1;
+  stroke: none;
+  stroke-width: 1;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  stroke-miterlimit: 4;
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+  stroke-opacity: 1;
+  marker: none;
+  enable-background: accumulate; }
+
+#frontpaper {
+  color: #000000;
+  display: inline;
+  overflow: visible;
+  visibility: visible;
+  fill: #491adc;
+  fill-opacity: 1;
+  stroke: #491adc;
+  stroke-width: 1;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  stroke-miterlimit: 4;
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+  stroke-opacity: 1;
+  marker: none;
+  enable-background: accumulate; }
+
+#page-lines {
+  color: #000000;
+  display: inline;
+  overflow: visible;
+  visibility: visible;
+  fill: #3f9c48;
+  fill-opacity: 1;
+  stroke: none;
+  stroke-width: 1;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  stroke-miterlimit: 4;
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+  stroke-opacity: 1;
+  marker: none;
+  enable-background: accumulate; }
+
+#fold {
+  color: #000000;
+  display: inline;
+  overflow: visible;
+  visibility: visible;
+  fill: #776870;
+  fill-opacity: 1;
+  stroke: none;
+  stroke-width: 1;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  stroke-miterlimit: 4;
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+  stroke-opacity: 1;
+  marker: none;
+  enable-background: accumulate; }

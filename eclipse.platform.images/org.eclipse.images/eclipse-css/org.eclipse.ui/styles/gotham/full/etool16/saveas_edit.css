@@ -1,0 +1,86 @@
+/*
+ * gotham.scss test theme for experimenting with icon themes
+ */
+/** Cross theme styles */
+/*
+ * Global.scss provides styles and configuration
+ * all themes.
+ *
+ */
+/** Global styles and values */
+/** styles and values */
+/** Global Styles */
+/** Navigation Elements (Back, Forward, Stop, etc)*/
+/** UI Trim (Popup menu buttons, close buttons, etc)*/
+#dot1 {
+  opacity: 1;
+  fill: #07c3ff;
+  fill-opacity: 1;
+  fill-rule: nonzero;
+  stroke: none;
+  stroke-width: 0.80000001;
+  marker: none;
+  visibility: visible;
+  display: inline;
+  overflow: visible;
+  enable-background: accumulate; }
+
+#dot2 {
+  opacity: 1;
+  fill: #07c3ff;
+  fill-opacity: 1;
+  fill-rule: nonzero;
+  stroke: none;
+  stroke-width: 0.80000001;
+  marker: none;
+  visibility: visible;
+  display: inline;
+  overflow: visible;
+  enable-background: accumulate; }
+
+#dot3 {
+  opacity: 1;
+  fill: #07c3ff;
+  fill-opacity: 1;
+  fill-rule: nonzero;
+  stroke: none;
+  stroke-width: 0.80000001;
+  marker: none;
+  visibility: visible;
+  display: inline;
+  overflow: visible;
+  enable-background: accumulate; }
+
+#disk-base {
+  fill: #776870;
+  fill-opacity: 1;
+  stroke: #776870;
+  stroke-opacity: 1; }
+
+#io-slider {
+  display: inline;
+  fill: #4a11ff;
+  fill-opacity: 1;
+  stroke: #4a11ff;
+  stroke-opacity: 1;
+  stroke-width: 1; }
+
+#io-slider-slot {
+  display: none;
+  fill: #3f9c48;
+  fill-opacity: 1;
+  stroke-width: 1; }
+
+#label-base {
+  display: inline;
+  fill: #cdd3d9;
+  fill-opacity: 1;
+  stroke: #cdd3d9;
+  stroke-opacity: 1; }
+
+#label-lines {
+  display: none;
+  opacity: 1;
+  fill: #491adc;
+  fill-opacity: 1;
+  stroke: none; }

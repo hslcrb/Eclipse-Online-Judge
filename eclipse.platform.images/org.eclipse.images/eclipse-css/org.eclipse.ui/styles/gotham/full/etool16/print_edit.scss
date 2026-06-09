@@ -1,0 +1,55 @@
+@import "gotham";
+
+#layer1 {
+	display: inline;
+}
+
+#printer-footer {
+	display: inline;
+	fill: $gotham-background-light;
+	fill-opacity: 1;
+	stroke: $gotham-background-light;
+	stroke-opacity: 1;
+}
+
+#printer-body {
+	fill: $gotham-background-dark;
+	fill-opacity: 1;
+	stroke: $gotham-background-dark;
+	stroke-opacity: 1;
+}
+
+#paper-base {
+	display: inline;
+	fill: $gotham-background-very-light;
+	fill-opacity: 1;
+	stroke: $gotham-background-very-light;
+	stroke-width: 1;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-miterlimit: 4;
+	stroke-dashoffset: 0;
+	stroke-opacity: 1;
+}
+
+#paper-fold {
+	fill: $gotham-background-dark;
+	fill-opacity: 1;
+	stroke: none;
+}
+
+#paper-lines {
+	display: inline;
+	fill: $gotham-background-accent-purple;
+	fill-opacity: 1;
+	stroke: none;
+}
+
+#body-shadow-left {
+	display: none;
+}
+
+#body-shadow-right {
+	display: none;
+}
+

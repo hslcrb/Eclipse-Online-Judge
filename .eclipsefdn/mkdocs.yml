@@ -1,0 +1,40 @@
+site_name: Otterdog configuration @ eclipse-platform
+site_description: Otterdog configuration @ eclipse-platform
+strict: false
+
+site_url: https://eclipse-platform.github.io/.eclipsefdn/
+
+repo_name: eclipse-platform/.eclipsefdn
+repo_url: https://github.com/eclipse-platform/.eclipsefdn/
+
+docs_dir: ./docs
+site_dir: ./_site
+
+theme:
+  name: 'material'
+  custom_dir: docs/overrides
+  features:
+    - navigation.tabs
+
+markdown_extensions:
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+plugins:
+  - macros
+
+nav:
+  - Overview: index.md
+
+watch: []
+
+extra:
+  org_id: eclipse-platform
+
+extra_css:
+  - stylesheets/extra.css

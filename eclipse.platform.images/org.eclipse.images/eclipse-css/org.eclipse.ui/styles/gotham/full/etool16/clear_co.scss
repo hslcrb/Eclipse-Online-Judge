@@ -1,0 +1,44 @@
+@import "gotham";
+
+#line {
+	fill: none;
+	stroke: $gotham-background-accent-red-bright;
+	stroke-width: 1px;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-opacity: 1;
+}
+
+#lightarea {
+	fill: $gotham-background-accent-red;
+	fill-opacity: 1;
+	stroke: none;
+	display: inline;
+}
+
+#darkarea {
+	fill: $gotham-background-accent-red-dark;
+	fill-opacity: 1;
+	stroke: none;
+	display: inline;
+}
+
+#divider {
+	fill: none;
+	stroke: $gotham-background-accent-red-dark;
+	stroke-width: 1px;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-opacity: 0.5;
+	display: inline;
+}
+
+#eraser {
+	display: inline;
+	fill: none;
+	stroke: $gotham-background-accent-red-bright;
+	stroke-width: 1;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-opacity: 1;
+}

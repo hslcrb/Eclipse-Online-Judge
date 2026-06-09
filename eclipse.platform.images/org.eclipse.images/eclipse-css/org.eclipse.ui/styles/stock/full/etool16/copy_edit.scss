@@ -1,0 +1,138 @@
+@import "stock";
+
+#fold-bg-stop0 {
+	stop-color: #d8bc68;
+	stop-opacity: 1;
+}
+
+#fold-bg-stop1 {
+	stop-color: #fff0c2;
+	stop-opacity: 1;
+}
+
+#frontpaper-bg-stop0 {
+	stop-color: #daedef;
+	stop-opacity: 1;
+}
+
+#frontpaper-bg-stop1 {
+	stop-color: #ffffff;
+	stop-opacity: 1;
+}
+
+#frontpaper-stroke-stop0 {
+	stop-color: #c89840;
+	stop-opacity: 1;
+}
+
+#frontpaper-stroke-stop1 {
+	stop-color: #798da2;
+	stop-opacity: 1;
+}
+
+#back-bg-stop0 {
+	stop-color: #daedef;
+	stop-opacity: 1;
+}
+
+#back-bg-stop1 {
+	stop-color: #ffffff;
+	stop-opacity: 1;
+}
+
+#back-stroke-stop0 {
+	stop-color: #c89840;
+	stop-opacity: 1;
+}
+
+#back-stroke-stop1 {
+	stop-color: #798da2;
+	stop-opacity: 1;
+}
+
+#layer1 {
+	display: inline;
+}
+
+#backpaper {
+	color: #000000;
+	display: inline;
+	overflow: visible;
+	visibility: visible;
+	fill: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//copy_edit.svg#linearGradient5568);
+	fill-opacity: 1;
+	stroke: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//copy_edit.svg#linearGradient5570);
+	stroke-width: 1;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-miterlimit: 4;
+	stroke-dasharray: none;
+	stroke-dashoffset: 0;
+	stroke-opacity: 1;
+	marker: none;
+	enable-background: accumulate;
+}
+
+#page-lines-back {
+	color: #000000;
+	display: inline;
+	overflow: visible;
+	visibility: visible;
+	fill: #7795b6;
+	fill-opacity: 1;
+	stroke: none;
+	stroke-width: 0.99252546;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-miterlimit: 4;
+	stroke-dasharray: none;
+	stroke-dashoffset: 0;
+	stroke-opacity: 1;
+	marker: none;
+	enable-background: accumulate;
+}
+
+#frontpaper {
+	color: #000000;
+	display: inline;
+	overflow: visible;
+	visibility: visible;
+	fill: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//copy_edit.svg#linearGradient4279);
+	fill-opacity: 1;
+	stroke: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//copy_edit.svg#linearGradient4281);
+	stroke-width: 1;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-miterlimit: 4;
+	stroke-dasharray: none;
+	stroke-dashoffset: 0;
+	stroke-opacity: 1;
+	marker: none;
+	enable-background: accumulate;
+}
+
+#page-lines {
+	color: #000000;
+	display: inline;
+	overflow: visible;
+	visibility: visible;
+	fill: #7795b6;
+	fill-opacity: 1;
+	stroke: none;
+	stroke-width: 0.99252546;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-miterlimit: 4;
+	stroke-dasharray: none;
+	stroke-dashoffset: 0;
+	stroke-opacity: 1;
+	marker: none;
+	enable-background: accumulate;
+}
+
+#fold {
+	fill: #d8bc68;
+	fill-opacity: 1;
+	stroke: none;
+}
+

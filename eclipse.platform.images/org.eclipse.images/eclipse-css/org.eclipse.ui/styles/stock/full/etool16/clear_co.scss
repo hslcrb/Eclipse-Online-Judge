@@ -1,0 +1,89 @@
+@import "stock";
+
+#divider-stroke-stop0 {
+	stop-color: #ac9575;
+	stop-opacity: 1;
+}
+
+#divider-stroke-stop1 {
+	stop-color: #f4efe9;
+	stop-opacity: 1;
+}
+
+#eraser-stroke-stop0 {
+	stop-color: #9a8d73;
+	stop-opacity: 1;
+}
+
+#eraser-stroke-stop1 {
+	stop-color: #c0b194;
+	stop-opacity: 1;
+}
+
+#lightarea-bg-stop0 {
+	stop-color: #f5ede6;
+	stop-opacity: 1;
+}
+
+#lightarea-bg-stop1 {
+	stop-color: #ffffff;
+	stop-opacity: 1;
+}
+
+#darkarea-bg-stop0 {
+	stop-color: #ccbba3;
+	stop-opacity: 1;
+}
+
+#darkarea-bg-stop1 {
+	stop-color: #f2ebe4;
+	stop-opacity: 1;
+}
+
+#layer1 {
+	display: inline;
+}
+
+#line {
+	fill: none;
+	stroke: #9a8d73;
+	stroke-width: 1px;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-opacity: 1;
+}
+
+#lightarea {
+	fill: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//clear_co.svg#lightarea-bg);
+	fill-opacity: 1;
+	stroke: none;
+	display: inline;
+}
+
+#darkarea {
+	fill: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//clear_co.svg#darkarea-bg);
+	fill-opacity: 1;
+	stroke: none;
+	display: inline;
+}
+
+#divider {
+	fill: none;
+	stroke: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//clear_co.svg#divider-stroke);
+	stroke-width: 1px;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-opacity: 1;
+	display: inline;
+}
+
+#eraser {
+	display: inline;
+	fill: none;
+	stroke: url(../../../../../../eclipse-svg/org.eclipse.ui/icons/full/etool16//clear_co.svg#eraser-stroke);
+	stroke-width: 0.99504387px;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-opacity: 1;
+}
+
