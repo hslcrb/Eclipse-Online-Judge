@@ -1,0 +1,66 @@
+rootProject.name = 'eclipse-platform-wasm'
+
+def isSkipped(String name) {
+    // 1. Tests & Examples & Unittest
+    if (name.endsWith(".tests") || name.contains(".tests.") || name.contains(".examples") || 
+        name in ["terminal", "examples", "tests"] || name.contains("terminal") || name.contains(".unittest")) {
+        return true
+    }
+    // 2. UA & Help & Tips & Intro (User Assistance)
+    if (name.startsWith("org.eclipse.help") || name.startsWith("org.eclipse.tips") || 
+        name.startsWith("org.eclipse.ua") || name == "org.eclipse.ui.cheatsheets" || 
+        name.startsWith("org.eclipse.ui.intro")) {
+        return true
+    }
+    // 3. Developer Tools & Debug utilities & SVG Rasterizer
+    if (name.contains(".tools") || name == "org.eclipse.swt.tools" || name == "org.eclipse.text.quicksearch" || name == "org.eclipse.swt.svg") {
+        return true
+    }
+    // 4. Platform specific (win32, cocoa, macosx) - we only target GTK Linux
+    if (name.contains(".win32") || name.contains(".cocoa") || name.contains(".macosx")) {
+        return true
+    }
+    // 5. Monitoring & Performance metrics
+    if (name == "org.eclipse.ui.monitoring") {
+        return true
+    }
+    // 6. Ant UI components (extremely heavy JDT/JUnit dependencies)
+    if (name.startsWith("org.eclipse.ant.ui")) {
+        return true
+    }
+    return false
+}
+
+def findBundles(File parentDir, String prefix) {
+    if (!parentDir.exists() || !parentDir.isDirectory()) return
+    
+    parentDir.listFiles().each { child ->
+        if (child.isDirectory()) {
+            if (isSkipped(child.name)) {
+                return
+            }
+            // Include projects having java source dirs or build.properties configuration
+            def hasSrc = new File(child, "src").exists() || new File(child, "build.properties").exists() || child.name == 'org.eclipse.swt'
+            if (hasSrc) {
+                def projectName = "${prefix}:${child.name}"
+                include projectName
+                project(projectName).projectDir = child
+            } else {
+                // Recurse into directories that group bundles, skipping ua (User Assistance), ant, update, releng
+                if (child.name in ['bundles', 'platform', 'resources', 'runtime']) {
+                    findBundles(child, "${prefix}:${child.name}")
+                }
+            }
+        }
+    }
+}
+
+// Dynamically scan all platform group directories in the workspace root
+findBundles(file('eclipse.platform'), ':eclipse.platform')
+findBundles(file('eclipse.platform.common'), ':eclipse.platform.common')
+findBundles(file('eclipse.platform.resources'), ':eclipse.platform.resources')
+findBundles(file('eclipse.platform.runtime'), ':eclipse.platform.runtime')
+findBundles(file('eclipse.platform.swt'), ':eclipse.platform.swt')
+findBundles(file('eclipse.platform.team'), ':eclipse.platform.team')
+findBundles(file('eclipse.platform.text'), ':eclipse.platform.text')
+findBundles(file('eclipse.platform.ui'), ':eclipse.platform.ui')

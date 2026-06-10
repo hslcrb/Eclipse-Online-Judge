@@ -1,0 +1,179 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.eclipse.platform'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.eclipse.org/content/repositories/releases/" }
+    maven { url "https://repo.eclipse.org/content/repositories/snapshots/" }
+}
+
+configurations.all {
+    exclude group: 'org.eclipse.platform', module: 'org.eclipse.swt'
+}
+
+dependencies {
+    // Essential Java EE / OSGi and helper libraries for compilation
+    implementation 'org.osgi:org.osgi.core:6.0.0'
+    implementation 'org.osgi:org.osgi.service.event:1.3.1'
+    implementation 'org.eclipse.platform:org.eclipse.osgi:3.18.0'
+    implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+    implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
+    
+    // Equinox core components
+    implementation 'org.eclipse.platform:org.eclipse.equinox.common:3.18.0'
+    implementation 'org.eclipse.platform:org.eclipse.equinox.registry:3.11.200'
+    implementation 'org.eclipse.platform:org.eclipse.equinox.preferences:3.10.100'
+    implementation 'org.eclipse.platform:org.eclipse.equinox.app:1.6.200'
+    implementation 'org.eclipse.platform:org.eclipse.core.contenttype:3.8.200'
+    implementation 'org.eclipse.platform:org.eclipse.core.jobs:3.14.0'
+    implementation 'org.eclipse.platform:org.eclipse.core.runtime:3.26.100'
+    implementation 'org.eclipse.platform:org.eclipse.core.expressions:3.8.200'
+    implementation 'org.eclipse.platform:org.eclipse.core.variables:3.5.100'
+    
+    // JDT, Debug, and Help frameworks
+    implementation 'org.eclipse.platform:org.eclipse.debug.core:3.19.0'
+    implementation 'org.eclipse.platform:org.eclipse.debug.ui:3.18.200'
+    implementation 'org.eclipse.jdt:org.eclipse.jdt.core:3.35.0'
+    implementation 'org.eclipse.jdt:org.eclipse.jdt.launching:3.19.100'
+    implementation 'org.eclipse.platform:org.eclipse.help:3.9.100'
+    
+    // UI, Workbench, and IDE components
+    implementation 'org.eclipse.platform:org.eclipse.ui:3.203.0'
+    implementation 'org.eclipse.platform:org.eclipse.ui.workbench:3.129.0'
+    implementation 'org.eclipse.platform:org.eclipse.ui.ide:3.20.100'
+    implementation 'org.eclipse.platform:org.eclipse.ui.editors:3.14.300'
+    implementation 'org.eclipse.platform:org.eclipse.ui.views:3.11.200'
+    implementation 'org.eclipse.platform:org.eclipse.ui.forms:3.11.200'
+    
+    // Apache Ant and PDE annotations
+    implementation 'org.apache.ant:ant:1.10.14'
+    implementation 'org.eclipse.pde:org.eclipse.pde.api.tools.annotations:1.4.0'
+    
+    // OSGi components, Compare and Network utilities
+    implementation 'org.osgi:org.osgi.service.component.annotations:1.5.0'
+    implementation 'org.eclipse.platform:org.eclipse.core.net:1.3.100'
+    implementation 'org.eclipse.platform:org.eclipse.compare:3.8.400'
+    implementation 'org.eclipse.platform:org.eclipse.compare.core:3.6.800'
+    
+    // SWT dependencies for native components (used during compilation)
+    // Exclude generic SWT and use Linux-specific SWT to avoid unresolved ${osgi.platform} property in Gradle
+    implementation ('org.eclipse.platform:org.eclipse.jface:3.31.0') {
+        exclude group: 'org.eclipse.platform', module: 'org.eclipse.swt'
+    }
+    implementation 'org.eclipse.platform:org.eclipse.swt.gtk.linux.x86_64:3.124.100'
+    implementation 'org.eclipse.platform:org.eclipse.core.commands:3.11.100'
+    
+    // Team and Annotations support (For LTK / Editors compatibility)
+    implementation 'org.eclipse.platform:org.eclipse.team.core:3.9.100'
+    implementation 'org.eclipse.platform:org.eclipse.team.ui:3.9.100'
+    implementation 'org.eclipse.jdt:org.eclipse.jdt.annotation:2.2.800'
+}
+
+tasks.withType(JavaCompile) {
+    options.release = 17
+}
+
+def isSkippedSourceDir = { File dir ->
+    def name = dir.name
+    // Skip welcome pages, tips and browser components that have unresolved dependencies
+    return name in ["src-intro", "src-tips", "src-cef", "src-browser"]
+}
+
+def getSubprojectSrcDirs = { sub ->
+    def dirs = []
+    if (sub.name == 'org.eclipse.swt') {
+        sub.projectDir.listFiles().each { folder ->
+            // Exclude printing directory to avoid Cairo PDF surface dependency compile errors
+            if (folder.isDirectory() && folder.name.startsWith('Eclipse SWT') && folder.name != 'Eclipse SWT Printing') {
+                folder.listFiles().each { subfolder ->
+                    if (subfolder.isDirectory() && subfolder.name in ['common', 'gtk']) {
+                        dirs << subfolder
+                    }
+                }
+            }
+        }
+    } else {
+        def buildProperties = new File(sub.projectDir, 'build.properties')
+        def foundSource = false
+        if (buildProperties.exists()) {
+            def lines = buildProperties.readLines()
+            def sourceLines = []
+            def insideSource = false
+            lines.each { line ->
+                def trimmed = line.trim()
+                if (trimmed.startsWith('source..')) {
+                    def val = trimmed.substring(trimmed.indexOf('=') + 1)
+                    sourceLines << val
+                    insideSource = val.trim().endsWith('\\')
+                } else if (insideSource) {
+                    sourceLines << trimmed
+                    insideSource = trimmed.endsWith('\\')
+                }
+            }
+            if (!sourceLines.isEmpty()) {
+                def joined = sourceLines.collect { it.trim().replaceAll('\\\\$', '') }.join("")
+                def paths = joined.split(",")
+                paths.each { p ->
+                    def cleanPath = p.trim().replaceAll('/$', '')
+                    if (!cleanPath.isEmpty() && cleanPath != ".") {
+                        def srcDir = new File(sub.projectDir, cleanPath)
+                        if (srcDir.exists() && srcDir.isDirectory() && !isSkippedSourceDir(srcDir)) {
+                            dirs << srcDir
+                            foundSource = true
+                        }
+                    }
+                }
+            }
+        }
+        if (!foundSource) {
+            def srcDir = new File(sub.projectDir, 'src')
+            if (srcDir.exists() && srcDir.isDirectory() && !isSkippedSourceDir(srcDir)) {
+                dirs << srcDir
+            }
+        }
+    }
+    return dirs
+}
+
+sourceSets {
+    main {
+        java {
+            subprojects.each { sub ->
+                srcDirs += getSubprojectSrcDirs(sub)
+            }
+        }
+        resources {
+            subprojects.each { sub ->
+                srcDirs += getSubprojectSrcDirs(sub)
+            }
+            exclude '**/*.java'
+        }
+    }
+}
+
+// Generate a fat jar containing all compiled classes
+jar {
+    archiveFileName = 'eclipse-platform-wasm.jar'
+    manifest {
+        attributes(
+            'Main-Class': 'org.eclipse.core.launcher.Main'
+        )
+    }
+    doLast {
+        copy {
+            from "build/libs/eclipse-platform-wasm.jar"
+            into "eclipse-web-app/public"
+        }
+        println "Copied eclipse-platform-wasm.jar to Next.js public directory."
+    }
+}
+
+task printSrcDirs {
+    doLast {
+        sourceSets.main.java.srcDirs.each { println it }
+    }
+}
