@@ -1,6 +1,18 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import * as THREE from "three";
+import {
+  Scene,
+  PerspectiveCamera,
+  WebGLRenderer,
+  SphereGeometry,
+  MeshBasicMaterial,
+  Mesh,
+  LineBasicMaterial,
+  BufferGeometry,
+  BufferAttribute,
+  LineSegments,
+  Vector3
+} from "three";
 
 // Theme palettes
 const DARK_COLORS = {
@@ -241,11 +253,11 @@ function Tesseract({ resolvedTheme }: { resolvedTheme: "dark" | "light" }) {
 
     const width = 300;
     const height = 300;
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+    const scene = new Scene();
+    const camera = new PerspectiveCamera(45, width / height, 0.1, 100);
     camera.position.z = 4.2;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer = new WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     mountRef.current.appendChild(renderer.domElement);
@@ -277,19 +289,19 @@ function Tesseract({ resolvedTheme }: { resolvedTheme: "dark" | "light" }) {
     }
 
     // Three.js Point Meshes for Vertices
-    const pointGeo = new THREE.SphereGeometry(0.04, 12, 12);
+    const pointGeo = new SphereGeometry(0.04, 12, 12);
     const pointMatColor = resolvedTheme === "dark" ? 0x5C8FD6 : 0x0066CC;
-    const pointMat = new THREE.MeshBasicMaterial({ color: pointMatColor });
-    const pointMeshes: THREE.Mesh[] = [];
+    const pointMat = new MeshBasicMaterial({ color: pointMatColor });
+    const pointMeshes: Mesh[] = [];
     for (let i = 0; i < 16; i++) {
-      const mesh = new THREE.Mesh(pointGeo, pointMat);
+      const mesh = new Mesh(pointGeo, pointMat);
       scene.add(mesh);
       pointMeshes.push(mesh);
     }
 
     // Three.js Line Segment geometry for Edges
     const lineMatColor = resolvedTheme === "dark" ? 0x999999 : 0x555555;
-    const lineMat = new THREE.LineBasicMaterial({
+    const lineMat = new LineBasicMaterial({
       color: lineMatColor,
       transparent: true,
       opacity: 0.8,
@@ -297,9 +309,9 @@ function Tesseract({ resolvedTheme }: { resolvedTheme: "dark" | "light" }) {
     });
     
     const linePositions = new Float32Array(32 * 2 * 3);
-    const lineGeo = new THREE.BufferGeometry();
-    lineGeo.setAttribute("position", new THREE.BufferAttribute(linePositions, 3));
-    const lines = new THREE.LineSegments(lineGeo, lineMat);
+    const lineGeo = new BufferGeometry();
+    lineGeo.setAttribute("position", new BufferAttribute(linePositions, 3));
+    const lines = new LineSegments(lineGeo, lineMat);
     scene.add(lines);
 
     // Animation variables
@@ -319,7 +331,7 @@ function Tesseract({ resolvedTheme }: { resolvedTheme: "dark" | "light" }) {
       angleZW += 0.018;
       angleXY += 0.01;
 
-      const projected3D: THREE.Vector3[] = [];
+      const projected3D: Vector3[] = [];
       const d = 2.0; // projection distance in 4D space
 
       for (let i = 0; i < 16; i++) {
@@ -347,7 +359,7 @@ function Tesseract({ resolvedTheme }: { resolvedTheme: "dark" | "light" }) {
         const y3d = y2 * factor;
         const z3d = z3 * factor;
 
-        projected3D.push(new THREE.Vector3(x3d, y3d, z3d));
+        projected3D.push(new Vector3(x3d, y3d, z3d));
         pointMeshes[i].position.set(x3d, y3d, z3d);
       }
 
