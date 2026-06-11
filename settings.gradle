@@ -1,43 +1,55 @@
 rootProject.name = 'eclipse-platform-wasm'
 
 def isSkipped(String name) {
-    // 1. Tests & Examples & Snippets & Unittests
+    // 1. Tests & Examples & Snippets & Unittests (Always skipped)
     if (name.endsWith(".tests") || name.contains(".tests.") || name.contains(".examples") || 
-        name.contains("snippets") || name.contains("unittest") || name in ["terminal", "examples", "tests"]) {
+        name.contains("snippets") || name.contains("unittest") || 
+        name in ["terminal", "examples", "tests", "binaries", "local-build", "org.eclipse.swt.tools", "org.eclipse.swt.svg"]) {
         return true
     }
-    // 2. UA & Help & Tips & Intro (User Assistance)
-    if (name.startsWith("org.eclipse.help") || name.startsWith("org.eclipse.tips") || 
-        name.startsWith("org.eclipse.ua") || name == "org.eclipse.ui.cheatsheets" || 
-        name.contains("intro")) {
-        return true
+
+    // 2. Core GUI & Workbench Whitelist
+    def whitelist = [
+        "org.eclipse.swt",
+        "org.eclipse.jface",
+        "org.eclipse.core.commands",
+        "org.eclipse.core.contenttype",
+        "org.eclipse.core.expressions",
+        "org.eclipse.core.filesystem",
+        "org.eclipse.core.jobs",
+        "org.eclipse.core.resources",
+        "org.eclipse.core.runtime",
+        "org.eclipse.e4.core.commands",
+        "org.eclipse.e4.core.contexts",
+        "org.eclipse.e4.core.di",
+        "org.eclipse.e4.core.di.annotations",
+        "org.eclipse.e4.core.di.extensions",
+        "org.eclipse.e4.core.di.extensions.supplier",
+        "org.eclipse.e4.core.services",
+        "org.eclipse.e4.ui.bindings",
+        "org.eclipse.e4.ui.css.core",
+        "org.eclipse.e4.ui.css.swt",
+        "org.eclipse.e4.ui.css.swt.theme",
+        "org.eclipse.e4.ui.di",
+        "org.eclipse.e4.ui.dialogs",
+        "org.eclipse.e4.ui.model.workbench",
+        "org.eclipse.e4.ui.progress",
+        "org.eclipse.e4.ui.services",
+        "org.eclipse.e4.ui.widgets",
+        "org.eclipse.e4.ui.workbench",
+        "org.eclipse.e4.ui.workbench.addons.swt",
+        "org.eclipse.e4.ui.workbench.renderers.swt",
+        "org.eclipse.e4.ui.workbench.swt",
+        "org.eclipse.e4.ui.workbench3",
+        "org.eclipse.ui",
+        "org.eclipse.ui.workbench"
+    ]
+
+    // If it is a bundle project starting with "org.eclipse.", filter by whitelist
+    if (name.startsWith("org.eclipse.") || name == "org.eclipse") {
+        return !(name in whitelist)
     }
-    // 3. Platform specific (Only target GTK Linux, skip win32, cocoa, macosx)
-    if (name.contains(".win32") || name.contains(".cocoa") || name.contains(".macosx")) {
-        return true
-    }
-    // 4. Developer Tools, Monitoring & Performance metrics
-    if (name.contains(".tools") || name == "org.eclipse.swt.tools" || name == "org.eclipse.ui.monitoring") {
-        return true
-    }
-    // 5. Ant & Debug & Console & External tools
-    if (name.startsWith("org.eclipse.ant") || name.startsWith("org.eclipse.debug") || 
-        name.contains(".console") || name.contains(".externaltools")) {
-        return true
-    }
-    // 6. Network & SSH / JSCH & Update Configuration
-    if (name.contains("jsch") || name.contains(".net") || name.startsWith("org.eclipse.update")) {
-        return true
-    }
-    // 7. Refactoring, Compare, Search, Editors, Text processing & Navigators
-    // (SWT GUI core 구동에 불필요하며 복잡한 의존성을 가짐)
-    if (name.contains("refactoring") || name.contains("compare") || name.contains("search") || 
-        name.contains("editor") || name.endsWith(".text") || name.contains(".text.") ||
-        name.contains("navigator") || name.contains("browser") || name.contains("urischeme") || 
-        name.contains("xpath") || name.contains("log") || name.contains("properties.tabbed") || 
-        name.contains("themes") || name == "org.eclipse.text") {
-        return true
-    }
+
     return false
 }
 
