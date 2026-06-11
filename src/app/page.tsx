@@ -616,6 +616,11 @@ export default function EclipseIDE() {
   const [completedCode, setCompletedCode] = useState<string[]>([]);
   const [targetWord, setTargetWord] = useState<string | null>(null);
 
+  // Grading system states
+  const [accuracy, setAccuracy] = useState(100);
+  const [mistakes, setMistakes] = useState(0);
+  const [savedNotification, setSavedNotification] = useState(false);
+
   // Splash screen lifecycle
   useEffect(() => {
     const fadeTimer = setTimeout(() => {
@@ -661,6 +666,27 @@ export default function EclipseIDE() {
   // Keyboard handler for code zoom (Ctrl + -- for zoom out, Ctrl + ++ for zoom in)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+S: Save
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        if (gameMode === "lineMatch") {
+          // Save in Line Match mode - trigger grading
+          setSavedNotification(true);
+          setTimeout(() => setSavedNotification(false), 2000);
+          
+          // Show save animation
+          setClearAnimations(prev => [...prev, {
+            id: Date.now(),
+            text: "💾 SAVED!",
+            x: 50
+          }]);
+          setTimeout(() => {
+            setClearAnimations(prev => prev.slice(1));
+          }, 1500);
+        }
+        return;
+      }
+
       // Only handle when Ctrl (or Cmd on Mac) is pressed
       if (!e.ctrlKey && !e.metaKey) return;
 
@@ -692,9 +718,9 @@ export default function EclipseIDE() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [lastKey, lastKeyTime]);
+  }, [lastKey, lastKeyTime, gameMode]);
 
-  // Challenge mode: Check typed code and trigger animations
+  // Challenge mode: Check typed code and trigger animations with real-time grading
   useEffect(() => {
     if (gameMode !== "lineMatch" || !startTime) return;
 
@@ -702,6 +728,32 @@ export default function EclipseIDE() {
     const lines = typedCode.split('\n');
     const targetLines = targetCode.split('\n');
     
+    // Calculate accuracy
+    let totalChars = 0;
+    let correctChars = 0;
+    let wrongChars = 0;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const typedLine = lines[i] || "";
+      const targetLine = targetLines[i] || "";
+      const maxLen = Math.max(typedLine.length, targetLine.length);
+      
+      for (let j = 0; j < maxLen; j++) {
+        totalChars++;
+        if (typedLine[j] === targetLine[j]) {
+          correctChars++;
+        } else if (typedLine[j] !== undefined) {
+          wrongChars++;
+        }
+      }
+    }
+    
+    // Calculate real-time accuracy
+    const currentAccuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
+    setAccuracy(currentAccuracy);
+    setMistakes(wrongChars);
+    
+    // Count correctly completed lines
     let correctLines = 0;
     for (let i = 0; i < Math.min(lines.length, targetLines.length); i++) {
       if (lines[i] === targetLines[i]) {
@@ -716,13 +768,14 @@ export default function EclipseIDE() {
       const newClears: { id: number; text: string; x: number }[] = [];
       for (let i = completedLines; i < correctLines; i++) {
         const comboMultiplier = Math.floor(combo / 5) + 1;
-        const lineScore = 100 * comboMultiplier;
-        setScore(prev => prev + lineScore);
+        const accuracyBonus = Math.floor(currentAccuracy / 10);
+        const lineScore = 100 * comboMultiplier * (1 + accuracyBonus * 0.1);
+        setScore(prev => prev + Math.round(lineScore));
         setCombo(prev => prev + 1);
         
         newClears.push({
           id: Date.now() + i,
-          text: combo >= 5 ? `COMBO x${comboMultiplier}! +${lineScore}` : `LINE CLEAR! +${lineScore}`,
+          text: combo >= 5 ? `COMBO x${comboMultiplier}! +${Math.round(lineScore)}` : `LINE CLEAR! +${Math.round(lineScore)}`,
           x: Math.random() * 60 + 20
         });
       }
@@ -740,19 +793,23 @@ export default function EclipseIDE() {
     if (typedCode === targetCode) {
       const timeTaken = (Date.now() - startTime) / 1000;
       const timeBonus = Math.max(0, Math.floor((300 - timeTaken) * 10));
-      setScore(prev => prev + timeBonus + 5000);
+      const accuracyBonus = Math.floor(currentAccuracy * 50);
+      const mistakePenalty = mistakes * 10;
+      const finalBonus = timeBonus + accuracyBonus - mistakePenalty + 5000;
+      
+      setScore(prev => prev + finalBonus);
       
       setClearAnimations(prev => [...prev, {
         id: Date.now(),
-        text: `🎉 PERFECT! +${timeBonus + 5000}`,
+        text: `🎉 PERFECT! +${finalBonus}`,
         x: 50
       }]);
 
       setTimeout(() => {
-        alert(`파일 완성! 최종 점수: ${score + timeBonus + 5000}\n소요 시간: ${timeTaken.toFixed(1)}초`);
+        alert(`파일 완성!\n\n최종 점수: ${score + finalBonus}\n정확도: ${currentAccuracy}%\n실수: ${mistakes}회\n소요 시간: ${timeTaken.toFixed(1)}초`);
       }, 100);
     }
-  }, [typedCode, gameMode, currentFile, completedLines, combo, startTime, score]);
+  }, [typedCode, gameMode, currentFile, completedLines, combo, startTime, score, mistakes]);
 
   // Reset combo if user stops typing for 3 seconds
   useEffect(() => {
@@ -1039,8 +1096,15 @@ export default function EclipseIDE() {
                 }}>
                   <div style={{ color: "#FFD700" }}>⭐ {score.toLocaleString()}</div>
                   <div style={{ color: "#00FF88" }}>{completedLines}/{CHALLENGE_FILES[currentFile].lines} 줄</div>
+                  <div style={{ 
+                    color: accuracy >= 95 ? "#00FF88" : accuracy >= 80 ? "#FFD700" : "#FF6B6B" 
+                  }}>
+                    🎯 {accuracy}%
+                  </div>
+                  {mistakes > 0 && <div style={{ color: "#FF6B6B", fontSize: 10 }}>❌ {mistakes}</div>}
                   {combo >= 5 && <div style={{ color: "#FF6B6B" }}>🔥 COMBO x{Math.floor(combo / 5) + 1}</div>}
                   <div style={{ fontSize: 9, color: "#AAA", marginTop: 2 }}>{currentFile}</div>
+                  <div style={{ fontSize: 9, color: "#AAA" }}>Ctrl+S 저장</div>
                 </div>
 
                 {/* Hint Button */}
@@ -1104,6 +1168,27 @@ export default function EclipseIDE() {
                     {anim.text}
                   </div>
                 ))}
+
+                {/* Save Notification */}
+                {savedNotification && (
+                  <div style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    background: "rgba(0, 255, 136, 0.95)",
+                    color: "#000",
+                    padding: "16px 32px",
+                    borderRadius: 12,
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    boxShadow: "0 8px 24px rgba(0, 255, 136, 0.5)",
+                    zIndex: 1000,
+                    animation: "clearFloat 2s ease-out forwards"
+                  }}>
+                    💾 저장 완료!
+                  </div>
+                )}
               </div>
             ) : gameMode === "typingRain" ? (
               // Typing Rain Mode
