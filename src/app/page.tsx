@@ -103,8 +103,8 @@ const S: { [key: string]: React.CSSProperties } = {
   tabActive: { background: "var(--eclipse-tabActive)", borderTop: "2px solid var(--eclipse-blue)" },
   tabInactive: { background: "var(--eclipse-tabInactive)", opacity: 0.8 },
   editor: { flex: 1, overflow: "auto", background: "var(--eclipse-editorBg)", display: "flex" },
-  lineNumbers: { color: "var(--eclipse-lineNumbersColor)", fontSize: 12, padding: "6px 8px 6px 6px", textAlign: "right", userSelect: "none", borderRight: "1px solid var(--eclipse-lineNumbersBorder)", lineHeight: "18px", flexShrink: 0, background: "var(--eclipse-lineNumbersBg)" },
-  code: { padding: "6px 8px", fontSize: 13, fontFamily: "'JetBrains Mono', 'Consolas', monospace", lineHeight: "18px", whiteSpace: "pre", flex: 1, outline: "none" },
+  lineNumbers: { color: "var(--eclipse-lineNumbersColor)", fontSize: 12, padding: "6px 8px 6px 6px", textAlign: "right", userSelect: "none", borderRight: "1px solid var(--eclipse-lineNumbersBorder)", lineHeight: "18px", flexShrink: 0, background: "var(--eclipse-lineNumbersBg)", transition: "font-size 0.15s ease, line-height 0.15s ease" },
+  code: { padding: "6px 8px", fontSize: 13, fontFamily: "'JetBrains Mono', 'Consolas', monospace", lineHeight: "18px", whiteSpace: "pre", flex: 1, outline: "none", transition: "font-size 0.15s ease, line-height 0.15s ease" },
   bottomPanel: { height: 150, borderTop: "1px solid var(--eclipse-border)", display: "flex", flexDirection: "column", flexShrink: 0 },
   bottomTabs: { display: "flex", background: "var(--eclipse-tabBar)", borderBottom: "1px solid var(--eclipse-border)", height: 22, alignItems: "flex-end" },
   bottomTab: { display: "flex", alignItems: "center", gap: 4, padding: "0 10px", height: 20, cursor: "pointer", fontSize: 12, borderRight: "1px solid var(--eclipse-border)" },
@@ -420,6 +420,11 @@ export default function EclipseIDE() {
   const [showSplash, setShowSplash] = useState(true);
   const [fadeSplash, setFadeSplash] = useState(false);
 
+  // Code editor zoom state
+  const [codeFontSize, setCodeFontSize] = useState(13);
+  const [lastKeyTime, setLastKeyTime] = useState(0);
+  const [lastKey, setLastKey] = useState<string | null>(null);
+
   // Splash screen lifecycle
   useEffect(() => {
     const fadeTimer = setTimeout(() => {
@@ -461,6 +466,42 @@ export default function EclipseIDE() {
     }
     localStorage.setItem("eclipse-theme-mode", themeMode);
   }, [themeMode]);
+
+  // Keyboard handler for code zoom (Ctrl + -- for zoom out, Ctrl + ++ for zoom in)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle when Ctrl (or Cmd on Mac) is pressed
+      if (!e.ctrlKey && !e.metaKey) return;
+
+      const currentTime = Date.now();
+      const key = e.key;
+
+      // Detect double press within 500ms
+      if ((key === '-' || key === '=' || key === '+') && lastKey === key && (currentTime - lastKeyTime) < 500) {
+        e.preventDefault();
+        
+        if (key === '-') {
+          // Zoom out (decrease font size, minimum 8)
+          setCodeFontSize(prev => Math.max(8, prev - 1));
+        } else if (key === '=' || key === '+') {
+          // Zoom in (increase font size, maximum 24)
+          setCodeFontSize(prev => Math.min(24, prev + 1));
+        }
+
+        // Reset tracking after successful action
+        setLastKey(null);
+        setLastKeyTime(0);
+      } else if (key === '-' || key === '=' || key === '+') {
+        // First press, track it
+        e.preventDefault();
+        setLastKey(key);
+        setLastKeyTime(currentTime);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lastKey, lastKeyTime]);
 
   const colors = resolvedTheme === "dark" ? DARK_COLORS : LIGHT_COLORS;
 
@@ -581,13 +622,13 @@ export default function EclipseIDE() {
           {/* Editor */}
           <div style={S.editor}>
             {/* Line numbers */}
-            <div style={S.lineNumbers}>
+            <div style={{ ...S.lineNumbers, fontSize: codeFontSize - 1, lineHeight: `${Math.round(codeFontSize * 1.38)}px` }}>
               {Array.from({ length: totalLines }, (_, i) => (
                 <div key={i}>{i + 1}</div>
               ))}
             </div>
             {/* Code */}
-            <div style={S.code}>
+            <div style={{ ...S.code, fontSize: codeFontSize, lineHeight: `${Math.round(codeFontSize * 1.38)}px` }}>
               {JAVA_CODE.map((token, i) => (
                 <span key={i} style={{ color: token.type ? `var(--eclipse-${token.type})` : "var(--eclipse-text)" }}>
                   {token.t}
