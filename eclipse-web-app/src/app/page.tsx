@@ -1,195 +1,360 @@
 "use client";
+import { useState } from "react";
 
-import { useEffect, useRef, useState } from "react";
+const ECLIPSE_COLORS = {
+  bg: "#3C3F41",
+  editorBg: "#2B2B2B",
+  tabBar: "#3C3F41",
+  tabActive: "#2B2B2B",
+  tabInactive: "#4E5254",
+  sidebarBg: "#3C3F41",
+  menuBg: "#3C3F41",
+  toolbarBg: "#3C3F41",
+  text: "#A9B7C6",
+  textDim: "#6E7070",
+  textBright: "#BBBBBB",
+  border: "#515658",
+  selection: "#214283",
+  keyword: "#CC7832",
+  string: "#6A8759",
+  comment: "#629755",
+  number: "#6897BB",
+  annotation: "#BBB529",
+  type: "#A9B7C6",
+  blue: "#5C8FD6",
+  statusBg: "#306EAF",
+};
 
-type Phase = "loading" | "running" | "error";
+const S: { [key: string]: React.CSSProperties } = {
+  root: { display: "flex", flexDirection: "column", width: "100vw", height: "100vh", background: ECLIPSE_COLORS.bg, fontFamily: "'Segoe UI', Arial, sans-serif", fontSize: 12, color: ECLIPSE_COLORS.text, overflow: "hidden", userSelect: "none" },
+  menuBar: { display: "flex", alignItems: "center", background: ECLIPSE_COLORS.menuBg, borderBottom: `1px solid ${ECLIPSE_COLORS.border}`, height: 22, flexShrink: 0, paddingLeft: 4 },
+  menuItem: { padding: "0 8px", height: "100%", display: "flex", alignItems: "center", cursor: "pointer", fontSize: 12 },
+  toolbar: { display: "flex", alignItems: "center", background: ECLIPSE_COLORS.toolbarBg, borderBottom: `1px solid ${ECLIPSE_COLORS.border}`, height: 26, flexShrink: 0, padding: "0 4px", gap: 1 },
+  toolBtn: { width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", borderRadius: 2, border: "1px solid transparent", fontSize: 13 },
+  separator: { width: 1, height: 18, background: ECLIPSE_COLORS.border, margin: "0 3px" },
+  workspace: { display: "flex", flex: 1, overflow: "hidden" },
+  sidePanel: { width: 220, display: "flex", flexDirection: "column", background: ECLIPSE_COLORS.sidebarBg, borderRight: `1px solid ${ECLIPSE_COLORS.border}`, flexShrink: 0 },
+  panelTitle: { background: "#4E5254", color: ECLIPSE_COLORS.textBright, padding: "3px 6px", fontSize: 11, fontWeight: "bold", borderBottom: `1px solid ${ECLIPSE_COLORS.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" },
+  panelTitleIcons: { display: "flex", gap: 3 },
+  panelIcon: { cursor: "pointer", opacity: 0.7, fontSize: 10 },
+  tree: { flex: 1, overflow: "auto", padding: "2px 0" },
+  treeItem: { display: "flex", alignItems: "center", gap: 3, padding: "1px 4px", cursor: "pointer", whiteSpace: "nowrap" },
+  centerArea: { flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" },
+  tabBar: { display: "flex", background: ECLIPSE_COLORS.tabBar, borderBottom: `1px solid ${ECLIPSE_COLORS.border}`, height: 24, flexShrink: 0, alignItems: "flex-end" },
+  tab: { display: "flex", alignItems: "center", gap: 5, padding: "0 10px", height: 22, cursor: "pointer", borderRight: `1px solid ${ECLIPSE_COLORS.border}`, fontSize: 12, whiteSpace: "nowrap" },
+  tabActive: { background: ECLIPSE_COLORS.tabActive, borderTop: `2px solid ${ECLIPSE_COLORS.blue}` },
+  tabInactive: { background: ECLIPSE_COLORS.tabInactive, opacity: 0.8 },
+  editor: { flex: 1, overflow: "auto", background: ECLIPSE_COLORS.editorBg, display: "flex" },
+  lineNumbers: { color: "#606366", fontSize: 12, padding: "6px 8px 6px 6px", textAlign: "right", userSelect: "none", borderRight: `1px solid #3c3c3c`, lineHeight: "18px", flexShrink: 0, background: "#313335" },
+  code: { padding: "6px 8px", fontSize: 13, fontFamily: "'JetBrains Mono', 'Consolas', monospace", lineHeight: "18px", whiteSpace: "pre", flex: 1, outline: "none" },
+  bottomPanel: { height: 150, borderTop: `1px solid ${ECLIPSE_COLORS.border}`, display: "flex", flexDirection: "column", flexShrink: 0 },
+  bottomTabs: { display: "flex", background: ECLIPSE_COLORS.tabBar, borderBottom: `1px solid ${ECLIPSE_COLORS.border}`, height: 22, alignItems: "flex-end" },
+  bottomTab: { display: "flex", alignItems: "center", gap: 4, padding: "0 10px", height: 20, cursor: "pointer", fontSize: 12, borderRight: `1px solid ${ECLIPSE_COLORS.border}` },
+  console: { flex: 1, background: "#1E1E1E", padding: "4px 8px", overflow: "auto", fontFamily: "Consolas, monospace", fontSize: 12, lineHeight: "16px" },
+  rightPanel: { width: 180, borderLeft: `1px solid ${ECLIPSE_COLORS.border}`, display: "flex", flexDirection: "column", background: ECLIPSE_COLORS.sidebarBg, flexShrink: 0 },
+  statusBar: { height: 18, background: ECLIPSE_COLORS.statusBg, display: "flex", alignItems: "center", padding: "0 8px", gap: 16, fontSize: 11, color: "#fff", flexShrink: 0, borderTop: `1px solid #1a4a7a` },
+  statusSep: { width: 1, height: 12, background: "rgba(255,255,255,0.3)" },
+};
 
-export default function Home() {
-  const displayRef = useRef<HTMLDivElement>(null);
-  const [phase, setPhase] = useState<Phase>("loading");
-  const [message, setMessage] = useState("CheerpJ 로딩 중...");
-  const [errorDetail, setErrorDetail] = useState("");
+const JAVA_CODE = [
+  { t: "package", c: ECLIPSE_COLORS.keyword }, { t: " com.eclipse.judge.solution;", c: ECLIPSE_COLORS.text },
+  { t: "\n" },
+  { t: "\n" },
+  { t: "import", c: ECLIPSE_COLORS.keyword }, { t: " java.util.Scanner;\n", c: ECLIPSE_COLORS.text },
+  { t: "import", c: ECLIPSE_COLORS.keyword }, { t: " java.util.ArrayList;\n", c: ECLIPSE_COLORS.text },
+  { t: "\n" },
+  { t: "/**\n * Main solution class for the Online Judge\n * @author user\n */", c: ECLIPSE_COLORS.comment },
+  { t: "\n" },
+  { t: "public", c: ECLIPSE_COLORS.keyword }, { t: " " }, { t: "class", c: ECLIPSE_COLORS.keyword }, { t: " Main {\n", c: ECLIPSE_COLORS.text },
+  { t: "\n" },
+  { t: "    ", c: ECLIPSE_COLORS.text }, { t: "private", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "static", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "int", c: ECLIPSE_COLORS.keyword }, { t: " N;\n", c: ECLIPSE_COLORS.text },
+  { t: "    ", c: ECLIPSE_COLORS.text }, { t: "private", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "static", c: ECLIPSE_COLORS.keyword }, { t: " ArrayList<Integer> adj[];\n", c: ECLIPSE_COLORS.text },
+  { t: "\n" },
+  { t: "    ", c: ECLIPSE_COLORS.text }, { t: "public", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "static", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "void", c: ECLIPSE_COLORS.keyword }, { t: " main(String[] args) {\n", c: ECLIPSE_COLORS.text },
+  { t: "        Scanner sc = ", c: ECLIPSE_COLORS.text }, { t: "new", c: ECLIPSE_COLORS.keyword }, { t: " Scanner(System.in);\n", c: ECLIPSE_COLORS.text },
+  { t: "        N = sc.nextInt();\n", c: ECLIPSE_COLORS.text },
+  { t: "        " }, { t: "int", c: ECLIPSE_COLORS.keyword }, { t: " M = sc.nextInt();\n", c: ECLIPSE_COLORS.text },
+  { t: "\n" },
+  { t: "        // Initialize adjacency list\n", c: ECLIPSE_COLORS.comment },
+  { t: "        adj = ", c: ECLIPSE_COLORS.text }, { t: "new", c: ECLIPSE_COLORS.keyword }, { t: " ArrayList[N + ", c: ECLIPSE_COLORS.text }, { t: "1", c: ECLIPSE_COLORS.number }, { t: "];\n", c: ECLIPSE_COLORS.text },
+  { t: "        " }, { t: "for", c: ECLIPSE_COLORS.keyword }, { t: " (", c: ECLIPSE_COLORS.text }, { t: "int", c: ECLIPSE_COLORS.keyword }, { t: " i = ", c: ECLIPSE_COLORS.text }, { t: "0", c: ECLIPSE_COLORS.number }, { t: "; i <= N; i++) {\n", c: ECLIPSE_COLORS.text },
+  { t: "            adj[i] = ", c: ECLIPSE_COLORS.text }, { t: "new", c: ECLIPSE_COLORS.keyword }, { t: " ArrayList<>();\n", c: ECLIPSE_COLORS.text },
+  { t: "        }\n", c: ECLIPSE_COLORS.text },
+  { t: "\n" },
+  { t: "        " }, { t: "for", c: ECLIPSE_COLORS.keyword }, { t: " (", c: ECLIPSE_COLORS.text }, { t: "int", c: ECLIPSE_COLORS.keyword }, { t: " i = ", c: ECLIPSE_COLORS.text }, { t: "0", c: ECLIPSE_COLORS.number }, { t: "; i < M; i++) {\n", c: ECLIPSE_COLORS.text },
+  { t: "            " }, { t: "int", c: ECLIPSE_COLORS.keyword }, { t: " u = sc.nextInt(), v = sc.nextInt();\n", c: ECLIPSE_COLORS.text },
+  { t: "            adj[u].add(v);\n", c: ECLIPSE_COLORS.text },
+  { t: "            adj[v].add(u);\n", c: ECLIPSE_COLORS.text },
+  { t: "        }\n\n" },
+  { t: "        System.out.println(bfs(", c: ECLIPSE_COLORS.text }, { t: "1", c: ECLIPSE_COLORS.number }, { t: "));\n", c: ECLIPSE_COLORS.text },
+  { t: "    }\n\n" },
+  { t: "    ", c: ECLIPSE_COLORS.text }, { t: "static", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "int", c: ECLIPSE_COLORS.keyword }, { t: " bfs(", c: ECLIPSE_COLORS.text }, { t: "int", c: ECLIPSE_COLORS.keyword }, { t: " start) {\n", c: ECLIPSE_COLORS.text },
+  { t: "        ", c: ECLIPSE_COLORS.text }, { t: "boolean", c: ECLIPSE_COLORS.keyword }, { t: "[] visited = ", c: ECLIPSE_COLORS.text }, { t: "new", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "boolean", c: ECLIPSE_COLORS.keyword }, { t: "[N + ", c: ECLIPSE_COLORS.text }, { t: "1", c: ECLIPSE_COLORS.number }, { t: "];\n", c: ECLIPSE_COLORS.text },
+  { t: "        // BFS traversal\n", c: ECLIPSE_COLORS.comment },
+  { t: "        visited[start] = ", c: ECLIPSE_COLORS.text }, { t: "true", c: ECLIPSE_COLORS.keyword }, { t: ";\n", c: ECLIPSE_COLORS.text },
+  { t: "        " }, { t: "return", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "0", c: ECLIPSE_COLORS.number }, { t: ";\n", c: ECLIPSE_COLORS.text },
+  { t: "    }\n" },
+  { t: "}\n" },
+];
 
-  useEffect(() => {
-    let cancelled = false;
+const totalLines = (() => {
+  let n = 1;
+  for (const t of JAVA_CODE) if (t.t.includes("\n")) n += (t.t.match(/\n/g) || []).length;
+  return n;
+})();
 
-    // 전역 cheerpjInit 함수가 로드될 때까지 대기하는 함수
-    async function waitForCheerpJ(): Promise<any> {
-      return new Promise((resolve, reject) => {
-        const win = window as any;
+type TreeNode = { name: string; icon: string; children?: TreeNode[]; open?: boolean };
 
-        // 이미 정의되어 있다면 바로 반환
-        if (win.cheerpjInit) {
-          resolve(win);
-          return;
-        }
-
-        let attempts = 0;
-        const interval = setInterval(() => {
-          if (win.cheerpjInit) {
-            clearInterval(interval);
-            resolve(win);
-          } else {
-            attempts++;
-            // 최대 30초 (100ms * 300) 대기
-            if (attempts > 300) {
-              clearInterval(interval);
-              reject(
-                new Error(
-                  "CheerpJ CDN 스크립트 로드 타임아웃. CDN(cjrtnc.leaningtech.com) 접속 상태를 확인해 주세요."
-                )
-              );
-            }
+const TREE: TreeNode[] = [
+  {
+    name: "EclipseOnlineJudge", icon: "📁", open: true, children: [
+      {
+        name: "src", icon: "📂", open: true, children: [
+          {
+            name: "com.eclipse.judge", icon: "📦", open: true, children: [
+              { name: "Main.java", icon: "☕" },
+              { name: "Solution.java", icon: "☕" },
+              { name: "BFS.java", icon: "☕" },
+            ]
+          },
+          {
+            name: "com.eclipse.judge.utils", icon: "📦", children: [
+              { name: "InputReader.java", icon: "☕" },
+              { name: "OutputWriter.java", icon: "☕" },
+            ]
           }
-        }, 100);
-      });
-    }
+        ]
+      },
+      {
+        name: "JRE System Library [17]", icon: "📚", children: [
+          { name: "rt.jar", icon: "🫙" },
+        ]
+      },
+      { name: "build.gradle", icon: "🔧" },
+      { name: "README.md", icon: "📄" },
+    ]
+  }
+];
 
-    async function bootEclipse() {
-      try {
-        setMessage("CheerpJ 런타임 파일(WASM)을 다운로드하는 중...");
-        const win = await waitForCheerpJ();
-        if (cancelled) return;
-
-        setMessage("WebAssembly JVM 환경 초기화 중...");
-        // CheerpJ 3.0 공식 API 초기화
-        await win.cheerpjInit({
-          enableSound: false,
-        });
-        if (cancelled) return;
-
-        setMessage("가상 IndexedDB 파일시스템 마운트 중...");
-        // CheerpJ 3.0: cheerpjFSMount(type, path)
-        await win.cheerpjFSMount("str", "/str/");
-        if (cancelled) return;
-
-        setMessage("SWT 디스플레이 컨테이너 준비 중...");
-        if (displayRef.current) {
-          // -1, -1은 컨테이너 div 크기에 맞춰 100% 가득 채우는 것을 의미합니다.
-          await win.cheerpjCreateDisplay(-1, -1, displayRef.current);
-        }
-        if (cancelled) return;
-
-        setMessage("Eclipse IDE 실행 중...");
-        setPhase("running");
-
-        // Next.js public/에 위치한 jar를 /app/ 경로를 통해 실행
-        const exitCode = await win.cheerpjRunJar("/app/eclipse-platform-wasm.jar");
-        
-        if (!cancelled) {
-          setPhase("error");
-          setMessage(`JVM 프로세스 종료`);
-          setErrorDetail(`Eclipse가 종료 코드 ${exitCode}로 종료되었습니다.`);
-        }
-      } catch (err: any) {
-        if (!cancelled) {
-          setPhase("error");
-          setMessage("초기화 오류");
-          setErrorDetail(err?.message || String(err));
-        }
-      }
-    }
-
-    bootEclipse();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
+function TreeView({ nodes, depth = 0 }: { nodes: TreeNode[]; depth?: number }) {
+  const [openMap, setOpenMap] = useState<{ [k: string]: boolean }>(() => {
+    const m: { [k: string]: boolean } = {};
+    nodes.forEach(n => { if (n.open) m[n.name] = true; });
+    return m;
+  });
   return (
-    <div style={{ width: "100vw", height: "100vh", position: "relative", background: "#1e1e1e" }}>
-      {/* Eclipse SWT Canvas가 렌더링될 영역 */}
-      <div
-        ref={displayRef}
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          background: "#000",
-        }}
-      />
-
-      {/* 로딩 및 에러 오버레이 */}
-      {phase !== "running" && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "rgba(18, 18, 18, 0.97)",
-            color: "#fff",
-            fontFamily: "monospace",
-            gap: 20,
-            zIndex: 10,
-          }}
-        >
-          {/* Eclipse 로고 */}
-          <svg width="64" height="64" viewBox="0 0 100 100" fill="none">
-            <circle cx="50" cy="50" r="45" stroke="#FF7B00" strokeWidth="5" fill="none" />
-            <ellipse cx="42" cy="50" rx="28" ry="18" fill="#1e1e1e" />
-            <text x="50" y="56" textAnchor="middle" fill="#FF7B00" fontSize="22" fontWeight="bold">e</text>
-          </svg>
-
-          {phase === "loading" ? (
-            <>
-              <div
-                style={{
-                  width: 36,
-                  height: 36,
-                  border: "4px solid rgba(255, 123, 0, 0.2)",
-                  borderTop: "4px solid #FF7B00",
-                  borderRadius: "50%",
-                  animation: "spin 0.8s linear infinite",
-                }}
-              />
-              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-              <p style={{ margin: 0, fontSize: 14, color: "#aaa" }}>{message}</p>
-            </>
-          ) : (
-            <div style={{ fontSize: 14, color: "#ff5555", textAlign: "center", maxWidth: 520, lineHeight: 1.6 }}>
-              <p style={{ margin: 0, fontWeight: "bold" }}>{message}</p>
-              {errorDetail && (
-                <pre
-                  style={{
-                    marginTop: 12,
-                    background: "#2a1a1a",
-                    padding: "12px 16px",
-                    borderRadius: 8,
-                    fontSize: 12,
-                    overflowX: "auto",
-                    textAlign: "left",
-                    border: "1px solid #5a1a1a",
-                    whiteSpace: "pre-wrap",
-                    wordBreak: "break-all",
-                  }}
-                >
-                  {errorDetail}
-                </pre>
-              )}
-              <button
-                onClick={() => window.location.reload()}
-                style={{
-                  marginTop: 20,
-                  padding: "8px 20px",
-                  background: "#FF7B00",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 6,
-                  cursor: "pointer",
-                  fontSize: 13,
-                  fontWeight: "bold",
-                }}
-              >
-                다시 시도
-              </button>
-            </div>
+    <>
+      {nodes.map(node => (
+        <div key={node.name}>
+          <div
+            style={{ ...S.treeItem, paddingLeft: 4 + depth * 14 }}
+            onClick={() => node.children && setOpenMap(m => ({ ...m, [node.name]: !m[node.name] }))}
+          >
+            {node.children ? (
+              <span style={{ color: ECLIPSE_COLORS.textDim, fontSize: 10, width: 10 }}>{openMap[node.name] ? "▾" : "▸"}</span>
+            ) : (
+              <span style={{ width: 10 }} />
+            )}
+            <span style={{ fontSize: 13 }}>{node.icon}</span>
+            <span style={{ color: node.name.endsWith(".java") ? "#FFC66D" : ECLIPSE_COLORS.textBright, fontSize: 12 }}>{node.name}</span>
+          </div>
+          {node.children && openMap[node.name] && (
+            <TreeView nodes={node.children} depth={depth + 1} />
           )}
         </div>
-      )}
+      ))}
+    </>
+  );
+}
+
+const MENUS = ["File", "Edit", "Source", "Refactor", "Navigate", "Search", "Project", "Run", "Window", "Help"];
+
+const TOOLBAR_ICONS = [
+  ["🆕", "New"], ["📂", "Open"], ["💾", "Save"], null,
+  ["↩️", "Undo"], ["↪️", "Redo"], null,
+  ["🔍", "Search"], null,
+  ["▶️", "Run"], ["🐛", "Debug"], null,
+  ["📦", "Export"],
+];
+
+const BOTTOM_TABS = ["Problems", "Javadoc", "Declaration", "Console", "Progress", "Error Log"];
+
+const OUTLINE_ITEMS = [
+  { icon: "📦", label: "Main", depth: 0 },
+  { icon: "🔷", label: "N : int", depth: 1 },
+  { icon: "🔷", label: "adj : ArrayList[]", depth: 1 },
+  { icon: "🟠", label: "main(String[]) : void", depth: 1 },
+  { icon: "🟠", label: "bfs(int) : int", depth: 1 },
+];
+
+export default function EclipseIDE() {
+  const [activeTab, setActiveTab] = useState(0);
+  const [activeBottom, setActiveBottom] = useState(3);
+  const [hoveredMenu, setHoveredMenu] = useState<number | null>(null);
+
+  const tabs = [
+    { name: "Main.java", modified: false },
+    { name: "Solution.java", modified: true },
+    { name: "build.gradle", modified: false },
+  ];
+
+  return (
+    <div style={S.root}>
+      {/* Menu Bar */}
+      <div style={S.menuBar}>
+        <span style={{ marginRight: 8, fontSize: 14 }}>🌑</span>
+        {MENUS.map((m, i) => (
+          <div
+            key={m}
+            style={{
+              ...S.menuItem,
+              background: hoveredMenu === i ? ECLIPSE_COLORS.selection : "transparent",
+            }}
+            onMouseEnter={() => setHoveredMenu(i)}
+            onMouseLeave={() => setHoveredMenu(null)}
+          >
+            {m}
+          </div>
+        ))}
+      </div>
+
+      {/* Toolbar */}
+      <div style={S.toolbar}>
+        {TOOLBAR_ICONS.map((t, i) =>
+          t === null ? (
+            <div key={i} style={S.separator} />
+          ) : (
+            <div key={i} title={t[1]} style={S.toolBtn}>
+              <span style={{ fontSize: 14 }}>{t[0]}</span>
+            </div>
+          )
+        )}
+        <div style={{ flex: 1 }} />
+        <div style={{ display: "flex", alignItems: "center", background: "#4E5254", borderRadius: 3, padding: "1px 6px", gap: 4, border: `1px solid ${ECLIPSE_COLORS.border}` }}>
+          <span style={{ color: ECLIPSE_COLORS.textDim, fontSize: 11 }}>🔍</span>
+          <span style={{ color: ECLIPSE_COLORS.textDim, fontSize: 11 }}>Quick Access</span>
+        </div>
+        <div style={{ width: 20, textAlign: "center", cursor: "pointer" }}>⊞</div>
+      </div>
+
+      {/* Workspace */}
+      <div style={S.workspace}>
+        {/* Left: Package Explorer */}
+        <div style={S.sidePanel}>
+          <div style={S.panelTitle}>
+            Package Explorer
+            <div style={S.panelTitleIcons}>
+              <span style={S.panelIcon}>⊟</span>
+              <span style={S.panelIcon}>↕</span>
+              <span style={S.panelIcon}>✕</span>
+            </div>
+          </div>
+          <div style={S.tree}>
+            <TreeView nodes={TREE} />
+          </div>
+        </div>
+
+        {/* Center: Editor + Bottom */}
+        <div style={S.centerArea}>
+          {/* Editor Tabs */}
+          <div style={S.tabBar}>
+            {tabs.map((tab, i) => (
+              <div
+                key={tab.name}
+                style={{ ...S.tab, ...(activeTab === i ? S.tabActive : S.tabInactive) }}
+                onClick={() => setActiveTab(i)}
+              >
+                <span style={{ fontSize: 13 }}>☕</span>
+                <span>{tab.modified ? `${tab.name} *` : tab.name}</span>
+                <span style={{ color: ECLIPSE_COLORS.textDim, fontSize: 10, marginLeft: 2 }}>✕</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Editor */}
+          <div style={S.editor}>
+            {/* Line numbers */}
+            <div style={S.lineNumbers}>
+              {Array.from({ length: totalLines }, (_, i) => (
+                <div key={i}>{i + 1}</div>
+              ))}
+            </div>
+            {/* Code */}
+            <div style={S.code}>
+              {JAVA_CODE.map((token, i) => (
+                <span key={i} style={{ color: token.c || ECLIPSE_COLORS.text }}>
+                  {token.t}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Bottom Panel */}
+          <div style={S.bottomPanel}>
+            <div style={S.bottomTabs}>
+              {BOTTOM_TABS.map((t, i) => (
+                <div
+                  key={t}
+                  style={{
+                    ...S.bottomTab,
+                    ...(activeBottom === i ? { background: ECLIPSE_COLORS.tabActive, borderTop: `2px solid ${ECLIPSE_COLORS.blue}` } : { background: ECLIPSE_COLORS.tabInactive }),
+                  }}
+                  onClick={() => setActiveBottom(i)}
+                >
+                  {t === "Problems" && <span style={{ color: "#e05252", fontSize: 10 }}>⚠</span>}
+                  {t === "Console" && <span style={{ fontSize: 10 }}>🖥</span>}
+                  {t}
+                </div>
+              ))}
+            </div>
+            <div style={S.console}>
+              {activeBottom === 3 ? (
+                <>
+                  <div style={{ color: "#6A9955" }}><span style={{ color: "#607B97" }}>Eclipse Online Judge</span> [Java Application]</div>
+                  <div style={{ color: ECLIPSE_COLORS.text }}>{'>'} Compiled successfully. Running with JDK 17...</div>
+                  <div style={{ color: "#A9B7C6" }}>{'>'} Waiting for input...</div>
+                  <div style={{ color: ECLIPSE_COLORS.textDim, marginTop: 4 }}>Terminated. (Exit value: 0)</div>
+                </>
+              ) : activeBottom === 0 ? (
+                <div style={{ color: ECLIPSE_COLORS.textDim }}>0 errors, 0 warnings, 0 infos</div>
+              ) : (
+                <div style={{ color: ECLIPSE_COLORS.textDim }}>No content</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Outline */}
+        <div style={S.rightPanel}>
+          <div style={S.panelTitle}>
+            Outline
+            <div style={S.panelTitleIcons}>
+              <span style={S.panelIcon}>✕</span>
+            </div>
+          </div>
+          <div style={{ padding: "4px 0" }}>
+            {OUTLINE_ITEMS.map((item, i) => (
+              <div key={i} style={{ ...S.treeItem, paddingLeft: 6 + item.depth * 14, fontSize: 12 }}>
+                <span style={{ fontSize: 12 }}>{item.icon}</span>
+                <span style={{ color: ECLIPSE_COLORS.textBright }}>{item.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Status Bar */}
+      <div style={S.statusBar}>
+        <span>Main.java</span>
+        <div style={S.statusSep} />
+        <span>Line 24, Column 18</span>
+        <div style={S.statusSep} />
+        <span>UTF-8</span>
+        <div style={S.statusSep} />
+        <span>Java 17</span>
+        <div style={{ flex: 1 }} />
+        <span>Eclipse Online Judge</span>
+      </div>
     </div>
   );
 }
