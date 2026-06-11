@@ -304,6 +304,15 @@ INSERT INTO member_tbl_02 VALUES (100006,'차공단','010-1111-7777','제주시 
   }
 };
 
+// Typing Rain mode word pools
+const TYPING_WORDS = {
+  keywords: ["function", "if", "else", "return", "const", "let", "var", "for", "while", "class", "import", "export", "async", "await", "try", "catch"],
+  htmlTags: ["<div>", "<span>", "<input>", "<form>", "<table>", "<tr>", "<td>", "<button>", "<script>", "<style>", "<head>", "<body>", "<html>"],
+  jspTags: ["<%@", "%>", "<%=", "<%", "<jsp:include", "</jsp:include>", "page", "import", "contentType"],
+  symbols: ["(", ")", "{", "}", "[", "]", ";", ":", "=", "==", "!=", "&&", "||", ".", ","],
+  common: ["document", "value", "alert", "focus", "name", "type", "align", "center", "text"]
+};
+
 type TreeNode = { name: string; icon: string; children?: TreeNode[]; open?: boolean };
 
 const TREE: TreeNode[] = [
@@ -589,7 +598,7 @@ export default function EclipseIDE() {
   const [lastKey, setLastKey] = useState<string | null>(null);
 
   // Challenge mode states
-  const [challengeMode, setChallengeMode] = useState(false);
+  const [gameMode, setGameMode] = useState<"normal" | "lineMatch" | "typingRain">("normal");
   const [currentFile, setCurrentFile] = useState<string>("check.js");
   const [typedCode, setTypedCode] = useState("");
   const [completedLines, setCompletedLines] = useState(0);
@@ -599,6 +608,13 @@ export default function EclipseIDE() {
   const [combo, setCombo] = useState(0);
   const [startTime, setStartTime] = useState<number | null>(null);
   const editorRef = useRef<HTMLTextAreaElement>(null);
+
+  // Typing Rain mode states
+  const [fallingWords, setFallingWords] = useState<{ id: number; word: string; x: number; y: number; speed: number; type: string }[]>([]);
+  const [currentInput, setCurrentInput] = useState("");
+  const [currentLine, setCurrentLine] = useState<string[]>([]);
+  const [completedCode, setCompletedCode] = useState<string[]>([]);
+  const [targetWord, setTargetWord] = useState<string | null>(null);
 
   // Splash screen lifecycle
   useEffect(() => {
@@ -680,7 +696,7 @@ export default function EclipseIDE() {
 
   // Challenge mode: Check typed code and trigger animations
   useEffect(() => {
-    if (!challengeMode || !startTime) return;
+    if (gameMode !== "lineMatch" || !startTime) return;
 
     const targetCode = CHALLENGE_FILES[currentFile].content;
     const lines = typedCode.split('\n');
@@ -736,18 +752,82 @@ export default function EclipseIDE() {
         alert(`파일 완성! 최종 점수: ${score + timeBonus + 5000}\n소요 시간: ${timeTaken.toFixed(1)}초`);
       }, 100);
     }
-  }, [typedCode, challengeMode, currentFile, completedLines, combo, startTime, score]);
+  }, [typedCode, gameMode, currentFile, completedLines, combo, startTime, score]);
 
   // Reset combo if user stops typing for 3 seconds
   useEffect(() => {
-    if (!challengeMode || combo === 0) return;
+    if (gameMode !== "lineMatch" || combo === 0) return;
     
     const timer = setTimeout(() => {
       setCombo(0);
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [typedCode, challengeMode, combo]);
+  }, [typedCode, gameMode, combo]);
+
+  // Typing Rain: Spawn falling words
+  useEffect(() => {
+    if (gameMode !== "typingRain") return;
+
+    const spawnWord = () => {
+      const allWords = [
+        ...TYPING_WORDS.keywords,
+        ...TYPING_WORDS.htmlTags,
+        ...TYPING_WORDS.jspTags,
+        ...TYPING_WORDS.symbols,
+        ...TYPING_WORDS.common
+      ];
+      
+      const types = ["keyword", "htmlTag", "jspTag", "symbol", "common"];
+      const typeIndex = Math.floor(Math.random() * 5);
+      const wordType = types[typeIndex];
+      
+      let word = "";
+      switch (wordType) {
+        case "keyword":
+          word = TYPING_WORDS.keywords[Math.floor(Math.random() * TYPING_WORDS.keywords.length)];
+          break;
+        case "htmlTag":
+          word = TYPING_WORDS.htmlTags[Math.floor(Math.random() * TYPING_WORDS.htmlTags.length)];
+          break;
+        case "jspTag":
+          word = TYPING_WORDS.jspTags[Math.floor(Math.random() * TYPING_WORDS.jspTags.length)];
+          break;
+        case "symbol":
+          word = TYPING_WORDS.symbols[Math.floor(Math.random() * TYPING_WORDS.symbols.length)];
+          break;
+        default:
+          word = TYPING_WORDS.common[Math.floor(Math.random() * TYPING_WORDS.common.length)];
+      }
+
+      setFallingWords(prev => [...prev, {
+        id: Date.now() + Math.random(),
+        word,
+        x: Math.random() * 80 + 5,
+        y: -5,
+        speed: Math.random() * 0.5 + 0.3,
+        type: wordType
+      }]);
+    };
+
+    const spawnInterval = setInterval(spawnWord, 1500);
+    return () => clearInterval(spawnInterval);
+  }, [gameMode]);
+
+  // Typing Rain: Update falling words positions
+  useEffect(() => {
+    if (gameMode !== "typingRain") return;
+
+    const updateInterval = setInterval(() => {
+      setFallingWords(prev => 
+        prev
+          .map(w => ({ ...w, y: w.y + w.speed }))
+          .filter(w => w.y < 100) // Remove words that fell off screen
+      );
+    }, 16); // ~60fps
+
+    return () => clearInterval(updateInterval);
+  }, [gameMode]);
 
   const colors = resolvedTheme === "dark" ? DARK_COLORS : LIGHT_COLORS;
 
@@ -795,16 +875,27 @@ export default function EclipseIDE() {
   const handleFileClick = (fileName: string) => {
     if (CHALLENGE_FILES[fileName]) {
       setCurrentFile(fileName);
-      if (!challengeMode) {
-        const startChallenge = confirm(`${fileName} 챌린지를 시작하시겠습니까?\n\n목표: ${CHALLENGE_FILES[fileName].lines}줄\n힌트: ${CHALLENGE_FILES[fileName].hint}`);
-        if (startChallenge) {
-          setChallengeMode(true);
+      if (gameMode === "normal") {
+        const modeChoice = confirm(`${fileName} 게임 모드를 선택하세요:\n\n확인 = 라인 맞추기 모드\n취소 = 타자연습 모드`);
+        if (modeChoice) {
+          // Line Match Mode
+          setGameMode("lineMatch");
           setTypedCode("");
           setCompletedLines(0);
           setScore(0);
           setCombo(0);
           setStartTime(Date.now());
           setTimeout(() => editorRef.current?.focus(), 100);
+        } else {
+          // Typing Rain Mode
+          setGameMode("typingRain");
+          setCurrentInput("");
+          setCurrentLine([]);
+          setCompletedCode([]);
+          setFallingWords([]);
+          setScore(0);
+          setCombo(0);
+          setStartTime(Date.now());
         }
       }
     }
@@ -885,8 +976,8 @@ export default function EclipseIDE() {
 
           {/* Editor */}
           <div style={S.editor}>
-            {challengeMode ? (
-              // Challenge Mode Editor
+            {gameMode === "lineMatch" ? (
+              // Line Match Mode Editor
               <div style={{ flex: 1, display: "flex", flexDirection: "column", position: "relative" }}>
                 <textarea
                   ref={editorRef}
@@ -974,6 +1065,27 @@ export default function EclipseIDE() {
                   </div>
                 )}
 
+                {/* Exit Button */}
+                <button
+                  onClick={() => setGameMode("normal")}
+                  style={{
+                    position: "absolute",
+                    bottom: 8,
+                    right: 8,
+                    background: "rgba(255, 59, 59, 0.9)",
+                    border: "none",
+                    borderRadius: 6,
+                    padding: "6px 12px",
+                    color: "#FFF",
+                    fontSize: 11,
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                    zIndex: 10
+                  }}
+                >
+                  ❌ 종료
+                </button>
+
                 {/* Clear Animations */}
                 {clearAnimations.map(anim => (
                   <div
@@ -990,6 +1102,215 @@ export default function EclipseIDE() {
                       pointerEvents: "none",
                       zIndex: 100,
                       whiteSpace: "nowrap"
+                    }}
+                  >
+                    {anim.text}
+                  </div>
+                ))}
+              </div>
+            ) : gameMode === "typingRain" ? (
+              // Typing Rain Mode
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
+                {/* Falling Words */}
+                {fallingWords.map(word => (
+                  <div
+                    key={word.id}
+                    style={{
+                      position: "absolute",
+                      left: `${word.x}%`,
+                      top: `${word.y}%`,
+                      fontSize: 16,
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontWeight: "bold",
+                      color: word.word === targetWord ? "#FFD700" : 
+                             word.type === "keyword" ? "#CC7832" :
+                             word.type === "htmlTag" ? "#E8BF6A" :
+                             word.type === "jspTag" ? "#9876AA" :
+                             word.type === "symbol" ? "#A9B7C6" : "#6A8759",
+                      textShadow: word.word === targetWord ? "0 0 8px #FFD700" : "none",
+                      pointerEvents: "none",
+                      whiteSpace: "nowrap",
+                      zIndex: 5
+                    }}
+                  >
+                    {word.word}
+                  </div>
+                ))}
+
+                {/* Completed Code Display */}
+                <div style={{
+                  position: "absolute",
+                  top: 8,
+                  left: 8,
+                  right: 8,
+                  maxHeight: "30%",
+                  overflow: "auto",
+                  background: "rgba(43, 43, 43, 0.7)",
+                  backdropFilter: "blur(6px)",
+                  padding: "8px",
+                  borderRadius: 6,
+                  fontSize: 12,
+                  fontFamily: "'JetBrains Mono', monospace",
+                  color: "#A9B7C6",
+                  zIndex: 10,
+                  lineHeight: "18px"
+                }}>
+                  {completedCode.map((line, i) => (
+                    <div key={i}>{line}</div>
+                  ))}
+                </div>
+
+                {/* Current Line Display */}
+                <div style={{
+                  position: "absolute",
+                  bottom: 80,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: "rgba(0, 0, 0, 0.85)",
+                  backdropFilter: "blur(10px)",
+                  padding: "12px 20px",
+                  borderRadius: 8,
+                  fontSize: 16,
+                  fontFamily: "'JetBrains Mono', monospace",
+                  color: "#00FF88",
+                  zIndex: 15,
+                  minWidth: 400,
+                  textAlign: "center",
+                  border: "2px solid #00FF88"
+                }}>
+                  {currentLine.join(" ")}
+                </div>
+
+                {/* Input Box */}
+                <div style={{
+                  position: "absolute",
+                  bottom: 20,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  zIndex: 20
+                }}>
+                  <input
+                    type="text"
+                    value={currentInput}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setCurrentInput(value);
+                      
+                      // Check if matches any falling word
+                      const matched = fallingWords.find(w => w.word === value);
+                      if (matched) {
+                        setTargetWord(matched.word);
+                        // Word captured!
+                        setCurrentLine(prev => [...prev, matched.word]);
+                        setFallingWords(prev => prev.filter(w => w.id !== matched.id));
+                        setCurrentInput("");
+                        setScore(prev => prev + 50);
+                        setCombo(prev => prev + 1);
+                        setTargetWord(null);
+                        
+                        // Show animation
+                        setClearAnimations(prev => [...prev, {
+                          id: Date.now(),
+                          text: `+50`,
+                          x: 50
+                        }]);
+                        setTimeout(() => {
+                          setClearAnimations(prev => prev.slice(1));
+                        }, 1000);
+                      } else {
+                        setTargetWord(null);
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && currentLine.length > 0) {
+                        // Submit line
+                        const line = currentLine.join(" ");
+                        setCompletedCode(prev => [...prev, line]);
+                        setCurrentLine([]);
+                        setScore(prev => prev + 200);
+                        
+                        setClearAnimations(prev => [...prev, {
+                          id: Date.now(),
+                          text: `LINE! +200`,
+                          x: 50
+                        }]);
+                        setTimeout(() => {
+                          setClearAnimations(prev => prev.slice(1));
+                        }, 1500);
+                      }
+                    }}
+                    style={{
+                      width: 400,
+                      padding: "12px 16px",
+                      fontSize: 16,
+                      fontFamily: "'JetBrains Mono', monospace",
+                      background: "rgba(43, 43, 43, 0.95)",
+                      color: "#FFF",
+                      border: "2px solid #5C8FD6",
+                      borderRadius: 8,
+                      outline: "none",
+                      textAlign: "center"
+                    }}
+                    placeholder="떨어지는 단어를 입력하세요..."
+                    autoFocus
+                  />
+                </div>
+
+                {/* Score HUD */}
+                <div style={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  background: "rgba(0, 0, 0, 0.7)",
+                  backdropFilter: "blur(8px)",
+                  padding: "8px 12px",
+                  borderRadius: 8,
+                  color: "#FFF",
+                  fontSize: 11,
+                  fontWeight: "bold",
+                  zIndex: 10
+                }}>
+                  <div style={{ color: "#FFD700" }}>⭐ {score.toLocaleString()}</div>
+                  <div style={{ color: "#00FF88" }}>줄: {completedCode.length}</div>
+                  {combo > 0 && <div style={{ color: "#FF6B6B" }}>🔥 x{combo}</div>}
+                </div>
+
+                {/* Exit Button */}
+                <button
+                  onClick={() => setGameMode("normal")}
+                  style={{
+                    position: "absolute",
+                    bottom: 8,
+                    right: 8,
+                    background: "rgba(255, 59, 59, 0.9)",
+                    border: "none",
+                    borderRadius: 6,
+                    padding: "6px 12px",
+                    color: "#FFF",
+                    fontSize: 11,
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                    zIndex: 10
+                  }}
+                >
+                  ❌ 종료
+                </button>
+
+                {/* Clear Animations */}
+                {clearAnimations.map(anim => (
+                  <div
+                    key={anim.id}
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: `${anim.x}%`,
+                      fontSize: 20,
+                      fontWeight: "bold",
+                      color: "#00FF88",
+                      textShadow: "0 0 10px #00FF88",
+                      animation: "clearFloat 1s ease-out forwards",
+                      pointerEvents: "none",
+                      zIndex: 100
                     }}
                   >
                     {anim.text}
