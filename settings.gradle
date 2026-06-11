@@ -37,6 +37,7 @@ def isSkipped(String name) {
         "org.eclipse.e4.ui.services",
         "org.eclipse.e4.ui.widgets",
         "org.eclipse.e4.ui.workbench",
+        "org.eclipse.e4.emf.xpath",
         "org.eclipse.e4.ui.workbench.addons.swt",
         "org.eclipse.e4.ui.workbench.renderers.swt",
         "org.eclipse.e4.ui.workbench.swt",
