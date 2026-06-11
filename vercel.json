@@ -1,0 +1,5 @@
+{
+  "buildCommand": "npm run build --prefix eclipse-web-app",
+  "outputDirectory": "eclipse-web-app/.next",
+  "installCommand": "npm install --prefix eclipse-web-app"
+}

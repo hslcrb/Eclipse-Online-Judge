@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const ECLIPSE_COLORS = {
+// Theme palettes
+const DARK_COLORS = {
   bg: "#3C3F41",
   editorBg: "#2B2B2B",
   tabBar: "#3C3F41",
@@ -23,76 +24,114 @@ const ECLIPSE_COLORS = {
   type: "#A9B7C6",
   blue: "#5C8FD6",
   statusBg: "#306EAF",
+  statusBarText: "#FFFFFF",
+  consoleBg: "#1E1E1E",
+  javaFileText: "#FFC66D",
+  lineNumbersBg: "#313335",
+  lineNumbersColor: "#606366",
+  lineNumbersBorder: "#3C3C3C",
+  panelTitleBg: "#4E5254",
+};
+
+const LIGHT_COLORS = {
+  bg: "#F3F3F3",
+  editorBg: "#FFFFFF",
+  tabBar: "#E1E1E2",
+  tabActive: "#FFFFFF",
+  tabInactive: "#ECECEE",
+  sidebarBg: "#F3F3F3",
+  menuBg: "#F3F3F3",
+  toolbarBg: "#F3F3F3",
+  text: "#000000",
+  textDim: "#787878",
+  textBright: "#1E1E1E",
+  border: "#C9C9C9",
+  selection: "#A6CAF0",
+  keyword: "#7F0055",
+  string: "#2A00FF",
+  comment: "#3F7F5F",
+  number: "#0000FF",
+  annotation: "#646464",
+  type: "#000000",
+  blue: "#0066CC",
+  statusBg: "#EAEAEA",
+  statusBarText: "#333333",
+  consoleBg: "#FFFFFF",
+  javaFileText: "#333333",
+  lineNumbersBg: "#FFFFFF",
+  lineNumbersColor: "#787878",
+  lineNumbersBorder: "#E1E1E2",
+  panelTitleBg: "#E1E1E2",
 };
 
 const S: { [key: string]: React.CSSProperties } = {
-  root: { display: "flex", flexDirection: "column", width: "100vw", height: "100vh", background: ECLIPSE_COLORS.bg, fontFamily: "'Segoe UI', Arial, sans-serif", fontSize: 12, color: ECLIPSE_COLORS.text, overflow: "hidden", userSelect: "none" },
-  menuBar: { display: "flex", alignItems: "center", background: ECLIPSE_COLORS.menuBg, borderBottom: `1px solid ${ECLIPSE_COLORS.border}`, height: 22, flexShrink: 0, paddingLeft: 4 },
+  root: { display: "flex", flexDirection: "column", width: "100vw", height: "100vh", background: "var(--eclipse-bg)", fontFamily: "'Segoe UI', Arial, sans-serif", fontSize: 12, color: "var(--eclipse-text)", overflow: "hidden", userSelect: "none" },
+  menuBar: { display: "flex", alignItems: "center", background: "var(--eclipse-menuBg)", borderBottom: "1px solid var(--eclipse-border)", height: 22, flexShrink: 0, paddingLeft: 4 },
   menuItem: { padding: "0 8px", height: "100%", display: "flex", alignItems: "center", cursor: "pointer", fontSize: 12 },
-  toolbar: { display: "flex", alignItems: "center", background: ECLIPSE_COLORS.toolbarBg, borderBottom: `1px solid ${ECLIPSE_COLORS.border}`, height: 26, flexShrink: 0, padding: "0 4px", gap: 1 },
+  toolbar: { display: "flex", alignItems: "center", background: "var(--eclipse-toolbarBg)", borderBottom: "1px solid var(--eclipse-border)", height: 26, flexShrink: 0, padding: "0 4px", gap: 1 },
   toolBtn: { width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", borderRadius: 2, border: "1px solid transparent", fontSize: 13 },
-  separator: { width: 1, height: 18, background: ECLIPSE_COLORS.border, margin: "0 3px" },
+  separator: { width: 1, height: 18, background: "var(--eclipse-border)", margin: "0 3px" },
   workspace: { display: "flex", flex: 1, overflow: "hidden" },
-  sidePanel: { width: 220, display: "flex", flexDirection: "column", background: ECLIPSE_COLORS.sidebarBg, borderRight: `1px solid ${ECLIPSE_COLORS.border}`, flexShrink: 0 },
-  panelTitle: { background: "#4E5254", color: ECLIPSE_COLORS.textBright, padding: "3px 6px", fontSize: 11, fontWeight: "bold", borderBottom: `1px solid ${ECLIPSE_COLORS.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" },
+  sidePanel: { width: 220, display: "flex", flexDirection: "column", background: "var(--eclipse-sidebarBg)", borderRight: "1px solid var(--eclipse-border)", flexShrink: 0 },
+  panelTitle: { background: "var(--eclipse-panelTitleBg)", color: "var(--eclipse-textBright)", padding: "3px 6px", fontSize: 11, fontWeight: "bold", borderBottom: "1px solid var(--eclipse-border)", display: "flex", alignItems: "center", justifyContent: "space-between" },
   panelTitleIcons: { display: "flex", gap: 3 },
   panelIcon: { cursor: "pointer", opacity: 0.7, fontSize: 10 },
   tree: { flex: 1, overflow: "auto", padding: "2px 0" },
   treeItem: { display: "flex", alignItems: "center", gap: 3, padding: "1px 4px", cursor: "pointer", whiteSpace: "nowrap" },
   centerArea: { flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" },
-  tabBar: { display: "flex", background: ECLIPSE_COLORS.tabBar, borderBottom: `1px solid ${ECLIPSE_COLORS.border}`, height: 24, flexShrink: 0, alignItems: "flex-end" },
-  tab: { display: "flex", alignItems: "center", gap: 5, padding: "0 10px", height: 22, cursor: "pointer", borderRight: `1px solid ${ECLIPSE_COLORS.border}`, fontSize: 12, whiteSpace: "nowrap" },
-  tabActive: { background: ECLIPSE_COLORS.tabActive, borderTop: `2px solid ${ECLIPSE_COLORS.blue}` },
-  tabInactive: { background: ECLIPSE_COLORS.tabInactive, opacity: 0.8 },
-  editor: { flex: 1, overflow: "auto", background: ECLIPSE_COLORS.editorBg, display: "flex" },
-  lineNumbers: { color: "#606366", fontSize: 12, padding: "6px 8px 6px 6px", textAlign: "right", userSelect: "none", borderRight: `1px solid #3c3c3c`, lineHeight: "18px", flexShrink: 0, background: "#313335" },
+  tabBar: { display: "flex", background: "var(--eclipse-tabBar)", borderBottom: "1px solid var(--eclipse-border)", height: 24, flexShrink: 0, alignItems: "flex-end" },
+  tab: { display: "flex", alignItems: "center", gap: 5, padding: "0 10px", height: 22, cursor: "pointer", borderRight: "1px solid var(--eclipse-border)", fontSize: 12, whiteSpace: "nowrap" },
+  tabActive: { background: "var(--eclipse-tabActive)", borderTop: "2px solid var(--eclipse-blue)" },
+  tabInactive: { background: "var(--eclipse-tabInactive)", opacity: 0.8 },
+  editor: { flex: 1, overflow: "auto", background: "var(--eclipse-editorBg)", display: "flex" },
+  lineNumbers: { color: "var(--eclipse-lineNumbersColor)", fontSize: 12, padding: "6px 8px 6px 6px", textAlign: "right", userSelect: "none", borderRight: "1px solid var(--eclipse-lineNumbersBorder)", lineHeight: "18px", flexShrink: 0, background: "var(--eclipse-lineNumbersBg)" },
   code: { padding: "6px 8px", fontSize: 13, fontFamily: "'JetBrains Mono', 'Consolas', monospace", lineHeight: "18px", whiteSpace: "pre", flex: 1, outline: "none" },
-  bottomPanel: { height: 150, borderTop: `1px solid ${ECLIPSE_COLORS.border}`, display: "flex", flexDirection: "column", flexShrink: 0 },
-  bottomTabs: { display: "flex", background: ECLIPSE_COLORS.tabBar, borderBottom: `1px solid ${ECLIPSE_COLORS.border}`, height: 22, alignItems: "flex-end" },
-  bottomTab: { display: "flex", alignItems: "center", gap: 4, padding: "0 10px", height: 20, cursor: "pointer", fontSize: 12, borderRight: `1px solid ${ECLIPSE_COLORS.border}` },
-  console: { flex: 1, background: "#1E1E1E", padding: "4px 8px", overflow: "auto", fontFamily: "Consolas, monospace", fontSize: 12, lineHeight: "16px" },
-  rightPanel: { width: 180, borderLeft: `1px solid ${ECLIPSE_COLORS.border}`, display: "flex", flexDirection: "column", background: ECLIPSE_COLORS.sidebarBg, flexShrink: 0 },
-  statusBar: { height: 18, background: ECLIPSE_COLORS.statusBg, display: "flex", alignItems: "center", padding: "0 8px", gap: 16, fontSize: 11, color: "#fff", flexShrink: 0, borderTop: `1px solid #1a4a7a` },
-  statusSep: { width: 1, height: 12, background: "rgba(255,255,255,0.3)" },
+  bottomPanel: { height: 150, borderTop: "1px solid var(--eclipse-border)", display: "flex", flexDirection: "column", flexShrink: 0 },
+  bottomTabs: { display: "flex", background: "var(--eclipse-tabBar)", borderBottom: "1px solid var(--eclipse-border)", height: 22, alignItems: "flex-end" },
+  bottomTab: { display: "flex", alignItems: "center", gap: 4, padding: "0 10px", height: 20, cursor: "pointer", fontSize: 12, borderRight: "1px solid var(--eclipse-border)" },
+  console: { flex: 1, background: "var(--eclipse-consoleBg)", padding: "4px 8px", overflow: "auto", fontFamily: "Consolas, monospace", fontSize: 12, lineHeight: "16px" },
+  rightPanel: { width: 180, borderLeft: "1px solid var(--eclipse-border)", display: "flex", flexDirection: "column", background: "var(--eclipse-sidebarBg)", flexShrink: 0 },
+  statusBar: { height: 18, background: "var(--eclipse-statusBg)", display: "flex", alignItems: "center", padding: "0 8px", gap: 16, fontSize: 11, color: "var(--eclipse-statusBarText)", flexShrink: 0, borderTop: "1px solid var(--eclipse-border)" },
+  statusSep: { width: 1, height: 12, background: "var(--eclipse-statusSep)" },
 };
 
-const JAVA_CODE = [
-  { t: "package", c: ECLIPSE_COLORS.keyword }, { t: " com.eclipse.judge.solution;", c: ECLIPSE_COLORS.text },
+const JAVA_CODE: { t: string; type?: "keyword" | "text" | "comment" | "number" | "string" | "annotation" | "type" }[] = [
+  { t: "package", type: "keyword" }, { t: " com.eclipse.judge.solution;", type: "text" },
   { t: "\n" },
   { t: "\n" },
-  { t: "import", c: ECLIPSE_COLORS.keyword }, { t: " java.util.Scanner;\n", c: ECLIPSE_COLORS.text },
-  { t: "import", c: ECLIPSE_COLORS.keyword }, { t: " java.util.ArrayList;\n", c: ECLIPSE_COLORS.text },
+  { t: "import", type: "keyword" }, { t: " java.util.Scanner;\n", type: "text" },
+  { t: "import", type: "keyword" }, { t: " java.util.ArrayList;\n", type: "text" },
   { t: "\n" },
-  { t: "/**\n * Main solution class for the Online Judge\n * @author user\n */", c: ECLIPSE_COLORS.comment },
+  { t: "/**\n * Main solution class for the Online Judge\n * @author user\n */", type: "comment" },
   { t: "\n" },
-  { t: "public", c: ECLIPSE_COLORS.keyword }, { t: " " }, { t: "class", c: ECLIPSE_COLORS.keyword }, { t: " Main {\n", c: ECLIPSE_COLORS.text },
+  { t: "public", type: "keyword" }, { t: " " }, { t: "class", type: "keyword" }, { t: " Main {\n", type: "text" },
   { t: "\n" },
-  { t: "    ", c: ECLIPSE_COLORS.text }, { t: "private", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "static", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "int", c: ECLIPSE_COLORS.keyword }, { t: " N;\n", c: ECLIPSE_COLORS.text },
-  { t: "    ", c: ECLIPSE_COLORS.text }, { t: "private", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "static", c: ECLIPSE_COLORS.keyword }, { t: " ArrayList<Integer> adj[];\n", c: ECLIPSE_COLORS.text },
+  { t: "    ", type: "text" }, { t: "private", type: "keyword" }, { t: " ", type: "text" }, { t: "static", type: "keyword" }, { t: " ", type: "text" }, { t: "int", type: "keyword" }, { t: " N;\n", type: "text" },
+  { t: "    ", type: "text" }, { t: "private", type: "keyword" }, { t: " ", type: "text" }, { t: "static", type: "keyword" }, { t: " ArrayList<Integer> adj[];\n", type: "text" },
   { t: "\n" },
-  { t: "    ", c: ECLIPSE_COLORS.text }, { t: "public", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "static", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "void", c: ECLIPSE_COLORS.keyword }, { t: " main(String[] args) {\n", c: ECLIPSE_COLORS.text },
-  { t: "        Scanner sc = ", c: ECLIPSE_COLORS.text }, { t: "new", c: ECLIPSE_COLORS.keyword }, { t: " Scanner(System.in);\n", c: ECLIPSE_COLORS.text },
-  { t: "        N = sc.nextInt();\n", c: ECLIPSE_COLORS.text },
-  { t: "        " }, { t: "int", c: ECLIPSE_COLORS.keyword }, { t: " M = sc.nextInt();\n", c: ECLIPSE_COLORS.text },
+  { t: "    ", type: "text" }, { t: "public", type: "keyword" }, { t: " ", type: "text" }, { t: "static", type: "keyword" }, { t: " ", type: "text" }, { t: "void", type: "keyword" }, { t: " main(String[] args) {\n", type: "text" },
+  { t: "        Scanner sc = ", type: "text" }, { t: "new", type: "keyword" }, { t: " Scanner(System.in);\n", type: "text" },
+  { t: "        N = sc.nextInt();\n", type: "text" },
+  { t: "        " }, { t: "int", type: "keyword" }, { t: " M = sc.nextInt();\n", type: "text" },
   { t: "\n" },
-  { t: "        // Initialize adjacency list\n", c: ECLIPSE_COLORS.comment },
-  { t: "        adj = ", c: ECLIPSE_COLORS.text }, { t: "new", c: ECLIPSE_COLORS.keyword }, { t: " ArrayList[N + ", c: ECLIPSE_COLORS.text }, { t: "1", c: ECLIPSE_COLORS.number }, { t: "];\n", c: ECLIPSE_COLORS.text },
-  { t: "        " }, { t: "for", c: ECLIPSE_COLORS.keyword }, { t: " (", c: ECLIPSE_COLORS.text }, { t: "int", c: ECLIPSE_COLORS.keyword }, { t: " i = ", c: ECLIPSE_COLORS.text }, { t: "0", c: ECLIPSE_COLORS.number }, { t: "; i <= N; i++) {\n", c: ECLIPSE_COLORS.text },
-  { t: "            adj[i] = ", c: ECLIPSE_COLORS.text }, { t: "new", c: ECLIPSE_COLORS.keyword }, { t: " ArrayList<>();\n", c: ECLIPSE_COLORS.text },
-  { t: "        }\n", c: ECLIPSE_COLORS.text },
+  { t: "        // Initialize adjacency list\n", type: "comment" },
+  { t: "        adj = ", type: "text" }, { t: "new", type: "keyword" }, { t: " ArrayList[N + ", type: "text" }, { t: "1", type: "number" }, { t: "];\n", type: "text" },
+  { t: "        " }, { t: "for", type: "keyword" }, { t: " (", type: "text" }, { t: "int", type: "keyword" }, { t: " i = ", type: "text" }, { t: "0", type: "number" }, { t: "; i <= N; i++) {\n", type: "text" },
+  { t: "            adj[i] = ", type: "text" }, { t: "new", type: "keyword" }, { t: " ArrayList<>();\n", type: "text" },
+  { t: "        }\n", type: "text" },
   { t: "\n" },
-  { t: "        " }, { t: "for", c: ECLIPSE_COLORS.keyword }, { t: " (", c: ECLIPSE_COLORS.text }, { t: "int", c: ECLIPSE_COLORS.keyword }, { t: " i = ", c: ECLIPSE_COLORS.text }, { t: "0", c: ECLIPSE_COLORS.number }, { t: "; i < M; i++) {\n", c: ECLIPSE_COLORS.text },
-  { t: "            " }, { t: "int", c: ECLIPSE_COLORS.keyword }, { t: " u = sc.nextInt(), v = sc.nextInt();\n", c: ECLIPSE_COLORS.text },
-  { t: "            adj[u].add(v);\n", c: ECLIPSE_COLORS.text },
-  { t: "            adj[v].add(u);\n", c: ECLIPSE_COLORS.text },
+  { t: "        " }, { t: "for", type: "keyword" }, { t: " (", type: "text" }, { t: "int", type: "keyword" }, { t: " i = ", type: "text" }, { t: "0", type: "number" }, { t: "; i < M; i++) {\n", type: "text" },
+  { t: "            " }, { t: "int", type: "keyword" }, { t: " u = sc.nextInt(), v = sc.nextInt();\n", type: "text" },
+  { t: "            adj[u].add(v);\n", type: "text" },
+  { t: "            adj[v].add(u);\n", type: "text" },
   { t: "        }\n\n" },
-  { t: "        System.out.println(bfs(", c: ECLIPSE_COLORS.text }, { t: "1", c: ECLIPSE_COLORS.number }, { t: "));\n", c: ECLIPSE_COLORS.text },
+  { t: "        System.out.println(bfs(", type: "text" }, { t: "1", type: "number" }, { t: "));\n", type: "text" },
   { t: "    }\n\n" },
-  { t: "    ", c: ECLIPSE_COLORS.text }, { t: "static", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "int", c: ECLIPSE_COLORS.keyword }, { t: " bfs(", c: ECLIPSE_COLORS.text }, { t: "int", c: ECLIPSE_COLORS.keyword }, { t: " start) {\n", c: ECLIPSE_COLORS.text },
-  { t: "        ", c: ECLIPSE_COLORS.text }, { t: "boolean", c: ECLIPSE_COLORS.keyword }, { t: "[] visited = ", c: ECLIPSE_COLORS.text }, { t: "new", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "boolean", c: ECLIPSE_COLORS.keyword }, { t: "[N + ", c: ECLIPSE_COLORS.text }, { t: "1", c: ECLIPSE_COLORS.number }, { t: "];\n", c: ECLIPSE_COLORS.text },
-  { t: "        // BFS traversal\n", c: ECLIPSE_COLORS.comment },
-  { t: "        visited[start] = ", c: ECLIPSE_COLORS.text }, { t: "true", c: ECLIPSE_COLORS.keyword }, { t: ";\n", c: ECLIPSE_COLORS.text },
-  { t: "        " }, { t: "return", c: ECLIPSE_COLORS.keyword }, { t: " ", c: ECLIPSE_COLORS.text }, { t: "0", c: ECLIPSE_COLORS.number }, { t: ";\n", c: ECLIPSE_COLORS.text },
+  { t: "    ", type: "text" }, { t: "static", type: "keyword" }, { t: " ", type: "text" }, { t: "int", type: "keyword" }, { t: " bfs(", type: "text" }, { t: "int", type: "keyword" }, { t: " start) {\n", type: "text" },
+  { t: "        ", type: "text" }, { t: "boolean", type: "keyword" }, { t: "[] visited = ", type: "text" }, { t: "new", type: "keyword" }, { t: " ", type: "text" }, { t: "boolean", type: "keyword" }, { t: "[N + ", type: "text" }, { t: "1", type: "number" }, { t: "];\n", type: "text" },
+  { t: "        // BFS traversal\n", type: "comment" },
+  { t: "        visited[start] = ", type: "text" }, { t: "true", type: "keyword" }, { t: ";\n", type: "text" },
+  { t: "        " }, { t: "return", type: "keyword" }, { t: " ", type: "text" }, { t: "0", type: "number" }, { t: ";\n", type: "text" },
   { t: "    }\n" },
   { t: "}\n" },
 ];
@@ -151,12 +190,12 @@ function TreeView({ nodes, depth = 0 }: { nodes: TreeNode[]; depth?: number }) {
             onClick={() => node.children && setOpenMap(m => ({ ...m, [node.name]: !m[node.name] }))}
           >
             {node.children ? (
-              <span style={{ color: ECLIPSE_COLORS.textDim, fontSize: 10, width: 10 }}>{openMap[node.name] ? "▾" : "▸"}</span>
+              <span style={{ color: "var(--eclipse-textDim)", fontSize: 10, width: 10 }}>{openMap[node.name] ? "▾" : "▸"}</span>
             ) : (
               <span style={{ width: 10 }} />
             )}
             <span style={{ fontSize: 13 }}>{node.icon}</span>
-            <span style={{ color: node.name.endsWith(".java") ? "#FFC66D" : ECLIPSE_COLORS.textBright, fontSize: 12 }}>{node.name}</span>
+            <span style={{ color: node.name.endsWith(".java") ? "var(--eclipse-javaFileText)" : "var(--eclipse-textBright)", fontSize: 12 }}>{node.name}</span>
           </div>
           {node.children && openMap[node.name] && (
             <TreeView nodes={node.children} depth={depth + 1} />
@@ -192,6 +231,71 @@ export default function EclipseIDE() {
   const [activeBottom, setActiveBottom] = useState(3);
   const [hoveredMenu, setHoveredMenu] = useState<number | null>(null);
 
+  // Theme states
+  const [themeMode, setThemeMode] = useState<"dark" | "light" | "system">("system");
+  const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">("dark");
+  const [toggleOpen, setToggleOpen] = useState(false);
+
+  // Initialize themeMode from localStorage after mounting
+  useEffect(() => {
+    const saved = localStorage.getItem("eclipse-theme-mode");
+    if (saved === "dark" || saved === "light" || saved === "system") {
+      setThemeMode(saved);
+    }
+  }, []);
+
+  // Handle system preference dynamic detection
+  useEffect(() => {
+    if (themeMode === "system") {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      setResolvedTheme(mediaQuery.matches ? "dark" : "light");
+
+      const handleChange = (e: MediaQueryListEvent) => {
+        setResolvedTheme(e.matches ? "dark" : "light");
+      };
+
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    } else {
+      setResolvedTheme(themeMode);
+    }
+    localStorage.setItem("eclipse-theme-mode", themeMode);
+  }, [themeMode]);
+
+  const colors = resolvedTheme === "dark" ? DARK_COLORS : LIGHT_COLORS;
+
+  const themeVariables = {
+    "--eclipse-bg": colors.bg,
+    "--eclipse-editorBg": colors.editorBg,
+    "--eclipse-tabBar": colors.tabBar,
+    "--eclipse-tabActive": colors.tabActive,
+    "--eclipse-tabInactive": colors.tabInactive,
+    "--eclipse-sidebarBg": colors.sidebarBg,
+    "--eclipse-menuBg": colors.menuBg,
+    "--eclipse-toolbarBg": colors.toolbarBg,
+    "--eclipse-text": colors.text,
+    "--eclipse-textDim": colors.textDim,
+    "--eclipse-textBright": colors.textBright,
+    "--eclipse-border": colors.border,
+    "--eclipse-selection": colors.selection,
+    "--eclipse-keyword": colors.keyword,
+    "--eclipse-string": colors.string,
+    "--eclipse-comment": colors.comment,
+    "--eclipse-number": colors.number,
+    "--eclipse-annotation": colors.annotation,
+    "--eclipse-type": colors.type,
+    "--eclipse-blue": colors.blue,
+    "--eclipse-statusBg": colors.statusBg,
+    "--eclipse-statusBarText": colors.statusBarText,
+    "--eclipse-consoleBg": colors.consoleBg,
+    "--eclipse-javaFileText": colors.javaFileText,
+    "--eclipse-lineNumbersBg": colors.lineNumbersBg,
+    "--eclipse-lineNumbersColor": colors.lineNumbersColor,
+    "--eclipse-lineNumbersBorder": colors.lineNumbersBorder,
+    "--eclipse-panelTitleBg": colors.panelTitleBg,
+    "--eclipse-statusSep": resolvedTheme === "dark" ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.15)",
+  } as React.CSSProperties;
+
   const tabs = [
     { name: "Main.java", modified: false },
     { name: "Solution.java", modified: true },
@@ -199,7 +303,7 @@ export default function EclipseIDE() {
   ];
 
   return (
-    <div style={S.root}>
+    <div style={{ ...S.root, ...themeVariables }}>
       {/* Menu Bar */}
       <div style={S.menuBar}>
         <span style={{ marginRight: 8, fontSize: 14 }}>🌑</span>
@@ -208,7 +312,7 @@ export default function EclipseIDE() {
             key={m}
             style={{
               ...S.menuItem,
-              background: hoveredMenu === i ? ECLIPSE_COLORS.selection : "transparent",
+              background: hoveredMenu === i ? "var(--eclipse-selection)" : "transparent",
             }}
             onMouseEnter={() => setHoveredMenu(i)}
             onMouseLeave={() => setHoveredMenu(null)}
@@ -230,9 +334,9 @@ export default function EclipseIDE() {
           )
         )}
         <div style={{ flex: 1 }} />
-        <div style={{ display: "flex", alignItems: "center", background: "#4E5254", borderRadius: 3, padding: "1px 6px", gap: 4, border: `1px solid ${ECLIPSE_COLORS.border}` }}>
-          <span style={{ color: ECLIPSE_COLORS.textDim, fontSize: 11 }}>🔍</span>
-          <span style={{ color: ECLIPSE_COLORS.textDim, fontSize: 11 }}>Quick Access</span>
+        <div style={{ display: "flex", alignItems: "center", background: "var(--eclipse-tabInactive)", borderRadius: 3, padding: "1px 6px", gap: 4, border: "1px solid var(--eclipse-border)" }}>
+          <span style={{ color: "var(--eclipse-textDim)", fontSize: 11 }}>🔍</span>
+          <span style={{ color: "var(--eclipse-textDim)", fontSize: 11 }}>Quick Access</span>
         </div>
         <div style={{ width: 20, textAlign: "center", cursor: "pointer" }}>⊞</div>
       </div>
@@ -266,7 +370,7 @@ export default function EclipseIDE() {
               >
                 <span style={{ fontSize: 13 }}>☕</span>
                 <span>{tab.modified ? `${tab.name} *` : tab.name}</span>
-                <span style={{ color: ECLIPSE_COLORS.textDim, fontSize: 10, marginLeft: 2 }}>✕</span>
+                <span style={{ color: "var(--eclipse-textDim)", fontSize: 10, marginLeft: 2 }}>✕</span>
               </div>
             ))}
           </div>
@@ -282,7 +386,7 @@ export default function EclipseIDE() {
             {/* Code */}
             <div style={S.code}>
               {JAVA_CODE.map((token, i) => (
-                <span key={i} style={{ color: token.c || ECLIPSE_COLORS.text }}>
+                <span key={i} style={{ color: token.type ? `var(--eclipse-${token.type})` : "var(--eclipse-text)" }}>
                   {token.t}
                 </span>
               ))}
@@ -297,7 +401,7 @@ export default function EclipseIDE() {
                   key={t}
                   style={{
                     ...S.bottomTab,
-                    ...(activeBottom === i ? { background: ECLIPSE_COLORS.tabActive, borderTop: `2px solid ${ECLIPSE_COLORS.blue}` } : { background: ECLIPSE_COLORS.tabInactive }),
+                    ...(activeBottom === i ? { background: "var(--eclipse-tabActive)", borderTop: "2px solid var(--eclipse-blue)" } : { background: "var(--eclipse-tabInactive)" }),
                   }}
                   onClick={() => setActiveBottom(i)}
                 >
@@ -311,14 +415,14 @@ export default function EclipseIDE() {
               {activeBottom === 3 ? (
                 <>
                   <div style={{ color: "#6A9955" }}><span style={{ color: "#607B97" }}>Eclipse Online Judge</span> [Java Application]</div>
-                  <div style={{ color: ECLIPSE_COLORS.text }}>{'>'} Compiled successfully. Running with JDK 17...</div>
-                  <div style={{ color: "#A9B7C6" }}>{'>'} Waiting for input...</div>
-                  <div style={{ color: ECLIPSE_COLORS.textDim, marginTop: 4 }}>Terminated. (Exit value: 0)</div>
+                  <div style={{ color: "var(--eclipse-text)" }}>{'>'} Compiled successfully. Running with JDK 17...</div>
+                  <div style={{ color: "var(--eclipse-textBright)" }}>{'>'} Waiting for input...</div>
+                  <div style={{ color: "var(--eclipse-textDim)", marginTop: 4 }}>Terminated. (Exit value: 0)</div>
                 </>
               ) : activeBottom === 0 ? (
-                <div style={{ color: ECLIPSE_COLORS.textDim }}>0 errors, 0 warnings, 0 infos</div>
+                <div style={{ color: "var(--eclipse-textDim)" }}>0 errors, 0 warnings, 0 infos</div>
               ) : (
-                <div style={{ color: ECLIPSE_COLORS.textDim }}>No content</div>
+                <div style={{ color: "var(--eclipse-textDim)" }}>No content</div>
               )}
             </div>
           </div>
@@ -336,7 +440,7 @@ export default function EclipseIDE() {
             {OUTLINE_ITEMS.map((item, i) => (
               <div key={i} style={{ ...S.treeItem, paddingLeft: 6 + item.depth * 14, fontSize: 12 }}>
                 <span style={{ fontSize: 12 }}>{item.icon}</span>
-                <span style={{ color: ECLIPSE_COLORS.textBright }}>{item.label}</span>
+                <span style={{ color: "var(--eclipse-textBright)" }}>{item.label}</span>
               </div>
             ))}
           </div>
@@ -354,6 +458,77 @@ export default function EclipseIDE() {
         <span>Java 17</span>
         <div style={{ flex: 1 }} />
         <span>Eclipse Online Judge</span>
+      </div>
+
+      {/* Floating Theme Toggle */}
+      <div style={{ position: "fixed", bottom: 28, right: 20, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8, zIndex: 9999 }}>
+        {toggleOpen && (
+          <div style={{
+            background: resolvedTheme === "dark" ? "rgba(43, 43, 43, 0.85)" : "rgba(255, 255, 255, 0.85)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid var(--eclipse-border)",
+            borderRadius: 8,
+            padding: 4,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+            minWidth: 100,
+          }}>
+            {[
+              { id: "light", label: "Light", icon: "☀️" },
+              { id: "dark", label: "Dark", icon: "🌙" },
+              { id: "system", label: "System", icon: "🖥️" }
+            ].map(opt => (
+              <div
+                key={opt.id}
+                onClick={() => {
+                  setThemeMode(opt.id as any);
+                  setToggleOpen(false);
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "6px 10px",
+                  borderRadius: 6,
+                  cursor: "pointer",
+                  fontSize: 12,
+                  color: themeMode === opt.id ? "var(--eclipse-blue)" : "var(--eclipse-textBright)",
+                  background: themeMode === opt.id 
+                    ? (resolvedTheme === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)")
+                    : "transparent",
+                  fontWeight: themeMode === opt.id ? "bold" : "normal",
+                  transition: "background 0.15s"
+                }}
+              >
+                <span>{opt.icon}</span>
+                <span>{opt.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        <button
+          onClick={() => setToggleOpen(!toggleOpen)}
+          style={{
+            width: 38,
+            height: 38,
+            borderRadius: "50%",
+            background: resolvedTheme === "dark" ? "rgba(43, 43, 43, 0.85)" : "rgba(255, 255, 255, 0.85)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid var(--eclipse-border)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 16,
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+            transition: "transform 0.2s, background 0.2s",
+            outline: "none"
+          }}
+        >
+          {themeMode === "light" ? "☀️" : themeMode === "dark" ? "🌙" : "🖥️"}
+        </button>
       </div>
     </div>
   );
