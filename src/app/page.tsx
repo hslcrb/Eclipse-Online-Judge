@@ -737,6 +737,80 @@ export default function EclipseIDE() {
   const [showFrogPet, setShowFrogPet] = useState(true);
   const [showCatPet, setShowCatPet] = useState(true);
 
+  // Normal mode editor states
+  const [activeNormalFile, setActiveNormalFile] = useState<string>("Main.java");
+  const [normalFileContents, setNormalFileContents] = useState<Record<string, string>>({
+    "Main.java": `package com.eclipse.judge;
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, Eclipse Online Judge!");
+        
+        Solution solution = new Solution();
+        int result = solution.solve();
+        
+        System.out.println("Result: " + result);
+    }
+}`,
+    "Solution.java": `package com.eclipse.judge;
+
+public class Solution {
+    // TODO: Implement your solution here
+    
+    public int solve() {
+        // Your code here
+        return 0;
+    }
+    
+    public void test() {
+        System.out.println("Testing...");
+    }
+}`,
+    "BFS.java": `package com.eclipse.judge;
+
+import java.util.*;
+
+public class BFS {
+    public void breadthFirstSearch(int start) {
+        Queue<Integer> queue = new LinkedList<>();
+        boolean[] visited = new boolean[100];
+        
+        queue.offer(start);
+        visited[start] = true;
+        
+        while (!queue.isEmpty()) {
+            int node = queue.poll();
+            System.out.println("Visited: " + node);
+            
+            // Process neighbors
+        }
+    }
+}`,
+    "build.gradle": `plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.eclipse.judge'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+}
+
+application {
+    mainClass = 'com.eclipse.judge.Main'
+}
+
+test {
+    useJUnitPlatform()
+}`
+  });
+
   // Splash screen lifecycle
   useEffect(() => {
     const fadeTimer = setTimeout(() => {
@@ -1119,6 +1193,7 @@ export default function EclipseIDE() {
   ];
 
   const handleFileClick = (fileName: string) => {
+    // _jsp 폴더 챌린지 파일인 경우
     if (CHALLENGE_FILES[fileName]) {
       setCurrentFile(fileName);
       if (gameMode === "normal") {
@@ -1146,7 +1221,18 @@ export default function EclipseIDE() {
           setStartTime(Date.now());
         }
       }
+    } else {
+      // 일반 파일 (Main.java, Solution.java 등)
+      setActiveNormalFile(fileName);
     }
+  };
+
+  // 일반 모드 코드 변경 핸들러
+  const handleNormalCodeChange = (newCode: string) => {
+    setNormalFileContents(prev => ({
+      ...prev,
+      [activeNormalFile]: newCode
+    }));
   };
 
   return (
@@ -1229,10 +1315,14 @@ export default function EclipseIDE() {
               tabs.map((tab, i) => (
                 <div
                   key={tab.name}
-                  style={{ ...S.tab, ...(activeTab === i ? S.tabActive : S.tabInactive) }}
-                  onClick={() => setActiveTab(i)}
+                  style={{ 
+                    ...S.tab, 
+                    ...(activeNormalFile === tab.name ? S.tabActive : S.tabInactive),
+                    cursor: "pointer"
+                  }}
+                  onClick={() => handleFileClick(tab.name)}
                 >
-                  <span style={{ fontSize: 13 }}>☕</span>
+                  <span style={{ fontSize: 13 }}>{tab.name.endsWith('.gradle') ? '🔧' : '☕'}</span>
                   <span>{tab.modified ? `${tab.name} *` : tab.name}</span>
                   <span style={{ color: "var(--eclipse-textDim)", fontSize: 10, marginLeft: 2 }}>✕</span>
                 </div>
@@ -1739,18 +1829,32 @@ export default function EclipseIDE() {
               <>
                 {/* Line numbers */}
                 <div style={{ ...S.lineNumbers, fontSize: codeFontSize - 1, lineHeight: `${Math.round(codeFontSize * 1.38)}px` }}>
-                  {Array.from({ length: totalLines }, (_, i) => (
+                  {normalFileContents[activeNormalFile].split('\n').map((_, i) => (
                     <div key={i}>{i + 1}</div>
                   ))}
                 </div>
-                {/* Code */}
-                <div style={{ ...S.code, fontSize: codeFontSize, lineHeight: `${Math.round(codeFontSize * 1.38)}px` }}>
-                  {JAVA_CODE.map((token, i) => (
-                    <span key={i} style={{ color: token.type ? `var(--eclipse-${token.type})` : "var(--eclipse-text)" }}>
-                      {token.t}
-                    </span>
-                  ))}
-                </div>
+                {/* Editable Code */}
+                <textarea
+                  value={normalFileContents[activeNormalFile] || ''}
+                  onChange={(e) => handleNormalCodeChange(e.target.value)}
+                  spellCheck={false}
+                  style={{ 
+                    ...S.code as React.CSSProperties, 
+                    fontSize: codeFontSize, 
+                    lineHeight: `${Math.round(codeFontSize * 1.38)}px`,
+                    fontFamily: "'D2Coding', 'JetBrains Mono', 'Consolas', monospace",
+                    border: 'none',
+                    outline: 'none',
+                    resize: 'none',
+                    backgroundColor: 'transparent',
+                    color: 'var(--eclipse-text)',
+                    width: '100%',
+                    height: '100%',
+                    padding: '6px 8px',
+                    margin: 0,
+                    caretColor: 'var(--eclipse-text)'
+                  }}
+                />
               </>
             )}
           </div>
