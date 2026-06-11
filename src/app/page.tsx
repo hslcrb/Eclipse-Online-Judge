@@ -13,6 +13,7 @@ import {
   LineSegments,
   Vector3
 } from "three";
+import FrogPet from "@/components/pets/FrogPet";
 
 // Theme palettes
 const DARK_COLORS = {
@@ -1999,6 +2000,9 @@ export default function EclipseIDE() {
           </div>
         </div>
       )}
+      
+      {/* 🐸 펫 시스템 - 완전히 독립적 */}
+      <FrogPet />
     </div>
   );
 }
