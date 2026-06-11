@@ -251,8 +251,8 @@ function Tesseract({ resolvedTheme }: { resolvedTheme: "dark" | "light" }) {
   useEffect(() => {
     if (!mountRef.current) return;
 
-    const width = 300;
-    const height = 300;
+    const width = 210;
+    const height = 210;
     const scene = new Scene();
     const camera = new PerspectiveCamera(45, width / height, 0.1, 100);
     camera.position.z = 4.2;
@@ -403,7 +403,7 @@ function Tesseract({ resolvedTheme }: { resolvedTheme: "dark" | "light" }) {
     };
   }, [resolvedTheme]);
 
-  return <div ref={mountRef} style={{ width: 300, height: 300 }} />;
+  return <div ref={mountRef} style={{ width: 210, height: 210 }} />;
 }
 
 export default function EclipseIDE() {
