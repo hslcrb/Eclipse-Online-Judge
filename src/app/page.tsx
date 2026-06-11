@@ -242,6 +242,26 @@ export default function EclipseIDE() {
   const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">("dark");
   const [toggleOpen, setToggleOpen] = useState(false);
 
+  // Splash screen states
+  const [showSplash, setShowSplash] = useState(true);
+  const [fadeSplash, setFadeSplash] = useState(false);
+
+  // Splash screen lifecycle
+  useEffect(() => {
+    const fadeTimer = setTimeout(() => {
+      setFadeSplash(true);
+    }, 2000);
+
+    const removeTimer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2500);
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(removeTimer);
+    };
+  }, []);
+
   // Initialize themeMode from localStorage after mounting
   useEffect(() => {
     const saved = localStorage.getItem("eclipse-theme-mode");
@@ -539,6 +559,62 @@ export default function EclipseIDE() {
           {themeMode === "light" ? "☀️" : themeMode === "dark" ? "🌙" : "🖥️"}
         </button>
       </div>
+
+      {/* Splash Screen Overlay */}
+      {showSplash && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          background: resolvedTheme === "dark" ? "#2B2B2B" : "#FFFFFF",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 99999,
+          opacity: fadeSplash ? 0 : 1,
+          transition: "opacity 0.5s ease-in-out",
+          pointerEvents: fadeSplash ? "none" : "auto",
+        }}>
+          <div style={{
+            transform: fadeSplash ? "scale(0.95)" : "scale(1)",
+            transition: "transform 0.5s ease-in-out",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 16
+          }}>
+            <img 
+              src="/이클립스.svg" 
+              alt="Eclipse Logo" 
+              className="pulse-logo"
+              style={{
+                width: 120,
+                height: 120,
+              }} 
+            />
+            <h1 style={{
+              fontSize: 24,
+              fontWeight: "lighter",
+              color: resolvedTheme === "dark" ? "#FFFFFF" : "#000000",
+              fontFamily: "'Segoe UI', Arial, sans-serif",
+              letterSpacing: 2,
+              margin: 0
+            }}>
+              Eclipse IDE
+            </h1>
+            <p style={{
+              fontSize: 12,
+              color: resolvedTheme === "dark" ? "#888888" : "#666666",
+              margin: 0
+            }}>
+              Eclipse Online Judge Solution
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
