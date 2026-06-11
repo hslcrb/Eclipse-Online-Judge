@@ -5,19 +5,23 @@ import * as THREE from 'three';
 
 type DancePhase = 'rightArm' | 'leftArm' | 'rightLeg' | 'leftLeg' | 'wallClimb';
 
-export default function FrogPet() {
+interface FrogPetProps {
+  initialPosition?: { x: number; y: number };
+  onRemove?: () => void;
+}
+
+export default function FrogPet({ initialPosition = { x: 100, y: 100 }, onRemove }: FrogPetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ x: 100, y: 100 });
+  const [position, setPosition] = useState(initialPosition);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const frogRef = useRef<THREE.Group | null>(null);
   const animationFrameRef = useRef<number>(0);
-  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    if (!containerRef.current || !isVisible) return;
+    if (!containerRef.current) return;
 
     // Scene 설정
     const scene = new THREE.Scene();
@@ -700,11 +704,9 @@ export default function FrogPet() {
 
   // 펫 제거
   const handleRemove = () => {
-    setIsVisible(false);
     setContextMenu(null);
+    onRemove?.();
   };
-
-  if (!isVisible) return null;
 
   return (
     <>

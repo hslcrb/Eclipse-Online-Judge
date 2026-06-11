@@ -14,6 +14,7 @@ import {
   Vector3
 } from "three";
 import FrogPet from "@/components/pets/FrogPet";
+import CatPet from "@/components/pets/CatPet";
 
 // Theme palettes
 const DARK_COLORS = {
@@ -731,6 +732,10 @@ export default function EclipseIDE() {
   const [accuracy, setAccuracy] = useState(100);
   const [mistakes, setMistakes] = useState(0);
   const [savedNotification, setSavedNotification] = useState(false);
+
+  // Pet system states
+  const [showFrogPet, setShowFrogPet] = useState(true);
+  const [showCatPet, setShowCatPet] = useState(true);
 
   // Splash screen lifecycle
   useEffect(() => {
@@ -1928,6 +1933,53 @@ export default function EclipseIDE() {
                 <span>{opt.label}</span>
               </div>
             ))}
+
+            {/* Pet Options */}
+            <div style={{ 
+              padding: "4px 8px", 
+              fontSize: 10, 
+              color: "var(--eclipse-textDim)", 
+              fontWeight: "bold",
+              borderBottom: "1px solid var(--eclipse-border)",
+              marginTop: 4
+            }}>펫</div>
+            {[
+              { id: "frog", label: "개구리", icon: "🐸", state: showFrogPet, setState: setShowFrogPet },
+              { id: "cat", label: "고양이", icon: "🐱", state: showCatPet, setState: setShowCatPet }
+            ].map(opt => (
+              <div
+                key={opt.id}
+                onClick={() => {
+                  opt.setState(!opt.state);
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "6px 10px",
+                  borderRadius: 6,
+                  cursor: "pointer",
+                  fontSize: 12,
+                  color: opt.state ? "var(--eclipse-blue)" : "var(--eclipse-textDim)",
+                  background: opt.state 
+                    ? (resolvedTheme === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)")
+                    : "transparent",
+                  fontWeight: opt.state ? "bold" : "normal",
+                  transition: "background 0.15s",
+                  textDecoration: opt.state ? "none" : "line-through"
+                }}
+              >
+                <span>{opt.icon}</span>
+                <span>{opt.label}</span>
+                <span style={{ 
+                  marginLeft: "auto", 
+                  fontSize: 10,
+                  color: opt.state ? "var(--eclipse-string)" : "var(--eclipse-textDim)"
+                }}>
+                  {opt.state ? "ON" : "OFF"}
+                </span>
+              </div>
+            ))}
           </div>
         )}
         <button
@@ -2001,8 +2053,9 @@ export default function EclipseIDE() {
         </div>
       )}
       
-      {/* 🐸 펫 시스템 - 완전히 독립적 */}
-      <FrogPet />
+      {/* 🐸🐱 펫 시스템 - 완전히 독립적 */}
+      {showFrogPet && <FrogPet onRemove={() => setShowFrogPet(false)} />}
+      {showCatPet && <CatPet onRemove={() => setShowCatPet(false)} />}
     </div>
   );
 }
