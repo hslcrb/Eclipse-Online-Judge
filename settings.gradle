@@ -1,31 +1,41 @@
 rootProject.name = 'eclipse-platform-wasm'
 
 def isSkipped(String name) {
-    // 1. Tests & Examples & Unittest
+    // 1. Tests & Examples & Snippets & Unittests
     if (name.endsWith(".tests") || name.contains(".tests.") || name.contains(".examples") || 
-        name in ["terminal", "examples", "tests"] || name.contains("terminal") || name.contains(".unittest")) {
+        name.contains("snippets") || name.contains("unittest") || name in ["terminal", "examples", "tests"]) {
         return true
     }
     // 2. UA & Help & Tips & Intro (User Assistance)
     if (name.startsWith("org.eclipse.help") || name.startsWith("org.eclipse.tips") || 
         name.startsWith("org.eclipse.ua") || name == "org.eclipse.ui.cheatsheets" || 
-        name.startsWith("org.eclipse.ui.intro")) {
+        name.contains("intro")) {
         return true
     }
-    // 3. Developer Tools & Debug utilities & SVG Rasterizer
-    if (name.contains(".tools") || name == "org.eclipse.swt.tools" || name == "org.eclipse.text.quicksearch" || name == "org.eclipse.swt.svg") {
-        return true
-    }
-    // 4. Platform specific (win32, cocoa, macosx) - we only target GTK Linux
+    // 3. Platform specific (Only target GTK Linux, skip win32, cocoa, macosx)
     if (name.contains(".win32") || name.contains(".cocoa") || name.contains(".macosx")) {
         return true
     }
-    // 5. Monitoring & Performance metrics
-    if (name == "org.eclipse.ui.monitoring") {
+    // 4. Developer Tools, Monitoring & Performance metrics
+    if (name.contains(".tools") || name == "org.eclipse.swt.tools" || name == "org.eclipse.ui.monitoring") {
         return true
     }
-    // 6. Ant UI components (extremely heavy JDT/JUnit dependencies)
-    if (name.startsWith("org.eclipse.ant.ui")) {
+    // 5. Ant & Debug & Console & External tools
+    if (name.startsWith("org.eclipse.ant") || name.startsWith("org.eclipse.debug") || 
+        name.contains(".console") || name.contains(".externaltools")) {
+        return true
+    }
+    // 6. Network & SSH / JSCH & Update Configuration
+    if (name.contains("jsch") || name.contains(".net") || name.startsWith("org.eclipse.update")) {
+        return true
+    }
+    // 7. Refactoring, Compare, Search, Editors, Text processing & Navigators
+    // (SWT GUI core 구동에 불필요하며 복잡한 의존성을 가짐)
+    if (name.contains("refactoring") || name.contains("compare") || name.contains("search") || 
+        name.contains("editor") || name.endsWith(".text") || name.contains(".text.") ||
+        name.contains("navigator") || name.contains("browser") || name.contains("urischeme") || 
+        name.contains("xpath") || name.contains("log") || name.contains("properties.tabbed") || 
+        name.contains("themes") || name == "org.eclipse.text") {
         return true
     }
     return false
@@ -39,17 +49,15 @@ def findBundles(File parentDir, String prefix) {
             if (isSkipped(child.name)) {
                 return
             }
-            // Include projects having java source dirs or build.properties configuration
-            def hasSrc = new File(child, "src").exists() || new File(child, "build.properties").exists() || child.name == 'org.eclipse.swt'
-            if (hasSrc) {
+            // Include projects having META-INF/MANIFEST.MF configuration or if it is org.eclipse.swt
+            def hasManifest = new File(child, "META-INF/MANIFEST.MF").exists() || child.name == 'org.eclipse.swt'
+            if (hasManifest) {
                 def projectName = "${prefix}:${child.name}"
                 include projectName
                 project(projectName).projectDir = child
             } else {
-                // Recurse into directories that group bundles, skipping ua (User Assistance), ant, update, releng
-                if (child.name in ['bundles', 'platform', 'resources', 'runtime']) {
-                    findBundles(child, "${prefix}:${child.name}")
-                }
+                // Recurse into directories that group bundles
+                findBundles(child, "${prefix}:${child.name}")
             }
         }
     }
