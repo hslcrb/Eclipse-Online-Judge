@@ -698,6 +698,7 @@ export default function EclipseIDE() {
 
   // Challenge mode states
   const [gameMode, setGameMode] = useState<"normal" | "lineMatch" | "typingRain">("normal");
+  const [gameDifficulty, setGameDifficulty] = useState<"easy" | "normal" | "hard">("normal");
   const [currentFile, setCurrentFile] = useState<string>("check.js");
   const [typedCode, setTypedCode] = useState("");
   const [completedLines, setCompletedLines] = useState(0);
@@ -1023,10 +1024,18 @@ test {
       const snippet = snippets[Math.floor(Math.random() * snippets.length)];
       const points = calculateSnippetScore(snippet);
       
-      // Speed based on length: shorter = faster
-      const baseSpeed = 0.08;
-      const speedMultiplier = Math.max(0.5, 1 - (snippet.length / 150));
-      const speed = baseSpeed + (baseSpeed * speedMultiplier * 2);
+      // Difficulty settings
+      const difficultySettings = {
+        easy: { speedMultiplier: 0.6, spawnInterval: 3500 },
+        normal: { speedMultiplier: 1.0, spawnInterval: 2500 },
+        hard: { speedMultiplier: 1.5, spawnInterval: 1500 }
+      };
+      const settings = difficultySettings[gameDifficulty];
+      
+      // Speed based on length and difficulty
+      const baseSpeed = 0.08 * settings.speedMultiplier;
+      const lengthMultiplier = Math.max(0.5, 1 - (snippet.length / 150));
+      const speed = baseSpeed + (baseSpeed * lengthMultiplier * 2);
       
       // Random X position (multiple lanes)
       const lanes = [5, 15, 25, 35, 45, 55, 65, 75, 85];
@@ -1057,11 +1066,17 @@ test {
       }]);
     };
 
-    const spawnInterval = setInterval(spawnSnippet, 2500);
+    // Difficulty-based spawn interval
+    const difficultySettings = {
+      easy: { speedMultiplier: 0.6, spawnInterval: 3500 },
+      normal: { speedMultiplier: 1.0, spawnInterval: 2500 },
+      hard: { speedMultiplier: 1.5, spawnInterval: 1500 }
+    };
+    const spawnInterval = setInterval(spawnSnippet, difficultySettings[gameDifficulty].spawnInterval);
     spawnSnippet(); // Initial spawn
     
     return () => clearInterval(spawnInterval);
-  }, [gameMode, currentFile]);
+  }, [gameMode, currentFile, gameDifficulty]);
 
   // Line Match: Update snippet positions and handle time penalties
   useEffect(() => {
@@ -1120,19 +1135,34 @@ test {
       
       const word = selectedCategory.words[Math.floor(Math.random() * selectedCategory.words.length)];
 
+      // Difficulty-based speed
+      const difficultySpeed = {
+        easy: { min: 0.15, max: 0.3 },
+        normal: { min: 0.25, max: 0.55 },
+        hard: { min: 0.4, max: 0.8 }
+      };
+      const speedRange = difficultySpeed[gameDifficulty];
+      const speed = Math.random() * (speedRange.max - speedRange.min) + speedRange.min;
+
       setFallingWords(prev => [...prev, {
         id: Date.now() + Math.random(),
         word,
         x: Math.random() * 80 + 5,
         y: -5,
-        speed: Math.random() * 0.3 + 0.25,
+        speed,
         type: selectedCategory.type
       }]);
     };
 
-    const spawnInterval = setInterval(spawnWord, 2000);
+    // Difficulty-based spawn interval
+    const difficultyInterval = {
+      easy: 2500,
+      normal: 2000,
+      hard: 1200
+    };
+    const spawnInterval = setInterval(spawnWord, difficultyInterval[gameDifficulty]);
     return () => clearInterval(spawnInterval);
-  }, [gameMode]);
+  }, [gameMode, gameDifficulty]);
 
   // Typing Rain: Update falling words positions
   useEffect(() => {
@@ -2081,6 +2111,53 @@ test {
                   color: opt.state ? "var(--eclipse-string)" : "var(--eclipse-textDim)"
                 }}>
                   {opt.state ? "ON" : "OFF"}
+                </span>
+              </div>
+            ))}
+
+            {/* Difficulty Options */}
+            <div style={{ 
+              padding: "4px 8px", 
+              fontSize: 10, 
+              color: "var(--eclipse-textDim)", 
+              fontWeight: "bold",
+              borderBottom: "1px solid var(--eclipse-border)",
+              marginTop: 4
+            }}>난이도</div>
+            {[
+              { id: "easy", label: "쉬움", icon: "😊", desc: "느림" },
+              { id: "normal", label: "보통", icon: "😐", desc: "기본" },
+              { id: "hard", label: "어려움", icon: "😤", desc: "빠름" }
+            ].map(opt => (
+              <div
+                key={opt.id}
+                onClick={() => {
+                  setGameDifficulty(opt.id as any);
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "6px 10px",
+                  borderRadius: 6,
+                  cursor: "pointer",
+                  fontSize: 12,
+                  color: gameDifficulty === opt.id ? "var(--eclipse-keyword)" : "var(--eclipse-textBright)",
+                  background: gameDifficulty === opt.id 
+                    ? (resolvedTheme === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)")
+                    : "transparent",
+                  fontWeight: gameDifficulty === opt.id ? "bold" : "normal",
+                  transition: "background 0.15s"
+                }}
+              >
+                <span>{opt.icon}</span>
+                <span>{opt.label}</span>
+                <span style={{ 
+                  marginLeft: "auto", 
+                  fontSize: 10,
+                  color: "var(--eclipse-textDim)"
+                }}>
+                  {opt.desc}
                 </span>
               </div>
             ))}
