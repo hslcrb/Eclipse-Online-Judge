@@ -103,8 +103,8 @@ const S: { [key: string]: React.CSSProperties } = {
   tabActive: { background: "var(--eclipse-tabActive)", borderTop: "2px solid var(--eclipse-blue)" },
   tabInactive: { background: "var(--eclipse-tabInactive)", opacity: 0.8 },
   editor: { flex: 1, overflow: "auto", background: "var(--eclipse-editorBg)", display: "flex" },
-  lineNumbers: { color: "var(--eclipse-lineNumbersColor)", fontSize: 12, padding: "6px 8px 6px 6px", textAlign: "right", userSelect: "none", borderRight: "1px solid var(--eclipse-lineNumbersBorder)", lineHeight: "18px", flexShrink: 0, background: "var(--eclipse-lineNumbersBg)", transition: "font-size 0.15s ease, line-height 0.15s ease" },
-  code: { padding: "6px 8px", fontSize: 13, fontFamily: "'JetBrains Mono', 'Consolas', monospace", lineHeight: "18px", whiteSpace: "pre", flex: 1, outline: "none", transition: "font-size 0.15s ease, line-height 0.15s ease" },
+  lineNumbers: { color: "var(--eclipse-lineNumbersColor)", fontSize: 12, padding: "6px 8px 6px 6px", textAlign: "right", userSelect: "none", borderRight: "1px solid var(--eclipse-lineNumbersBorder)", lineHeight: "18px", flexShrink: 0, background: "var(--eclipse-lineNumbersBg)" },
+  code: { padding: "6px 8px", fontSize: 13, fontFamily: "'JetBrains Mono', 'Consolas', monospace", lineHeight: "18px", whiteSpace: "pre", flex: 1, outline: "none" },
   bottomPanel: { height: 150, borderTop: "1px solid var(--eclipse-border)", display: "flex", flexDirection: "column", flexShrink: 0 },
   bottomTabs: { display: "flex", background: "var(--eclipse-tabBar)", borderBottom: "1px solid var(--eclipse-border)", height: 22, alignItems: "flex-end" },
   bottomTab: { display: "flex", alignItems: "center", gap: 4, padding: "0 10px", height: 20, cursor: "pointer", fontSize: 12, borderRight: "1px solid var(--eclipse-border)" },
@@ -481,11 +481,11 @@ export default function EclipseIDE() {
         e.preventDefault();
         
         if (key === '-') {
-          // Zoom out (decrease font size by 2px, minimum 8)
-          setCodeFontSize(prev => Math.max(8, prev - 2));
+          // Zoom out (decrease font size by 10px, minimum 8)
+          setCodeFontSize(prev => Math.max(8, prev - 10));
         } else if (key === '=' || key === '+') {
-          // Zoom in (increase font size by 2px, maximum 28)
-          setCodeFontSize(prev => Math.min(28, prev + 2));
+          // Zoom in (increase font size by 10px, maximum 48)
+          setCodeFontSize(prev => Math.min(48, prev + 10));
         }
 
         // Reset tracking after successful action
