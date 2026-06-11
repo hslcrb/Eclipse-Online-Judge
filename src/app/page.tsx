@@ -161,6 +161,149 @@ const totalLines = (() => {
   return n;
 })();
 
+// Challenge files from _jsp folder
+const CHALLENGE_FILES: { [key: string]: { content: string; lines: number; hint: string } } = {
+  "check.js": {
+    content: `function joinCheck() {
+    if (document.frm.custno.value == '') {
+        alert('회원번호가 입력되지 않았습니다.')
+        document.frm.custno.focus();
+        return false;
+    }
+    if (document.frm.custname.value == '') {
+        alert('회원성명이 입력되지 않았습니다.')
+        document.frm.custname.focus();
+        return false;
+    }
+    if (document.frm.phone.value == '') {
+        alert('전화번호가 입력되지 않았습니다.')
+        document.frm.phone.focus();
+        return false;
+    }
+    if (document.frm.address.value == '') {
+        alert('회원주소가 입력되지 않았습니다.')
+        document.frm.address.focus();
+        return false;
+    }
+    if (document.frm.joindate.value == '') {
+        alert('가입일자가 입력되지 않았습니다.')
+        document.frm.joindate.focus();
+        return false;
+    }
+    if (document.frm.grade.value == '') {
+        alert('고객등급이 입력되지 않았습니다.')
+        document.frm.grade.focus();
+        return false;
+    }
+    if (document.frm.city.value == '') {
+        alert('도시코드가 입력되지 않았습니다.')
+        document.frm.city.focus();
+        return false;
+    }
+
+    return true;
+}`,
+    lines: 35,
+    hint: "폼 유효성 검사 함수입니다. 각 필드가 비어있는지 확인하세요!"
+  },
+  "db.jsp": {
+    content: `<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.sql.*" %>
+
+<% 
+  Class.forName("oracle.jdbc.OracleDriver");
+  Connection con = DriverManager.getConnection(
+    "jdbc:oracle:thin:@//localhost:1521/xe",
+    "system",
+    "1234"
+  );
+%>`,
+    lines: 10,
+    hint: "Oracle DB 연결 설정입니다. JDBC 드라이버를 로드하고 연결 객체를 생성하세요!"
+  },
+  "join.jsp": {
+    content: `<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ include file="db.jsp" %>
+<% request.setCharacterEncoding("utf-8"); %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>회원등록</title>
+</head>
+<body>
+    <script type="text/javascript" src="check.js"></script>
+    <jsp:include page="header.jsp"></jsp:include>
+    <h3 align="center">홈쇼핑 회원 등록</h3>
+    
+    <form name='frm' method='post' action='joinok.jsp'>
+        <table align='center' border='1'>
+            <tr>
+                <td align='center'>회원번호</td>
+                <td><input type='text' name='custno'></td>
+            </tr>
+            <tr>
+                <td align='center'>회원성명</td>
+                <td><input type='text' name='custname'></td>
+            </tr>
+            <tr>
+                <td align='center'>회원전화</td>
+                <td><input type='text' name='phone'></td>
+            </tr>
+            <tr>
+                <td align='center'>회원주소</td>
+                <td><input type='text' name='address'></td>
+            </tr>
+            <tr>
+                <td align='center'>가입일자</td>
+                <td><input type='text' name='joindate'></td>
+            </tr>
+            <tr>
+                <td align='center'>고객등급(A: VIP, B: 일반, C: 직원)</td>
+                <td><input type='text' name='grade'></td>
+            </tr>
+            <tr>
+                <td align='center'>도시코드</td>
+                <td><input type='text' name='city'></td>
+            </tr>
+            <tr>
+                <td colspan='2' align='center'>
+                    <input type='submit' value='등록' onclick='return joinCheck()'>
+                    <input type='button' value='조회'>
+                </td>
+            </tr>
+        </table>
+    </form>
+    
+    <jsp:include page="footer.jsp"></jsp:include>
+</body>
+</html>`,
+    lines: 54,
+    hint: "회원 등록 폼입니다. 테이블 구조와 input 태그를 정확히 작성하세요!"
+  },
+  "sql.sql": {
+    content: `CREATE TABLE member_tbl_02(
+    custno number(6) NOT NULL,
+    custname varchar2(20),
+    phone varchar2(13),
+    address varchar2(60),
+    joindate date,
+    grade char(1),
+    city char(2),
+    PRIMARY KEY(custno)
+);
+
+INSERT INTO member_tbl_02 VALUES (100001,'김행복','010-1111-2222','서울 동대문구 휘경1동','20151202','A','01');
+INSERT INTO member_tbl_02 VALUES (100002,'이축복','010-1111-3333','서울 동대문구 휘경2동','20151206','B','01');
+INSERT INTO member_tbl_02 VALUES (100003,'장믿음','010-1111-4444','울릉군 울릉읍 독도1리','20151001','B','30');
+INSERT INTO member_tbl_02 VALUES (100004,'최사랑','010-1111-5555','울릉군 울릉읍 독도2리','20151113','A','30');
+INSERT INTO member_tbl_02 VALUES (100005,'진평화','010-1111-6666','제주시 제주도 외나무골','20151225','B','60');
+INSERT INTO member_tbl_02 VALUES (100006,'차공단','010-1111-7777','제주시 제주도 감나무골','20151211','C','60');`,
+    lines: 17,
+    hint: "테이블 생성과 데이터 삽입 쿼리입니다. SQL 문법에 주의하세요!"
+  }
+};
+
 type TreeNode = { name: string; icon: string; children?: TreeNode[]; open?: boolean };
 
 const TREE: TreeNode[] = [
@@ -184,6 +327,20 @@ const TREE: TreeNode[] = [
         ]
       },
       {
+        name: "_jsp", icon: "📂", open: true, children: [
+          { name: "check.js", icon: "📜" },
+          { name: "db.jsp", icon: "📄" },
+          { name: "footer.jsp", icon: "📄" },
+          { name: "header.jsp", icon: "📄" },
+          { name: "index.jsp", icon: "📄" },
+          { name: "join.jsp", icon: "📄" },
+          { name: "joinok.jsp", icon: "📄" },
+          { name: "list.jsp", icon: "📄" },
+          { name: "sales.jsp", icon: "📄" },
+          { name: "sql.sql", icon: "🗄️" },
+        ]
+      },
+      {
         name: "JRE System Library [17]", icon: "📚", children: [
           { name: "rt.jar", icon: "🫙" },
         ]
@@ -194,7 +351,7 @@ const TREE: TreeNode[] = [
   }
 ];
 
-function TreeView({ nodes, depth = 0 }: { nodes: TreeNode[]; depth?: number }) {
+function TreeView({ nodes, depth = 0, onFileClick }: { nodes: TreeNode[]; depth?: number; onFileClick?: (name: string) => void }) {
   const [openMap, setOpenMap] = useState<{ [k: string]: boolean }>(() => {
     const m: { [k: string]: boolean } = {};
     nodes.forEach(n => { if (n.open) m[n.name] = true; });
@@ -206,7 +363,13 @@ function TreeView({ nodes, depth = 0 }: { nodes: TreeNode[]; depth?: number }) {
         <div key={node.name}>
           <div
             style={{ ...S.treeItem, paddingLeft: 4 + depth * 14 }}
-            onClick={() => node.children && setOpenMap(m => ({ ...m, [node.name]: !m[node.name] }))}
+            onClick={() => {
+              if (node.children) {
+                setOpenMap(m => ({ ...m, [node.name]: !m[node.name] }));
+              } else if (onFileClick) {
+                onFileClick(node.name);
+              }
+            }}
           >
             {node.children ? (
               <span style={{ color: "var(--eclipse-textDim)", fontSize: 10, width: 10 }}>{openMap[node.name] ? "▾" : "▸"}</span>
@@ -217,7 +380,7 @@ function TreeView({ nodes, depth = 0 }: { nodes: TreeNode[]; depth?: number }) {
             <span style={{ color: node.name.endsWith(".java") ? "var(--eclipse-javaFileText)" : "var(--eclipse-textBright)", fontSize: 12 }}>{node.name}</span>
           </div>
           {node.children && openMap[node.name] && (
-            <TreeView nodes={node.children} depth={depth + 1} />
+            <TreeView nodes={node.children} depth={depth + 1} onFileClick={onFileClick} />
           )}
         </div>
       ))}
@@ -425,6 +588,18 @@ export default function EclipseIDE() {
   const [lastKeyTime, setLastKeyTime] = useState(0);
   const [lastKey, setLastKey] = useState<string | null>(null);
 
+  // Challenge mode states
+  const [challengeMode, setChallengeMode] = useState(false);
+  const [currentFile, setCurrentFile] = useState<string>("check.js");
+  const [typedCode, setTypedCode] = useState("");
+  const [completedLines, setCompletedLines] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showHint, setShowHint] = useState(false);
+  const [clearAnimations, setClearAnimations] = useState<{ id: number; text: string; x: number }[]>([]);
+  const [combo, setCombo] = useState(0);
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+
   // Splash screen lifecycle
   useEffect(() => {
     const fadeTimer = setTimeout(() => {
@@ -481,11 +656,11 @@ export default function EclipseIDE() {
         e.preventDefault();
         
         if (key === '-') {
-          // Zoom out (decrease font size by 10px, minimum 8)
-          setCodeFontSize(prev => Math.max(8, prev - 10));
+          // Zoom out (decrease font size by 5px, minimum 8)
+          setCodeFontSize(prev => Math.max(8, prev - 5));
         } else if (key === '=' || key === '+') {
-          // Zoom in (increase font size by 10px, maximum 48)
-          setCodeFontSize(prev => Math.min(48, prev + 10));
+          // Zoom in (increase font size by 5px, maximum 48)
+          setCodeFontSize(prev => Math.min(48, prev + 5));
         }
 
         // Reset tracking after successful action
@@ -502,6 +677,77 @@ export default function EclipseIDE() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [lastKey, lastKeyTime]);
+
+  // Challenge mode: Check typed code and trigger animations
+  useEffect(() => {
+    if (!challengeMode || !startTime) return;
+
+    const targetCode = CHALLENGE_FILES[currentFile].content;
+    const lines = typedCode.split('\n');
+    const targetLines = targetCode.split('\n');
+    
+    let correctLines = 0;
+    for (let i = 0; i < Math.min(lines.length, targetLines.length); i++) {
+      if (lines[i] === targetLines[i]) {
+        correctLines++;
+      } else {
+        break;
+      }
+    }
+
+    if (correctLines > completedLines) {
+      // Line cleared! Add animation
+      const newClears: { id: number; text: string; x: number }[] = [];
+      for (let i = completedLines; i < correctLines; i++) {
+        const comboMultiplier = Math.floor(combo / 5) + 1;
+        const lineScore = 100 * comboMultiplier;
+        setScore(prev => prev + lineScore);
+        setCombo(prev => prev + 1);
+        
+        newClears.push({
+          id: Date.now() + i,
+          text: combo >= 5 ? `COMBO x${comboMultiplier}! +${lineScore}` : `LINE CLEAR! +${lineScore}`,
+          x: Math.random() * 60 + 20
+        });
+      }
+      
+      setClearAnimations(prev => [...prev, ...newClears]);
+      setCompletedLines(correctLines);
+
+      // Remove animations after 2 seconds
+      setTimeout(() => {
+        setClearAnimations(prev => prev.filter(a => !newClears.find(n => n.id === a.id)));
+      }, 2000);
+    }
+
+    // Check if completed
+    if (typedCode === targetCode) {
+      const timeTaken = (Date.now() - startTime) / 1000;
+      const timeBonus = Math.max(0, Math.floor((300 - timeTaken) * 10));
+      setScore(prev => prev + timeBonus + 5000);
+      
+      setClearAnimations(prev => [...prev, {
+        id: Date.now(),
+        text: `🎉 PERFECT! +${timeBonus + 5000}`,
+        x: 50
+      }]);
+
+      setTimeout(() => {
+        alert(`파일 완성! 최종 점수: ${score + timeBonus + 5000}\n소요 시간: ${timeTaken.toFixed(1)}초`);
+      }, 100);
+    }
+  }, [typedCode, challengeMode, currentFile, completedLines, combo, startTime, score]);
+
+  // Reset combo if user stops typing for 3 seconds
+  useEffect(() => {
+    if (!challengeMode || combo === 0) return;
+    
+    const timer = setTimeout(() => {
+      setCombo(0);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [typedCode, challengeMode, combo]);
 
   const colors = resolvedTheme === "dark" ? DARK_COLORS : LIGHT_COLORS;
 
@@ -545,6 +791,24 @@ export default function EclipseIDE() {
     { name: "Solution.java", modified: true },
     { name: "build.gradle", modified: false },
   ];
+
+  const handleFileClick = (fileName: string) => {
+    if (CHALLENGE_FILES[fileName]) {
+      setCurrentFile(fileName);
+      if (!challengeMode) {
+        const startChallenge = confirm(`${fileName} 챌린지를 시작하시겠습니까?\n\n목표: ${CHALLENGE_FILES[fileName].lines}줄\n힌트: ${CHALLENGE_FILES[fileName].hint}`);
+        if (startChallenge) {
+          setChallengeMode(true);
+          setTypedCode("");
+          setCompletedLines(0);
+          setScore(0);
+          setCombo(0);
+          setStartTime(Date.now());
+          setTimeout(() => editorRef.current?.focus(), 100);
+        }
+      }
+    }
+  };
 
   return (
     <div style={{ ...S.root, ...themeVariables }}>
@@ -598,7 +862,7 @@ export default function EclipseIDE() {
             </div>
           </div>
           <div style={S.tree}>
-            <TreeView nodes={TREE} />
+            <TreeView nodes={TREE} onFileClick={handleFileClick} />
           </div>
         </div>
 
@@ -621,20 +885,136 @@ export default function EclipseIDE() {
 
           {/* Editor */}
           <div style={S.editor}>
-            {/* Line numbers */}
-            <div style={{ ...S.lineNumbers, fontSize: codeFontSize - 1, lineHeight: `${Math.round(codeFontSize * 1.38)}px` }}>
-              {Array.from({ length: totalLines }, (_, i) => (
-                <div key={i}>{i + 1}</div>
-              ))}
-            </div>
-            {/* Code */}
-            <div style={{ ...S.code, fontSize: codeFontSize, lineHeight: `${Math.round(codeFontSize * 1.38)}px` }}>
-              {JAVA_CODE.map((token, i) => (
-                <span key={i} style={{ color: token.type ? `var(--eclipse-${token.type})` : "var(--eclipse-text)" }}>
-                  {token.t}
-                </span>
-              ))}
-            </div>
+            {challengeMode ? (
+              // Challenge Mode Editor
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", position: "relative" }}>
+                <textarea
+                  ref={editorRef}
+                  value={typedCode}
+                  onChange={(e) => setTypedCode(e.target.value)}
+                  spellCheck={false}
+                  style={{
+                    flex: 1,
+                    padding: "6px 8px",
+                    fontSize: codeFontSize,
+                    fontFamily: "'JetBrains Mono', 'Consolas', monospace",
+                    lineHeight: `${Math.round(codeFontSize * 1.38)}px`,
+                    background: "var(--eclipse-editorBg)",
+                    color: "var(--eclipse-text)",
+                    border: "none",
+                    outline: "none",
+                    resize: "none",
+                    whiteSpace: "pre",
+                    overflowWrap: "normal",
+                    overflowX: "auto"
+                  }}
+                />
+                
+                {/* Score & Progress HUD */}
+                <div style={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  background: "rgba(0, 0, 0, 0.7)",
+                  backdropFilter: "blur(8px)",
+                  padding: "8px 12px",
+                  borderRadius: 8,
+                  color: "#FFF",
+                  fontSize: 11,
+                  fontWeight: "bold",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
+                  pointerEvents: "none",
+                  zIndex: 10
+                }}>
+                  <div style={{ color: "#FFD700" }}>⭐ {score.toLocaleString()}</div>
+                  <div style={{ color: "#00FF88" }}>{completedLines}/{CHALLENGE_FILES[currentFile].lines} 줄</div>
+                  {combo >= 5 && <div style={{ color: "#FF6B6B" }}>🔥 COMBO x{Math.floor(combo / 5) + 1}</div>}
+                  <div style={{ fontSize: 9, color: "#AAA", marginTop: 2 }}>{currentFile}</div>
+                </div>
+
+                {/* Hint Button */}
+                <button
+                  onClick={() => setShowHint(!showHint)}
+                  style={{
+                    position: "absolute",
+                    top: 8,
+                    left: 8,
+                    background: "rgba(92, 143, 214, 0.9)",
+                    border: "none",
+                    borderRadius: 6,
+                    padding: "6px 12px",
+                    color: "#FFF",
+                    fontSize: 11,
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                    zIndex: 10
+                  }}
+                >
+                  💡 힌트
+                </button>
+
+                {showHint && (
+                  <div style={{
+                    position: "absolute",
+                    top: 40,
+                    left: 8,
+                    background: "rgba(255, 235, 59, 0.95)",
+                    border: "2px solid #FFA000",
+                    borderRadius: 6,
+                    padding: "8px 12px",
+                    color: "#000",
+                    fontSize: 11,
+                    maxWidth: 300,
+                    zIndex: 10,
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+                  }}>
+                    {CHALLENGE_FILES[currentFile].hint}
+                  </div>
+                )}
+
+                {/* Clear Animations */}
+                {clearAnimations.map(anim => (
+                  <div
+                    key={anim.id}
+                    style={{
+                      position: "absolute",
+                      top: "40%",
+                      left: `${anim.x}%`,
+                      fontSize: 24,
+                      fontWeight: "bold",
+                      color: "#00FF88",
+                      textShadow: "0 0 10px #00FF88, 0 0 20px #00FF88",
+                      animation: "clearFloat 2s ease-out forwards",
+                      pointerEvents: "none",
+                      zIndex: 100,
+                      whiteSpace: "nowrap"
+                    }}
+                  >
+                    {anim.text}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              // Normal Mode Editor
+              <>
+                {/* Line numbers */}
+                <div style={{ ...S.lineNumbers, fontSize: codeFontSize - 1, lineHeight: `${Math.round(codeFontSize * 1.38)}px` }}>
+                  {Array.from({ length: totalLines }, (_, i) => (
+                    <div key={i}>{i + 1}</div>
+                  ))}
+                </div>
+                {/* Code */}
+                <div style={{ ...S.code, fontSize: codeFontSize, lineHeight: `${Math.round(codeFontSize * 1.38)}px` }}>
+                  {JAVA_CODE.map((token, i) => (
+                    <span key={i} style={{ color: token.type ? `var(--eclipse-${token.type})` : "var(--eclipse-text)" }}>
+                      {token.t}
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           {/* Bottom Panel */}
