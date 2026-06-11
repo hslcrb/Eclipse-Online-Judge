@@ -672,11 +672,11 @@ export default function EclipseIDE() {
         e.preventDefault();
         
         if (key === '-') {
-          // Zoom out (decrease font size by 5px, minimum 8)
-          setCodeFontSize(prev => Math.max(8, prev - 5));
+          // Zoom out (decrease font size by 3px, minimum 8)
+          setCodeFontSize(prev => Math.max(8, prev - 3));
         } else if (key === '=' || key === '+') {
-          // Zoom in (increase font size by 5px, maximum 48)
-          setCodeFontSize(prev => Math.min(48, prev + 5));
+          // Zoom in (increase font size by 3px, maximum 48)
+          setCodeFontSize(prev => Math.min(48, prev + 3));
         }
 
         // Reset tracking after successful action
@@ -1065,27 +1065,6 @@ export default function EclipseIDE() {
                   </div>
                 )}
 
-                {/* Exit Button */}
-                <button
-                  onClick={() => setGameMode("normal")}
-                  style={{
-                    position: "absolute",
-                    bottom: 8,
-                    right: 8,
-                    background: "rgba(255, 59, 59, 0.9)",
-                    border: "none",
-                    borderRadius: 6,
-                    padding: "6px 12px",
-                    color: "#FFF",
-                    fontSize: 11,
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                    zIndex: 10
-                  }}
-                >
-                  ❌ 종료
-                </button>
-
                 {/* Clear Animations */}
                 {clearAnimations.map(anim => (
                   <div
@@ -1275,27 +1254,6 @@ export default function EclipseIDE() {
                   {combo > 0 && <div style={{ color: "#FF6B6B" }}>🔥 x{combo}</div>}
                 </div>
 
-                {/* Exit Button */}
-                <button
-                  onClick={() => setGameMode("normal")}
-                  style={{
-                    position: "absolute",
-                    bottom: 8,
-                    right: 8,
-                    background: "rgba(255, 59, 59, 0.9)",
-                    border: "none",
-                    borderRadius: 6,
-                    padding: "6px 12px",
-                    color: "#FFF",
-                    fontSize: 11,
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                    zIndex: 10
-                  }}
-                >
-                  ❌ 종료
-                </button>
-
                 {/* Clear Animations */}
                 {clearAnimations.map(anim => (
                   <div
@@ -1405,7 +1363,7 @@ export default function EclipseIDE() {
         <span>Eclipse Online Judge</span>
       </div>
 
-      {/* Floating Theme Toggle */}
+      {/* Floating Theme & Mode Toggle */}
       <div style={{ position: "fixed", bottom: 28, right: 20, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8, zIndex: 9999 }}>
         {toggleOpen && (
           <div style={{
@@ -1418,8 +1376,16 @@ export default function EclipseIDE() {
             flexDirection: "column",
             gap: 2,
             boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
-            minWidth: 100,
+            minWidth: 140,
           }}>
+            {/* Theme Options */}
+            <div style={{ 
+              padding: "4px 8px", 
+              fontSize: 10, 
+              color: "var(--eclipse-textDim)", 
+              fontWeight: "bold",
+              borderBottom: "1px solid var(--eclipse-border)"
+            }}>테마</div>
             {[
               { id: "light", label: "Light", icon: "☀️" },
               { id: "dark", label: "Dark", icon: "🌙" },
@@ -1429,7 +1395,6 @@ export default function EclipseIDE() {
                 key={opt.id}
                 onClick={() => {
                   setThemeMode(opt.id as any);
-                  setToggleOpen(false);
                 }}
                 style={{
                   display: "flex",
@@ -1444,6 +1409,62 @@ export default function EclipseIDE() {
                     ? (resolvedTheme === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)")
                     : "transparent",
                   fontWeight: themeMode === opt.id ? "bold" : "normal",
+                  transition: "background 0.15s"
+                }}
+              >
+                <span>{opt.icon}</span>
+                <span>{opt.label}</span>
+              </div>
+            ))}
+
+            {/* Mode Options */}
+            <div style={{ 
+              padding: "4px 8px", 
+              fontSize: 10, 
+              color: "var(--eclipse-textDim)", 
+              fontWeight: "bold",
+              borderBottom: "1px solid var(--eclipse-border)",
+              marginTop: 4
+            }}>모드</div>
+            {[
+              { id: "normal", label: "Normal", icon: "📝" },
+              { id: "lineMatch", label: "Line Match", icon: "🎯" },
+              { id: "typingRain", label: "Typing Rain", icon: "🌧️" }
+            ].map(opt => (
+              <div
+                key={opt.id}
+                onClick={() => {
+                  setGameMode(opt.id as any);
+                  if (opt.id !== "normal") {
+                    // Reset game states
+                    setScore(0);
+                    setCombo(0);
+                    setStartTime(Date.now());
+                    if (opt.id === "lineMatch") {
+                      setTypedCode("");
+                      setCompletedLines(0);
+                    } else if (opt.id === "typingRain") {
+                      setCurrentInput("");
+                      setCurrentLine([]);
+                      setCompletedCode([]);
+                      setFallingWords([]);
+                    }
+                  }
+                  setToggleOpen(false);
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "6px 10px",
+                  borderRadius: 6,
+                  cursor: "pointer",
+                  fontSize: 12,
+                  color: gameMode === opt.id ? "var(--eclipse-blue)" : "var(--eclipse-textBright)",
+                  background: gameMode === opt.id 
+                    ? (resolvedTheme === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)")
+                    : "transparent",
+                  fontWeight: gameMode === opt.id ? "bold" : "normal",
                   transition: "background 0.15s"
                 }}
               >
@@ -1472,7 +1493,7 @@ export default function EclipseIDE() {
             outline: "none"
           }}
         >
-          {themeMode === "light" ? "☀️" : themeMode === "dark" ? "🌙" : "🖥️"}
+          {gameMode === "lineMatch" ? "🎯" : gameMode === "typingRain" ? "🌧️" : (themeMode === "light" ? "☀️" : themeMode === "dark" ? "🌙" : "🖥️")}
         </button>
       </div>
 
