@@ -635,10 +635,8 @@ export default function EclipseIDE() {
   // Typing Rain mode states
   const [fallingWords, setFallingWords] = useState<{ id: number; word: string; x: number; y: number; speed: number; type: string }[]>([]);
   const [currentInput, setCurrentInput] = useState("");
-  const [currentLine, setCurrentLine] = useState<string[]>([]);
-  const [completedCode, setCompletedCode] = useState<string[]>([]);
+  const [capturedWords, setCapturedWords] = useState<string[]>([]);
   const [targetWord, setTargetWord] = useState<string | null>(null);
-  const [indentLevel, setIndentLevel] = useState(0);
 
   // Grading system states
   const [accuracy, setAccuracy] = useState(100);
@@ -966,8 +964,7 @@ export default function EclipseIDE() {
           // Typing Rain Mode
           setGameMode("typingRain");
           setCurrentInput("");
-          setCurrentLine([]);
-          setCompletedCode([]);
+          setCapturedWords([]);
           setFallingWords([]);
           setScore(0);
           setCombo(0);
@@ -1212,7 +1209,7 @@ export default function EclipseIDE() {
             ) : gameMode === "typingRain" ? (
               // Typing Rain Mode
               <div style={{ flex: 1, display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
-                {/* Background - Faded Source Code */}
+                {/* Background - Captured Words Building Up */}
                 <div style={{
                   position: "absolute",
                   top: 0,
@@ -1224,13 +1221,14 @@ export default function EclipseIDE() {
                   fontFamily: "'D2Coding', 'JetBrains Mono', 'Consolas', monospace",
                   lineHeight: `${Math.round(codeFontSize * 1.38)}px`,
                   color: "var(--eclipse-text)",
-                  opacity: 0.15,
+                  opacity: 0.3,
                   pointerEvents: "none",
-                  whiteSpace: "pre",
-                  overflow: "hidden",
+                  whiteSpace: "pre-wrap",
+                  wordWrap: "break-word",
+                  overflow: "auto",
                   zIndex: 1
                 }}>
-                  {CHALLENGE_FILES[currentFile]?.content}
+                  {capturedWords.join(" ")}
                 </div>
 
                 {/* Falling Words */}
@@ -1262,41 +1260,17 @@ export default function EclipseIDE() {
                   </div>
                 ))}
 
-                {/* Completed Code Display */}
-                <div style={{
-                  position: "absolute",
-                  top: 8,
-                  left: 8,
-                  right: 8,
-                  maxHeight: "40%",
-                  overflow: "auto",
-                  background: "rgba(43, 43, 43, 0.85)",
-                  backdropFilter: "blur(8px)",
-                  padding: "8px",
-                  borderRadius: 6,
-                  fontSize: 12,
-                  fontFamily: "'D2Coding', 'JetBrains Mono', monospace",
-                  color: "#A9B7C6",
-                  zIndex: 10,
-                  lineHeight: "18px",
-                  border: "1px solid rgba(92, 143, 214, 0.3)"
-                }}>
-                  {completedCode.length === 0 ? (
-                    <div style={{ color: "#666", fontStyle: "italic" }}>완성된 코드가 여기에 표시됩니다...</div>
-                  ) : (
-                    completedCode.map((line, i) => (
-                      <div key={i}>{line}</div>
-                    ))
-                  )}
-                </div>
-
                 {/* Input Box */}
                 <div style={{
                   position: "absolute",
                   bottom: 20,
                   left: "50%",
                   transform: "translateX(-50%)",
-                  zIndex: 20
+                  zIndex: 20,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 8
                 }}>
                   <input
                     type="text"
@@ -1314,14 +1288,14 @@ export default function EclipseIDE() {
                       }
                     }}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") {
+                      if (e.key === "Enter" && currentInput.trim().length > 0) {
                         e.preventDefault();
                         
                         // Check if input matches a falling word
                         const matched = fallingWords.find(w => w.word === currentInput);
                         if (matched) {
-                          // Capture word
-                          setCurrentLine(prev => [...prev, matched.word]);
+                          // Capture matched word
+                          setCapturedWords(prev => [...prev, matched.word]);
                           setFallingWords(prev => prev.filter(w => w.id !== matched.id));
                           setScore(prev => prev + Math.round(matched.word.length * 5));
                           setCombo(prev => prev + 1);
@@ -1329,70 +1303,29 @@ export default function EclipseIDE() {
                           // Show animation
                           setClearAnimations(prev => [...prev, {
                             id: Date.now(),
-                            text: `+${Math.round(matched.word.length * 5)}`,
+                            text: `✓ +${Math.round(matched.word.length * 5)}`,
                             x: 50
                           }]);
                           setTimeout(() => {
                             setClearAnimations(prev => prev.slice(1));
                           }, 1000);
-                        }
-                        
-                        // Finalize line (even if empty or partial)
-                        if (currentLine.length > 0 || currentInput.length > 0) {
-                          const finalLine = currentLine.length > 0 ? currentLine.join(" ") : currentInput;
-                          
-                          // Auto indent based on content
-                          let indent = "  ".repeat(indentLevel);
-                          let newIndentLevel = indentLevel;
-                          
-                          // Increase indent after opening braces
-                          if (finalLine.includes("{") && !finalLine.includes("}")) {
-                            newIndentLevel++;
-                          }
-                          // Decrease indent for closing braces
-                          if (finalLine.includes("}") && !finalLine.includes("{")) {
-                            indent = "  ".repeat(Math.max(0, indentLevel - 1));
-                            newIndentLevel = Math.max(0, indentLevel - 1);
-                          }
-                          
-                          setCompletedCode(prev => [...prev, indent + finalLine]);
-                          setCurrentLine([]);
-                          setIndentLevel(newIndentLevel);
-                          setScore(prev => prev + 100);
+                        } else {
+                          // Add as custom text (user typed freely)
+                          setCapturedWords(prev => [...prev, currentInput]);
+                          setScore(prev => prev + 20);
                           
                           setClearAnimations(prev => [...prev, {
                             id: Date.now(),
-                            text: `✓ LINE! +100`,
+                            text: `+20`,
                             x: 50
                           }]);
                           setTimeout(() => {
                             setClearAnimations(prev => prev.slice(1));
-                          }, 1500);
+                          }, 1000);
                         }
                         
                         setCurrentInput("");
                         setTargetWord(null);
-                      } else if (e.key === " " && currentInput.length > 0) {
-                        // Space: try to match word
-                        e.preventDefault();
-                        const matched = fallingWords.find(w => w.word === currentInput);
-                        if (matched) {
-                          setCurrentLine(prev => [...prev, matched.word]);
-                          setFallingWords(prev => prev.filter(w => w.id !== matched.id));
-                          setCurrentInput("");
-                          setScore(prev => prev + Math.round(matched.word.length * 5));
-                          setCombo(prev => prev + 1);
-                          setTargetWord(null);
-                          
-                          setClearAnimations(prev => [...prev, {
-                            id: Date.now(),
-                            text: `+${Math.round(matched.word.length * 5)}`,
-                            x: 50
-                          }]);
-                          setTimeout(() => {
-                            setClearAnimations(prev => prev.slice(1));
-                          }, 1000);
-                        }
                       }
                     }}
                     style={{
@@ -1402,28 +1335,26 @@ export default function EclipseIDE() {
                       fontFamily: "'D2Coding', 'JetBrains Mono', monospace",
                       background: "rgba(43, 43, 43, 0.95)",
                       color: "#FFF",
-                      border: "2px solid #5C8FD6",
+                      border: targetWord ? "2px solid #FFD700" : "2px solid #5C8FD6",
                       borderRadius: 8,
                       outline: "none",
-                      textAlign: "left"
+                      textAlign: "left",
+                      boxShadow: targetWord ? "0 0 12px rgba(255, 215, 0, 0.5)" : "none"
                     }}
-                    placeholder="떨어지는 단어를 입력하고 Enter로 확정..."
+                    placeholder="떨어지는 단어를 입력하고 Enter..."
                     autoFocus
                   />
-                  {currentLine.length > 0 && (
-                    <div style={{
-                      marginTop: 8,
-                      padding: "8px 12px",
-                      background: "rgba(0, 255, 136, 0.2)",
-                      border: "1px solid #00FF88",
-                      borderRadius: 6,
-                      fontSize: 12,
-                      color: "#00FF88",
-                      fontFamily: "'D2Coding', monospace"
-                    }}>
-                      현재: {currentLine.join(" ")}
-                    </div>
-                  )}
+                  <div style={{
+                    fontSize: 11,
+                    color: "#888",
+                    textAlign: "center"
+                  }}>
+                    {targetWord ? (
+                      <span style={{ color: "#FFD700", fontWeight: "bold" }}>🎯 매칭: {targetWord}</span>
+                    ) : (
+                      <span>단어를 입력하고 Enter로 확정</span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Score HUD */}
@@ -1441,10 +1372,8 @@ export default function EclipseIDE() {
                   zIndex: 10
                 }}>
                   <div style={{ color: "#FFD700" }}>⭐ {score.toLocaleString()}</div>
-                  <div style={{ color: "#00FF88" }}>줄: {completedCode.length}</div>
+                  <div style={{ color: "#00FF88" }}>단어: {capturedWords.length}</div>
                   {combo > 0 && <div style={{ color: "#FF6B6B" }}>🔥 x{combo}</div>}
-                  <div style={{ fontSize: 9, color: "#AAA", marginTop: 4 }}>Space: 단어 구분</div>
-                  <div style={{ fontSize: 9, color: "#AAA" }}>Enter: 줄 확정</div>
                 </div>
 
                 {/* Clear Animations */}
@@ -1638,8 +1567,7 @@ export default function EclipseIDE() {
                       setCompletedLines(0);
                     } else if (opt.id === "typingRain") {
                       setCurrentInput("");
-                      setCurrentLine([]);
-                      setCompletedCode([]);
+                      setCapturedWords([]);
                       setFallingWords([]);
                     }
                   }
