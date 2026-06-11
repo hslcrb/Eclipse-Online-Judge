@@ -707,7 +707,16 @@ export default function EclipseIDE() {
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
   // Line Match mode - snippet system
-  const [activeSnippets, setActiveSnippets] = useState<{ id: number; text: string; y: number; speed: number; points: number; spawnTime: number }[]>([]);
+  const [activeSnippets, setActiveSnippets] = useState<{ 
+    id: number; 
+    text: string; 
+    y: number; 
+    x: number;
+    speed: number; 
+    points: number; 
+    spawnTime: number;
+    color: { border: string; bg: string; text: string };
+  }[]>([]);
   const [completedSnippets, setCompletedSnippets] = useState<string[]>([]);
   const [currentSnippetInput, setCurrentSnippetInput] = useState("");
 
@@ -934,17 +943,41 @@ export default function EclipseIDE() {
       const snippet = snippets[Math.floor(Math.random() * snippets.length)];
       const points = calculateSnippetScore(snippet);
       
+      // Speed based on length: shorter = faster
+      const baseSpeed = 0.08;
+      const speedMultiplier = Math.max(0.5, 1 - (snippet.length / 150));
+      const speed = baseSpeed + (baseSpeed * speedMultiplier * 2);
+      
+      // Random X position (multiple lanes)
+      const lanes = [5, 15, 25, 35, 45, 55, 65, 75, 85];
+      const xPos = lanes[Math.floor(Math.random() * lanes.length)];
+      
+      // Random color palette
+      const colors = [
+        { border: "#00FF88", bg: "rgba(0, 255, 136, 0.1)", text: "#00FF88" },
+        { border: "#5C8FD6", bg: "rgba(92, 143, 214, 0.1)", text: "#5C8FD6" },
+        { border: "#FFD700", bg: "rgba(255, 215, 0, 0.1)", text: "#FFD700" },
+        { border: "#FF69B4", bg: "rgba(255, 105, 180, 0.1)", text: "#FF69B4" },
+        { border: "#00CED1", bg: "rgba(0, 206, 209, 0.1)", text: "#00CED1" },
+        { border: "#FF8C00", bg: "rgba(255, 140, 0, 0.1)", text: "#FF8C00" },
+        { border: "#9370DB", bg: "rgba(147, 112, 219, 0.1)", text: "#9370DB" },
+        { border: "#32CD32", bg: "rgba(50, 205, 50, 0.1)", text: "#32CD32" },
+      ];
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      
       setActiveSnippets(prev => [...prev, {
         id: Date.now() + Math.random(),
         text: snippet,
         y: -10,
-        speed: 0.15 + Math.random() * 0.1,
+        x: xPos,
+        speed,
         points,
-        spawnTime: Date.now()
+        spawnTime: Date.now(),
+        color
       }]);
     };
 
-    const spawnInterval = setInterval(spawnSnippet, 3000);
+    const spawnInterval = setInterval(spawnSnippet, 2500);
     spawnSnippet(); // Initial spawn
     
     return () => clearInterval(spawnInterval);
@@ -964,7 +997,7 @@ export default function EclipseIDE() {
             // In danger zone - deduct points over time
             const timeInDanger = Date.now() - s.spawnTime;
             if (timeInDanger % 500 < 20) { // Every 500ms
-              setScore(p => Math.max(0, p - 5));
+              setScore(p => p - 5); // Allow negative scores
             }
           }
         });
@@ -1232,41 +1265,49 @@ export default function EclipseIDE() {
                 {activeSnippets.map(snippet => {
                   const inDangerZone = snippet.y > 70;
                   const offScreen = snippet.y > 100;
+                  const isMatching = snippet.text === currentSnippetInput;
+                  
+                  // Width based on text length
+                  const width = Math.min(90, Math.max(20, snippet.text.length * 0.8 + 10));
                   
                   return (
                     <div
                       key={snippet.id}
                       style={{
                         position: "absolute",
-                        left: "10%",
-                        right: "10%",
+                        left: `${snippet.x}%`,
                         top: `${snippet.y}%`,
-                        padding: "8px 12px",
-                        fontSize: codeFontSize,
+                        width: `${width}%`,
+                        padding: "6px 10px",
+                        fontSize: Math.max(10, Math.min(codeFontSize, 14 - snippet.text.length / 20)),
                         fontFamily: "'D2Coding', 'JetBrains Mono', monospace",
                         fontWeight: "bold",
-                        color: snippet.text === currentSnippetInput ? "#FFD700" : 
-                               inDangerZone ? "#FF6B6B" : "#00FF88",
-                        background: inDangerZone ? "rgba(255, 107, 107, 0.15)" : "rgba(0, 255, 136, 0.1)",
-                        border: snippet.text === currentSnippetInput ? "2px solid #FFD700" : 
-                               inDangerZone ? "2px solid #FF6B6B" : "2px solid #00FF88",
+                        color: isMatching ? "#FFD700" : 
+                               inDangerZone ? "#FF6B6B" : snippet.color.text,
+                        background: isMatching ? "rgba(255, 215, 0, 0.15)" :
+                                   inDangerZone ? "rgba(255, 107, 107, 0.15)" : snippet.color.bg,
+                        border: `2px solid ${isMatching ? "#FFD700" : inDangerZone ? "#FF6B6B" : snippet.color.border}`,
                         borderRadius: 6,
-                        textShadow: snippet.text === currentSnippetInput ? "0 0 8px #FFD700" : "none",
-                        boxShadow: inDangerZone ? "0 0 20px rgba(255, 107, 107, 0.5)" : "0 2px 8px rgba(0, 0, 0, 0.3)",
+                        textShadow: isMatching ? "0 0 8px #FFD700" : "none",
+                        boxShadow: inDangerZone ? "0 0 20px rgba(255, 107, 107, 0.5)" : 
+                                   isMatching ? "0 0 16px rgba(255, 215, 0, 0.5)" :
+                                   `0 2px 8px ${snippet.color.border}40`,
                         pointerEvents: "none",
                         zIndex: 10,
                         opacity: offScreen ? 0 : 1,
                         transition: "all 0.2s",
-                        whiteSpace: "pre"
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-word",
+                        transform: `scale(${isMatching ? 1.05 : 1})`
                       }}
                     >
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span>{snippet.text}</span>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                        <span style={{ flex: 1 }}>{snippet.text}</span>
                         <span style={{ 
-                          marginLeft: 12, 
-                          fontSize: 10, 
-                          opacity: 0.7,
-                          color: inDangerZone ? "#FF6B6B" : "#00FF88"
+                          fontSize: 9, 
+                          opacity: 0.8,
+                          color: inDangerZone ? "#FF6B6B" : snippet.color.text,
+                          flexShrink: 0
                         }}>
                           +{snippet.points}
                         </span>
@@ -1341,7 +1382,7 @@ export default function EclipseIDE() {
                           const isOffScreenSnippet = completedSnippets.includes(input);
                           const penalty = isOffScreenSnippet ? 50 : 30;
                           
-                          setScore(prev => Math.max(0, prev - penalty));
+                          setScore(prev => prev - penalty); // Allow negative
                           setCombo(0);
                           
                           setClearAnimations(prev => [...prev, {
@@ -1404,7 +1445,9 @@ export default function EclipseIDE() {
                   pointerEvents: "none",
                   zIndex: 10
                 }}>
-                  <div style={{ color: "#FFD700" }}>⭐ {score.toLocaleString()}</div>
+                  <div style={{ color: score < 0 ? "#FF6B6B" : "#FFD700" }}>
+                    ⭐ {score.toLocaleString()}
+                  </div>
                   <div style={{ color: "#00FF88" }}>완료: {completedSnippets.length}</div>
                   <div style={{ color: "#5C8FD6" }}>활성: {activeSnippets.length}</div>
                   {combo >= 3 && <div style={{ color: "#FF6B6B" }}>🔥 x{combo}</div>}
