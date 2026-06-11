@@ -961,17 +961,35 @@ export default function EclipseIDE() {
         <div style={S.centerArea}>
           {/* Editor Tabs */}
           <div style={S.tabBar}>
-            {tabs.map((tab, i) => (
+            {gameMode !== "normal" && CHALLENGE_FILES[currentFile] ? (
+              // Game mode: Show current challenge file
               <div
-                key={tab.name}
-                style={{ ...S.tab, ...(activeTab === i ? S.tabActive : S.tabInactive) }}
-                onClick={() => setActiveTab(i)}
+                style={{ ...S.tab, ...S.tabActive }}
               >
-                <span style={{ fontSize: 13 }}>☕</span>
-                <span>{tab.modified ? `${tab.name} *` : tab.name}</span>
-                <span style={{ color: "var(--eclipse-textDim)", fontSize: 10, marginLeft: 2 }}>✕</span>
+                <span style={{ fontSize: 13 }}>
+                  {currentFile.endsWith('.js') ? '📜' : 
+                   currentFile.endsWith('.jsp') ? '📄' : 
+                   currentFile.endsWith('.sql') ? '🗄️' : '📝'}
+                </span>
+                <span>{currentFile}</span>
+                <span style={{ color: "var(--eclipse-textDim)", fontSize: 10, marginLeft: 2 }}>
+                  {gameMode === "lineMatch" ? "🎯" : "🌧️"}
+                </span>
               </div>
-            ))}
+            ) : (
+              // Normal mode: Show default tabs
+              tabs.map((tab, i) => (
+                <div
+                  key={tab.name}
+                  style={{ ...S.tab, ...(activeTab === i ? S.tabActive : S.tabInactive) }}
+                  onClick={() => setActiveTab(i)}
+                >
+                  <span style={{ fontSize: 13 }}>☕</span>
+                  <span>{tab.modified ? `${tab.name} *` : tab.name}</span>
+                  <span style={{ color: "var(--eclipse-textDim)", fontSize: 10, marginLeft: 2 }}>✕</span>
+                </div>
+              ))
+            )}
           </div>
 
           {/* Editor */}
