@@ -97,20 +97,21 @@ export default function Home() {
         throw new Error("CheerpJ loader script not found. Make sure layout.tsx includes cjrtnc loader.js");
       }
 
-      // Initialize the CheerpJ runtime
+      // Initialize the CheerpJ runtime with SWT/AWT graphical support
       await win.cheerpjInit({
         enableSound: false,
-        disableWebGl: false,
       });
 
       setStatus("READY_TO_LAUNCH");
       setStatusMessage("JVM Ready to Launch");
       console.log("CheerpJ JVM successfully initialized in WebAssembly!");
 
-      // Mount IndexedDB filesystem for persistent workspace
-      console.log("Mounting virtual persistent filesystem (/files) to IndexedDB...");
-      await win.cheerpjFSMount("str", "/files");
-      console.log("VFS successfully mounted to browser storage.");
+      // Mount IndexedDB-backed virtual filesystem for persistent workspace
+      // CheerpJ 3.0: cheerpjFSMount(type, mountPoint)
+      // "str" = IndexedDB-backed Storage
+      console.log("Mounting virtual persistent filesystem (/str/) to IndexedDB...");
+      await win.cheerpjFSMount("str", "/str/");
+      console.log("VFS /str/ successfully mounted to browser storage.");
       updateStorageStatus();
     } catch (err: any) {
       setStatus("ERROR");
@@ -129,26 +130,29 @@ export default function Home() {
 
     try {
       const win = window as any;
-      
-      // Create SWT graphical display container
+
+      // CheerpJ 3.0: Create graphical display canvas in the container div
+      // This must be called BEFORE cheerpjRunJar for SWT/AWT apps to render
       if (displayRef.current) {
-        console.log("Creating display canvas in layout container...");
-        // Parameters: (width, height, parentElement)
+        console.log("Creating CheerpJ graphical display canvas...");
         await win.cheerpjCreateDisplay(800, 600, displayRef.current);
+        console.log("Display canvas created successfully.");
       }
 
-      // Run the compiled JAR file (located in public/)
-      console.log("Executing CheerpJ JVM JAR player...");
-      
-      // We run the jar in the background
-      win.cheerpjRunJar("/eclipse-platform-wasm.jar")
+      // Run the compiled Eclipse JAR
+      // In Next.js, files in /public are served at the root URL /
+      // CheerpJ uses /app/ prefix to access HTTP-served JARs
+      console.log("Executing Eclipse Platform JAR via CheerpJ...");
+      win.cheerpjRunJar("/app/eclipse-platform-wasm.jar")
         .then((exitCode: number) => {
           console.log(`Eclipse JVM exited with code: ${exitCode}`);
           setStatus("READY_TO_LAUNCH");
           setStatusMessage(`Exited with code ${exitCode}`);
         })
         .catch((err: any) => {
-          console.error(`Execution crash: ${err.message}`);
+          console.error(`Execution crash: ${err.message || err}`);
+          setStatus("ERROR");
+          setStatusMessage(`Runtime Error: ${err.message || err}`);
         });
 
       setStatus("RUNNING");
