@@ -31,6 +31,9 @@ const DARK_COLORS = {
   lineNumbersColor: "#606366",
   lineNumbersBorder: "#3C3C3C",
   panelTitleBg: "#4E5254",
+  scrollbarThumb: "rgba(255, 255, 255, 0.2)",
+  scrollbarThumbHover: "rgba(255, 255, 255, 0.35)",
+  scrollbarTrack: "rgba(0, 0, 0, 0.1)",
 };
 
 const LIGHT_COLORS = {
@@ -62,6 +65,9 @@ const LIGHT_COLORS = {
   lineNumbersColor: "#787878",
   lineNumbersBorder: "#E1E1E2",
   panelTitleBg: "#E1E1E2",
+  scrollbarThumb: "rgba(0, 0, 0, 0.15)",
+  scrollbarThumbHover: "rgba(0, 0, 0, 0.3)",
+  scrollbarTrack: "rgba(0, 0, 0, 0.03)",
 };
 
 const S: { [key: string]: React.CSSProperties } = {
@@ -293,6 +299,9 @@ export default function EclipseIDE() {
     "--eclipse-lineNumbersColor": colors.lineNumbersColor,
     "--eclipse-lineNumbersBorder": colors.lineNumbersBorder,
     "--eclipse-panelTitleBg": colors.panelTitleBg,
+    "--eclipse-scrollbarThumb": colors.scrollbarThumb,
+    "--eclipse-scrollbarThumbHover": colors.scrollbarThumbHover,
+    "--eclipse-scrollbarTrack": colors.scrollbarTrack,
     "--eclipse-statusSep": resolvedTheme === "dark" ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.15)",
   } as React.CSSProperties;
 

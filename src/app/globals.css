@@ -1,2 +1,21 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--eclipse-scrollbarTrack, transparent);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--eclipse-scrollbarThumb, rgba(0, 0, 0, 0.2));
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--eclipse-scrollbarThumbHover, rgba(0, 0, 0, 0.35));
+}
