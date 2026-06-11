@@ -923,6 +923,60 @@ export default function EclipseIDE() {
     return () => clearTimeout(timer);
   }, [typedCode, gameMode, combo]);
 
+  // Line Match: Spawn falling snippets
+  useEffect(() => {
+    if (gameMode !== "lineMatch") return;
+
+    const spawnSnippet = () => {
+      const snippets = CHALLENGE_FILES[currentFile]?.snippets || [];
+      if (snippets.length === 0) return;
+      
+      const snippet = snippets[Math.floor(Math.random() * snippets.length)];
+      const points = calculateSnippetScore(snippet);
+      
+      setActiveSnippets(prev => [...prev, {
+        id: Date.now() + Math.random(),
+        text: snippet,
+        y: -10,
+        speed: 0.15 + Math.random() * 0.1,
+        points,
+        spawnTime: Date.now()
+      }]);
+    };
+
+    const spawnInterval = setInterval(spawnSnippet, 3000);
+    spawnSnippet(); // Initial spawn
+    
+    return () => clearInterval(spawnInterval);
+  }, [gameMode, currentFile]);
+
+  // Line Match: Update snippet positions and handle time penalties
+  useEffect(() => {
+    if (gameMode !== "lineMatch") return;
+
+    const updateInterval = setInterval(() => {
+      setActiveSnippets(prev => {
+        const updated = prev.map(s => ({ ...s, y: s.y + s.speed }));
+        
+        // Check for snippets past danger zone (y > 85)
+        updated.forEach(s => {
+          if (s.y > 85 && s.y < 100) {
+            // In danger zone - deduct points over time
+            const timeInDanger = Date.now() - s.spawnTime;
+            if (timeInDanger % 500 < 20) { // Every 500ms
+              setScore(p => Math.max(0, p - 5));
+            }
+          }
+        });
+        
+        // Remove snippets that fell off
+        return updated.filter(s => s.y < 100);
+      });
+    }, 16);
+
+    return () => clearInterval(updateInterval);
+  }, [gameMode]);
+
   // Typing Rain: Spawn falling words
   useEffect(() => {
     if (gameMode !== "typingRain") return;
@@ -1038,6 +1092,9 @@ export default function EclipseIDE() {
           setScore(0);
           setCombo(0);
           setStartTime(Date.now());
+          setActiveSnippets([]);
+          setCompletedSnippets([]);
+          setCurrentSnippetInput("");
           setTimeout(() => editorRef.current?.focus(), 100);
         } else {
           // Typing Rain Mode
@@ -1147,36 +1204,194 @@ export default function EclipseIDE() {
           {/* Editor */}
           <div style={S.editor}>
             {gameMode === "lineMatch" ? (
-              // Line Match Mode Editor
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", position: "relative" }}>
-                <textarea
-                  ref={editorRef}
-                  value={typedCode}
-                  onChange={(e) => setTypedCode(e.target.value)}
-                  spellCheck={false}
-                  style={{
-                    flex: 1,
-                    padding: "6px 8px",
-                    fontSize: codeFontSize,
-                    fontFamily: "'D2Coding', 'JetBrains Mono', 'Consolas', monospace",
-                    lineHeight: `${Math.round(codeFontSize * 1.38)}px`,
-                    background: "var(--eclipse-editorBg)",
-                    color: "var(--eclipse-text)",
-                    border: "none",
-                    outline: "none",
-                    resize: "none",
-                    whiteSpace: "pre",
-                    overflowWrap: "normal",
-                    overflowX: "auto"
-                  }}
-                />
-                
+              // Line Match Mode - Snippet System
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
+                {/* Background - Completed Snippets (Faded) */}
+                <div style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  padding: "6px 8px",
+                  fontSize: codeFontSize,
+                  fontFamily: "'D2Coding', 'JetBrains Mono', 'Consolas', monospace",
+                  lineHeight: `${Math.round(codeFontSize * 1.38)}px`,
+                  color: "var(--eclipse-text)",
+                  opacity: 0.25,
+                  pointerEvents: "none",
+                  whiteSpace: "pre-wrap",
+                  wordWrap: "break-word",
+                  overflow: "auto",
+                  zIndex: 1
+                }}>
+                  {completedSnippets.join("\n")}
+                </div>
+
+                {/* Falling Snippets */}
+                {activeSnippets.map(snippet => {
+                  const inDangerZone = snippet.y > 70;
+                  const offScreen = snippet.y > 100;
+                  
+                  return (
+                    <div
+                      key={snippet.id}
+                      style={{
+                        position: "absolute",
+                        left: "10%",
+                        right: "10%",
+                        top: `${snippet.y}%`,
+                        padding: "8px 12px",
+                        fontSize: codeFontSize,
+                        fontFamily: "'D2Coding', 'JetBrains Mono', monospace",
+                        fontWeight: "bold",
+                        color: snippet.text === currentSnippetInput ? "#FFD700" : 
+                               inDangerZone ? "#FF6B6B" : "#00FF88",
+                        background: inDangerZone ? "rgba(255, 107, 107, 0.15)" : "rgba(0, 255, 136, 0.1)",
+                        border: snippet.text === currentSnippetInput ? "2px solid #FFD700" : 
+                               inDangerZone ? "2px solid #FF6B6B" : "2px solid #00FF88",
+                        borderRadius: 6,
+                        textShadow: snippet.text === currentSnippetInput ? "0 0 8px #FFD700" : "none",
+                        boxShadow: inDangerZone ? "0 0 20px rgba(255, 107, 107, 0.5)" : "0 2px 8px rgba(0, 0, 0, 0.3)",
+                        pointerEvents: "none",
+                        zIndex: 10,
+                        opacity: offScreen ? 0 : 1,
+                        transition: "all 0.2s",
+                        whiteSpace: "pre"
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span>{snippet.text}</span>
+                        <span style={{ 
+                          marginLeft: 12, 
+                          fontSize: 10, 
+                          opacity: 0.7,
+                          color: inDangerZone ? "#FF6B6B" : "#00FF88"
+                        }}>
+                          +{snippet.points}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Danger Zone Indicator */}
+                <div style={{
+                  position: "absolute",
+                  left: 0,
+                  right: 0,
+                  top: "70%",
+                  height: "30%",
+                  background: "linear-gradient(to bottom, transparent, rgba(255, 0, 0, 0.05))",
+                  pointerEvents: "none",
+                  zIndex: 2,
+                  borderTop: "2px dashed rgba(255, 107, 107, 0.3)"
+                }} />
+
+                {/* Input Box */}
+                <div style={{
+                  position: "absolute",
+                  bottom: 20,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  width: "80%",
+                  zIndex: 20
+                }}>
+                  <input
+                    type="text"
+                    value={currentSnippetInput}
+                    onChange={(e) => {
+                      setCurrentSnippetInput(e.target.value);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        const input = currentSnippetInput;
+                        
+                        // Find matching snippet
+                        const matched = activeSnippets.find(s => s.text === input);
+                        
+                        if (matched) {
+                          // Correct match!
+                          const inDangerZone = matched.y > 70;
+                          let finalPoints = matched.points;
+                          
+                          // Penalty for being in danger zone
+                          if (inDangerZone) {
+                            const penalty = Math.floor((matched.y - 70) * 2);
+                            finalPoints = Math.max(10, finalPoints - penalty);
+                          }
+                          
+                          setCompletedSnippets(prev => [...prev, matched.text]);
+                          setActiveSnippets(prev => prev.filter(s => s.id !== matched.id));
+                          setScore(prev => prev + finalPoints);
+                          setCombo(prev => prev + 1);
+                          setCompletedLines(prev => prev + 1);
+                          
+                          setClearAnimations(prev => [...prev, {
+                            id: Date.now(),
+                            text: inDangerZone ? `⚠️ +${finalPoints}` : `✓ +${finalPoints}`,
+                            x: 50
+                          }]);
+                          setTimeout(() => {
+                            setClearAnimations(prev => prev.slice(1));
+                          }, 1500);
+                        } else {
+                          // Wrong input - penalty
+                          const isOffScreenSnippet = completedSnippets.includes(input);
+                          const penalty = isOffScreenSnippet ? 50 : 30;
+                          
+                          setScore(prev => Math.max(0, prev - penalty));
+                          setCombo(0);
+                          
+                          setClearAnimations(prev => [...prev, {
+                            id: Date.now(),
+                            text: `❌ -${penalty}`,
+                            x: 50
+                          }]);
+                          setTimeout(() => {
+                            setClearAnimations(prev => prev.slice(1));
+                          }, 1500);
+                        }
+                        
+                        setCurrentSnippetInput("");
+                      }
+                    }}
+                    style={{
+                      width: "100%",
+                      padding: "12px 16px",
+                      fontSize: codeFontSize,
+                      fontFamily: "'D2Coding', 'JetBrains Mono', monospace",
+                      background: "rgba(43, 43, 43, 0.95)",
+                      color: "#FFF",
+                      border: activeSnippets.some(s => s.text === currentSnippetInput) ? "2px solid #FFD700" : "2px solid #5C8FD6",
+                      borderRadius: 8,
+                      outline: "none",
+                      boxShadow: activeSnippets.some(s => s.text === currentSnippetInput) ? "0 0 12px rgba(255, 215, 0, 0.5)" : "none"
+                    }}
+                    placeholder="화면의 스니펫을 정확히 입력하고 Enter..."
+                    autoFocus
+                  />
+                  <div style={{
+                    marginTop: 8,
+                    fontSize: 10,
+                    color: "#888",
+                    textAlign: "center"
+                  }}>
+                    {activeSnippets.some(s => s.text === currentSnippetInput) ? (
+                      <span style={{ color: "#FFD700", fontWeight: "bold" }}>🎯 매칭!</span>
+                    ) : (
+                      <span>보이는 스니펫만 입력 가능 • 빨간 영역 = 점수 감소</span>
+                    )}
+                  </div>
+                </div>
+
                 {/* Score & Progress HUD */}
                 <div style={{
                   position: "absolute",
                   top: 8,
                   right: 8,
-                  background: "rgba(0, 0, 0, 0.7)",
+                  background: "rgba(0, 0, 0, 0.8)",
                   backdropFilter: "blur(8px)",
                   padding: "8px 12px",
                   borderRadius: 8,
@@ -1190,16 +1405,10 @@ export default function EclipseIDE() {
                   zIndex: 10
                 }}>
                   <div style={{ color: "#FFD700" }}>⭐ {score.toLocaleString()}</div>
-                  <div style={{ color: "#00FF88" }}>{completedLines}/{CHALLENGE_FILES[currentFile].lines} 줄</div>
-                  <div style={{ 
-                    color: accuracy >= 95 ? "#00FF88" : accuracy >= 80 ? "#FFD700" : "#FF6B6B" 
-                  }}>
-                    🎯 {accuracy}%
-                  </div>
-                  {mistakes > 0 && <div style={{ color: "#FF6B6B", fontSize: 10 }}>❌ {mistakes}</div>}
-                  {combo >= 5 && <div style={{ color: "#FF6B6B" }}>🔥 COMBO x{Math.floor(combo / 5) + 1}</div>}
+                  <div style={{ color: "#00FF88" }}>완료: {completedSnippets.length}</div>
+                  <div style={{ color: "#5C8FD6" }}>활성: {activeSnippets.length}</div>
+                  {combo >= 3 && <div style={{ color: "#FF6B6B" }}>🔥 x{combo}</div>}
                   <div style={{ fontSize: 9, color: "#AAA", marginTop: 2 }}>{currentFile}</div>
-                  <div style={{ fontSize: 9, color: "#AAA" }}>Ctrl+S 저장</div>
                 </div>
 
                 {/* Hint Button */}
@@ -1252,8 +1461,8 @@ export default function EclipseIDE() {
                       left: `${anim.x}%`,
                       fontSize: 24,
                       fontWeight: "bold",
-                      color: "#00FF88",
-                      textShadow: "0 0 10px #00FF88, 0 0 20px #00FF88",
+                      color: anim.text.includes("-") ? "#FF6B6B" : "#00FF88",
+                      textShadow: `0 0 10px ${anim.text.includes("-") ? "#FF6B6B" : "#00FF88"}`,
                       animation: "clearFloat 2s ease-out forwards",
                       pointerEvents: "none",
                       zIndex: 100,
@@ -1644,6 +1853,9 @@ export default function EclipseIDE() {
                     if (opt.id === "lineMatch") {
                       setTypedCode("");
                       setCompletedLines(0);
+                      setActiveSnippets([]);
+                      setCompletedSnippets([]);
+                      setCurrentSnippetInput("");
                     } else if (opt.id === "typingRain") {
                       setCurrentInput("");
                       setCapturedWords([]);
