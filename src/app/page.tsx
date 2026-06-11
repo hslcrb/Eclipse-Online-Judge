@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import * as THREE from "three";
 
 // Theme palettes
 const DARK_COLORS = {
@@ -231,6 +232,167 @@ const OUTLINE_ITEMS = [
   { icon: "🟠", label: "main(String[]) : void", depth: 1 },
   { icon: "🟠", label: "bfs(int) : int", depth: 1 },
 ];
+
+function Tesseract({ resolvedTheme }: { resolvedTheme: "dark" | "light" }) {
+  const mountRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!mountRef.current) return;
+
+    const width = 300;
+    const height = 300;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+    camera.position.z = 4.2;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    mountRef.current.appendChild(renderer.domElement);
+
+    // 4D vertices (16 vertices of tesseract)
+    const vertices4D: number[][] = [];
+    for (let x of [-1, 1]) {
+      for (let y of [-1, 1]) {
+        for (let z of [-1, 1]) {
+          for (let w of [-1, 1]) {
+            vertices4D.push([x, y, z, w]);
+          }
+        }
+      }
+    }
+
+    // 4D edges (32 edges)
+    const edges: [number, number][] = [];
+    for (let i = 0; i < 16; i++) {
+      for (let j = i + 1; j < 16; j++) {
+        let diff = 0;
+        for (let k = 0; k < 4; k++) {
+          if (vertices4D[i][k] !== vertices4D[j][k]) diff++;
+        }
+        if (diff === 1) {
+          edges.push([i, j]);
+        }
+      }
+    }
+
+    // Three.js Point Meshes for Vertices
+    const pointGeo = new THREE.SphereGeometry(0.04, 12, 12);
+    const pointMatColor = resolvedTheme === "dark" ? 0x5C8FD6 : 0x0066CC;
+    const pointMat = new THREE.MeshBasicMaterial({ color: pointMatColor });
+    const pointMeshes: THREE.Mesh[] = [];
+    for (let i = 0; i < 16; i++) {
+      const mesh = new THREE.Mesh(pointGeo, pointMat);
+      scene.add(mesh);
+      pointMeshes.push(mesh);
+    }
+
+    // Three.js Line Segment geometry for Edges
+    const lineMatColor = resolvedTheme === "dark" ? 0x999999 : 0x555555;
+    const lineMat = new THREE.LineBasicMaterial({
+      color: lineMatColor,
+      transparent: true,
+      opacity: 0.8,
+      linewidth: 1.5,
+    });
+    
+    const linePositions = new Float32Array(32 * 2 * 3);
+    const lineGeo = new THREE.BufferGeometry();
+    lineGeo.setAttribute("position", new THREE.BufferAttribute(linePositions, 3));
+    const lines = new THREE.LineSegments(lineGeo, lineMat);
+    scene.add(lines);
+
+    // Animation variables
+    let angleXW = 0;
+    let angleYW = 0;
+    let angleZW = 0;
+    let angleXY = 0;
+
+    let animationFrameId: number;
+
+    const animate = () => {
+      animationFrameId = requestAnimationFrame(animate);
+
+      // Fast, dynamic rotation
+      angleXW += 0.02;
+      angleYW += 0.015;
+      angleZW += 0.018;
+      angleXY += 0.01;
+
+      const projected3D: THREE.Vector3[] = [];
+      const d = 2.0; // projection distance in 4D space
+
+      for (let i = 0; i < 16; i++) {
+        let [x, y, z, w] = vertices4D[i];
+
+        // Rotation in XW plane
+        let x1 = x * Math.cos(angleXW) - w * Math.sin(angleXW);
+        let w1 = x * Math.sin(angleXW) + w * Math.cos(angleXW);
+
+        // Rotation in YW plane
+        let y2 = y * Math.cos(angleYW) - w1 * Math.sin(angleYW);
+        let w2 = y * Math.sin(angleYW) + w1 * Math.cos(angleYW);
+
+        // Rotation in ZW plane
+        let z3 = z * Math.cos(angleZW) - w2 * Math.sin(angleZW);
+        let w3 = z * Math.sin(angleZW) + w2 * Math.cos(angleZW);
+
+        // Rotation in XY plane
+        let x4 = x1 * Math.cos(angleXY) - y2 * Math.sin(angleXY);
+        let y4 = x1 * Math.sin(angleXY) + y2 * Math.cos(angleXY);
+
+        // Project 4D to 3D
+        const factor = 1.2 / (d - w3); // 1.2 is a scale multiplier to make it slightly larger
+        const x3d = x4 * factor;
+        const y3d = y2 * factor;
+        const z3d = z3 * factor;
+
+        projected3D.push(new THREE.Vector3(x3d, y3d, z3d));
+        pointMeshes[i].position.set(x3d, y3d, z3d);
+      }
+
+      // Update line segment vertices
+      const positions = lineGeo.attributes.position.array as Float32Array;
+      let posIdx = 0;
+      for (let e = 0; e < edges.length; e++) {
+        const [p1, p2] = edges[e];
+        const v1 = projected3D[p1];
+        const v2 = projected3D[p2];
+
+        positions[posIdx++] = v1.x;
+        positions[posIdx++] = v1.y;
+        positions[posIdx++] = v1.z;
+
+        positions[posIdx++] = v2.x;
+        positions[posIdx++] = v2.y;
+        positions[posIdx++] = v2.z;
+      }
+      lineGeo.attributes.position.needsUpdate = true;
+
+      // Rotate entire scene
+      scene.rotation.y += 0.008;
+      scene.rotation.x += 0.005;
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      if (mountRef.current && renderer.domElement.parentNode) {
+        mountRef.current.removeChild(renderer.domElement);
+      }
+      renderer.dispose();
+      pointGeo.dispose();
+      pointMat.dispose();
+      lineGeo.dispose();
+      lineMat.dispose();
+    };
+  }, [resolvedTheme]);
+
+  return <div ref={mountRef} style={{ width: 300, height: 300 }} />;
+}
 
 export default function EclipseIDE() {
   const [activeTab, setActiveTab] = useState(0);
@@ -586,15 +748,7 @@ export default function EclipseIDE() {
             alignItems: "center",
             gap: 16
           }}>
-            <img 
-              src="/이클립스.svg" 
-              alt="Eclipse Logo" 
-              className="pulse-logo"
-              style={{
-                width: 120,
-                height: 120,
-              }} 
-            />
+            <Tesseract resolvedTheme={resolvedTheme} />
             <h1 style={{
               fontSize: 24,
               fontWeight: "lighter",
