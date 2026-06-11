@@ -3,17 +3,21 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
+type DancePhase = 'rightArm' | 'leftArm' | 'rightLeg' | 'leftLeg' | 'wallClimb';
+
 export default function FrogPet() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ x: 100, y: 100 });
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const frogRef = useRef<THREE.Group | null>(null);
   const animationFrameRef = useRef<number>(0);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !isVisible) return;
 
     // Scene 설정
     const scene = new THREE.Scene();
@@ -48,55 +52,144 @@ export default function FrogPet() {
     scene.add(frog);
     frogRef.current = frog;
 
-    // 애니메이션 루프
+    // 애니메이션 루프 - 우아한 춤
     let time = 0;
+    let dancePhase: DancePhase = 'rightArm';
+    let phaseTime = 0;
+    
     const animate = () => {
-      time += 0.05;
+      time += 0.02; // 전체적으로 느리게
+      phaseTime += 0.02;
       
       if (frogRef.current) {
-        // 킹받는 춤 동작
         const frog = frogRef.current;
         
-        // 몸통 흔들기 (좌우로 심하게)
-        frog.rotation.z = Math.sin(time * 2) * 0.3;
-        
-        // 위아래로 통통 튀기
-        frog.position.y = Math.abs(Math.sin(time * 3)) * 0.5;
-        
-        // Y축 회전 (빙글빙글)
-        frog.rotation.y += 0.05;
-        
-        // 팔 흔들기 (킹받게)
+        // 각 파츠 가져오기
         const leftArm = frog.children.find(c => c.userData.name === 'leftArm');
         const rightArm = frog.children.find(c => c.userData.name === 'rightArm');
-        
-        if (leftArm) {
-          leftArm.rotation.z = Math.sin(time * 4) * 0.8 + 0.5;
-          leftArm.rotation.x = Math.cos(time * 3) * 0.4;
-        }
-        
-        if (rightArm) {
-          rightArm.rotation.z = -Math.sin(time * 4) * 0.8 - 0.5;
-          rightArm.rotation.x = Math.cos(time * 3) * 0.4;
-        }
-        
-        // 다리 흔들기
         const leftLeg = frog.children.find(c => c.userData.name === 'leftLeg');
         const rightLeg = frog.children.find(c => c.userData.name === 'rightLeg');
-        
-        if (leftLeg) {
-          leftLeg.rotation.x = Math.sin(time * 3 + Math.PI) * 0.3;
-        }
-        
-        if (rightLeg) {
-          rightLeg.rotation.x = Math.sin(time * 3) * 0.3;
-        }
-        
-        // 머리 끄덕이기 (미친듯이)
         const head = frog.children.find(c => c.userData.name === 'head');
+        
+        // 댄스 페이즈 전환 (각 동작 3초)
+        if (phaseTime > 3) {
+          phaseTime = 0;
+          const phases: DancePhase[] = ['rightArm', 'leftArm', 'rightLeg', 'leftLeg', 'wallClimb'];
+          const currentIndex = phases.indexOf(dancePhase);
+          dancePhase = phases[(currentIndex + 1) % phases.length];
+        }
+        
+        // 기본 자세로 리셋
+        frog.rotation.z = 0;
+        frog.position.y = 0;
+        frog.rotation.x = 0;
+        
+        if (leftArm) {
+          leftArm.rotation.z = 0.5;
+          leftArm.rotation.x = 0;
+          leftArm.rotation.y = 0;
+        }
+        if (rightArm) {
+          rightArm.rotation.z = -0.5;
+          rightArm.rotation.x = 0;
+          rightArm.rotation.y = 0;
+        }
+        if (leftLeg) {
+          leftLeg.rotation.x = 0;
+        }
+        if (rightLeg) {
+          rightLeg.rotation.x = 0;
+        }
         if (head) {
-          head.rotation.x = Math.sin(time * 5) * 0.2;
-          head.rotation.z = Math.cos(time * 4) * 0.15;
+          head.rotation.x = 0;
+          head.rotation.z = 0;
+        }
+        
+        // 페이즈별 동작
+        const progress = phaseTime / 3; // 0 ~ 1
+        const smoothProgress = (Math.sin((progress - 0.5) * Math.PI) + 1) / 2; // 부드러운 진행
+        
+        switch (dancePhase) {
+          case 'rightArm':
+            // 오른팔 천천히 앞으로 내밀기
+            if (rightArm) {
+              rightArm.rotation.z = -0.5 - smoothProgress * 1.2; // 점점 앞으로
+              rightArm.rotation.x = -smoothProgress * 0.8;
+            }
+            // 허리를 오른쪽으로 축축
+            frog.rotation.z = Math.sin(phaseTime * 2) * 0.15;
+            // 머리도 살짝
+            if (head) {
+              head.rotation.z = Math.sin(phaseTime * 2) * 0.1;
+            }
+            break;
+            
+          case 'leftArm':
+            // 왼팔 천천히 앞으로 내밀기
+            if (leftArm) {
+              leftArm.rotation.z = 0.5 + smoothProgress * 1.2;
+              leftArm.rotation.x = -smoothProgress * 0.8;
+            }
+            // 허리를 왼쪽으로 축축
+            frog.rotation.z = -Math.sin(phaseTime * 2) * 0.15;
+            if (head) {
+              head.rotation.z = -Math.sin(phaseTime * 2) * 0.1;
+            }
+            break;
+            
+          case 'rightLeg':
+            // 오른발 내밀고 허리 돌리기
+            if (rightLeg) {
+              rightLeg.rotation.x = smoothProgress * 0.6;
+            }
+            frog.rotation.z = Math.sin(phaseTime * 1.5) * 0.2;
+            frog.rotation.y = smoothProgress * 0.3;
+            if (head) {
+              head.rotation.x = Math.sin(phaseTime * 2) * 0.1;
+            }
+            break;
+            
+          case 'leftLeg':
+            // 왼발 내밀고 허리 돌리기
+            if (leftLeg) {
+              leftLeg.rotation.x = smoothProgress * 0.6;
+            }
+            frog.rotation.z = -Math.sin(phaseTime * 1.5) * 0.2;
+            frog.rotation.y = -smoothProgress * 0.3;
+            if (head) {
+              head.rotation.x = -Math.sin(phaseTime * 2) * 0.1;
+            }
+            break;
+            
+          case 'wallClimb':
+            // 벽타기 시뮬레이션
+            // 몸을 앞으로 기울이고
+            frog.rotation.x = smoothProgress * 0.5;
+            
+            // 팔다리를 교차로 움직임
+            if (leftArm) {
+              leftArm.rotation.z = 0.5 + Math.sin(phaseTime * 4) * 0.6;
+              leftArm.rotation.y = Math.sin(phaseTime * 4) * 0.3;
+            }
+            if (rightArm) {
+              rightArm.rotation.z = -0.5 - Math.sin(phaseTime * 4 + Math.PI) * 0.6;
+              rightArm.rotation.y = -Math.sin(phaseTime * 4 + Math.PI) * 0.3;
+            }
+            if (leftLeg) {
+              leftLeg.rotation.x = Math.sin(phaseTime * 4 + Math.PI) * 0.4;
+            }
+            if (rightLeg) {
+              rightLeg.rotation.x = Math.sin(phaseTime * 4) * 0.4;
+            }
+            
+            // 위아래로 살짝 움직임 (기어오르는 느낌)
+            frog.position.y = Math.sin(phaseTime * 2) * 0.3;
+            
+            // 머리를 위로
+            if (head) {
+              head.rotation.x = -0.2;
+            }
+            break;
         }
       }
 
@@ -115,7 +208,7 @@ export default function FrogPet() {
       }
       renderer.dispose();
     };
-  }, []);
+  }, [isVisible]);
 
   // 개구리 생성 함수
   const createFrog = (): THREE.Group => {
@@ -279,6 +372,8 @@ export default function FrogPet() {
 
   // 드래그 핸들러
   const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return; // 좌클릭만
+    
     const startX = e.clientX - position.x;
     const startY = e.clientY - position.y;
 
@@ -298,21 +393,114 @@ export default function FrogPet() {
     document.addEventListener('mouseup', handleMouseUp);
   };
 
+  // 우클릭 핸들러 (커스텀 메뉴)
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+    });
+  };
+
+  // 메뉴 닫기
+  useEffect(() => {
+    const closeMenu = () => setContextMenu(null);
+    
+    if (contextMenu) {
+      document.addEventListener('click', closeMenu);
+      document.addEventListener('contextmenu', closeMenu);
+      
+      return () => {
+        document.removeEventListener('click', closeMenu);
+        document.removeEventListener('contextmenu', closeMenu);
+      };
+    }
+  }, [contextMenu]);
+
+  // 펫 제거
+  const handleRemove = () => {
+    setIsVisible(false);
+    setContextMenu(null);
+  };
+
+  if (!isVisible) return null;
+
   return (
-    <div
-      ref={containerRef}
-      onMouseDown={handleMouseDown}
-      style={{
-        position: 'fixed',
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        width: '200px',
-        height: '200px',
-        zIndex: 99999,
-        cursor: 'grab',
-        pointerEvents: 'auto',
-      }}
-      className="frog-pet"
-    />
+    <>
+      <div
+        ref={containerRef}
+        onMouseDown={handleMouseDown}
+        onContextMenu={handleContextMenu}
+        style={{
+          position: 'fixed',
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+          width: '200px',
+          height: '200px',
+          zIndex: 99999,
+          cursor: 'grab',
+          pointerEvents: 'auto',
+        }}
+        className="frog-pet"
+      />
+      
+      {/* 커스텀 우클릭 메뉴 */}
+      {contextMenu && (
+        <div
+          style={{
+            position: 'fixed',
+            left: `${contextMenu.x}px`,
+            top: `${contextMenu.y}px`,
+            zIndex: 999999,
+            background: '#2B2B2B',
+            border: '1px solid #555',
+            borderRadius: '4px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+            padding: '4px 0',
+            minWidth: '150px',
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            fontSize: '13px',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div
+            onClick={handleRemove}
+            style={{
+              padding: '8px 16px',
+              cursor: 'pointer',
+              color: '#FF6B6B',
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 107, 107, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+            }}
+          >
+            🐸 개구리 끄기
+          </div>
+          <div
+            style={{
+              height: '1px',
+              background: '#444',
+              margin: '4px 8px',
+            }}
+          />
+          <div
+            style={{
+              padding: '8px 16px',
+              color: '#888',
+              fontSize: '11px',
+              pointerEvents: 'none',
+            }}
+          >
+            드래그로 이동 가능
+          </div>
+        </div>
+      )}
+    </>
   );
 }
