@@ -481,11 +481,11 @@ export default function EclipseIDE() {
         e.preventDefault();
         
         if (key === '-') {
-          // Zoom out (decrease font size, minimum 8)
-          setCodeFontSize(prev => Math.max(8, prev - 1));
+          // Zoom out (decrease font size by 2px, minimum 8)
+          setCodeFontSize(prev => Math.max(8, prev - 2));
         } else if (key === '=' || key === '+') {
-          // Zoom in (increase font size, maximum 24)
-          setCodeFontSize(prev => Math.min(24, prev + 1));
+          // Zoom in (increase font size by 2px, maximum 28)
+          setCodeFontSize(prev => Math.min(28, prev + 2));
         }
 
         // Reset tracking after successful action
