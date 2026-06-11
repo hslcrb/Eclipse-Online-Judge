@@ -162,7 +162,7 @@ const totalLines = (() => {
 })();
 
 // Challenge files from _jsp folder
-const CHALLENGE_FILES: { [key: string]: { content: string; lines: number; hint: string } } = {
+const CHALLENGE_FILES: { [key: string]: { content: string; lines: number; hint: string; snippets: string[] } } = {
   "check.js": {
     content: `function joinCheck() {
     if (document.frm.custno.value == '') {
@@ -204,7 +204,18 @@ const CHALLENGE_FILES: { [key: string]: { content: string; lines: number; hint: 
     return true;
 }`,
     lines: 35,
-    hint: "폼 유효성 검사 함수입니다. 각 필드가 비어있는지 확인하세요!"
+    hint: "폼 유효성 검사 함수입니다. 각 필드가 비어있는지 확인하세요!",
+    snippets: [
+      "function joinCheck() {",
+      "if (document.frm.custno.value == '') {",
+      "alert('회원번호가 입력되지 않았습니다.')",
+      "document.frm.custno.focus();",
+      "return false;",
+      "}",
+      "if (document.frm.custname.value == '') {",
+      "alert('회원성명이 입력되지 않았습니다.')",
+      "return true;"
+    ]
   },
   "db.jsp": {
     content: `<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
@@ -219,7 +230,17 @@ const CHALLENGE_FILES: { [key: string]: { content: string; lines: number; hint: 
   );
 %>`,
     lines: 10,
-    hint: "Oracle DB 연결 설정입니다. JDBC 드라이버를 로드하고 연결 객체를 생성하세요!"
+    hint: "Oracle DB 연결 설정입니다. JDBC 드라이버를 로드하고 연결 객체를 생성하세요!",
+    snippets: [
+      "<%@ page language=\"java\" contentType=\"text/html; charset=UTF-8\" pageEncoding=\"UTF-8\" %>",
+      "<%@ page import=\"java.sql.*\" %>",
+      "Class.forName(\"oracle.jdbc.OracleDriver\");",
+      "Connection con = DriverManager.getConnection(",
+      "\"jdbc:oracle:thin:@//localhost:1521/xe\",",
+      "\"system\",",
+      "\"1234\"",
+      ");"
+    ]
   },
   "join.jsp": {
     content: `<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
@@ -279,7 +300,29 @@ const CHALLENGE_FILES: { [key: string]: { content: string; lines: number; hint: 
 </body>
 </html>`,
     lines: 54,
-    hint: "회원 등록 폼입니다. 테이블 구조와 input 태그를 정확히 작성하세요!"
+    hint: "회원 등록 폼입니다. 테이블 구조와 input 태그를 정확히 작성하세요!",
+    snippets: [
+      "<%@ include file=\"db.jsp\" %>",
+      "<% request.setCharacterEncoding(\"utf-8\"); %>",
+      "<!DOCTYPE html>",
+      "<html>",
+      "<head>",
+      "<meta charset=\"UTF-8\">",
+      "<title>회원등록</title>",
+      "</head>",
+      "<body>",
+      "<script type=\"text/javascript\" src=\"check.js\"></script>",
+      "<jsp:include page=\"header.jsp\"></jsp:include>",
+      "<h3 align=\"center\">홈쇼핑 회원 등록</h3>",
+      "<form name='frm' method='post' action='joinok.jsp'>",
+      "<table align='center' border='1'>",
+      "<td align='center'>회원번호</td>",
+      "<td><input type='text' name='custno'></td>",
+      "</table>",
+      "</form>",
+      "</body>",
+      "</html>"
+    ]
   },
   "sql.sql": {
     content: `CREATE TABLE member_tbl_02(
@@ -300,9 +343,40 @@ INSERT INTO member_tbl_02 VALUES (100004,'최사랑','010-1111-5555','울릉군 
 INSERT INTO member_tbl_02 VALUES (100005,'진평화','010-1111-6666','제주시 제주도 외나무골','20151225','B','60');
 INSERT INTO member_tbl_02 VALUES (100006,'차공단','010-1111-7777','제주시 제주도 감나무골','20151211','C','60');`,
     lines: 17,
-    hint: "테이블 생성과 데이터 삽입 쿼리입니다. SQL 문법에 주의하세요!"
+    hint: "테이블 생성과 데이터 삽입 쿼리입니다. SQL 문법에 주의하세요!",
+    snippets: [
+      "CREATE TABLE member_tbl_02(",
+      "custno number(6) NOT NULL,",
+      "custname varchar2(20),",
+      "phone varchar2(13),",
+      "PRIMARY KEY(custno)",
+      ");",
+      "INSERT INTO member_tbl_02 VALUES (100001,'김행복','010-1111-2222','서울 동대문구 휘경1동','20151202','A','01');",
+      "INSERT INTO member_tbl_02 VALUES (100002,'이축복','010-1111-3333','서울 동대문구 휘경2동','20151206','B','01');"
+    ]
   }
 };
+
+// Calculate snippet difficulty score
+function calculateSnippetScore(snippet: string): number {
+  let baseScore = 50;
+  const length = snippet.length;
+  
+  // Length bonus
+  if (length > 60) baseScore += 100;
+  else if (length > 40) baseScore += 70;
+  else if (length > 20) baseScore += 40;
+  else if (length > 10) baseScore += 20;
+  
+  // Uppercase/special char bonus
+  const uppercaseCount = (snippet.match(/[A-Z]/g) || []).length;
+  const specialCount = (snippet.match(/[^a-zA-Z0-9\s]/g) || []).length;
+  
+  baseScore += uppercaseCount * 2;
+  baseScore += specialCount * 3;
+  
+  return baseScore;
+}
 
 // Typing Rain mode word pools - longer phrases
 const TYPING_WORDS = {
@@ -631,6 +705,11 @@ export default function EclipseIDE() {
   const [combo, setCombo] = useState(0);
   const [startTime, setStartTime] = useState<number | null>(null);
   const editorRef = useRef<HTMLTextAreaElement>(null);
+
+  // Line Match mode - snippet system
+  const [activeSnippets, setActiveSnippets] = useState<{ id: number; text: string; y: number; speed: number; points: number; spawnTime: number }[]>([]);
+  const [completedSnippets, setCompletedSnippets] = useState<string[]>([]);
+  const [currentSnippetInput, setCurrentSnippetInput] = useState("");
 
   // Typing Rain mode states
   const [fallingWords, setFallingWords] = useState<{ id: number; word: string; x: number; y: number; speed: number; type: string }[]>([]);
