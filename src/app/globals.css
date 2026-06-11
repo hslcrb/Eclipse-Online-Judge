@@ -1,6 +1,14 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
 
+/* D2Coding Font for Code Editor Only */
+@font-face {
+  font-family: 'D2Coding';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_three@1.0/D2Coding.woff') format('woff');
+  font-weight: normal;
+  font-display: swap;
+}
+
 /* Custom Scrollbar Styles */
 ::-webkit-scrollbar {
   width: 8px;
