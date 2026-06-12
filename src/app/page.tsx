@@ -553,7 +553,7 @@ function SQLEditor({
           paddingTop: 8,
           textAlign: 'right',
           paddingRight: 8,
-          fontFamily: 'Consolas, monospace',
+          fontFamily: 'D2Coding, Consolas, monospace',
         }}>
           {lines.map((_, i) => (
             <div key={i}>{i + 1}</div>
@@ -566,7 +566,7 @@ function SQLEditor({
           onChange={(e) => onCodeChange(activeFile, e.target.value)}
           style={{
             flex: 1,
-            fontFamily: 'Consolas, monospace',
+            fontFamily: 'D2Coding, Consolas, monospace',
             fontSize: 13,
             lineHeight: '20px',
             padding: '8px',
@@ -639,7 +639,7 @@ function JSPEditor({
           paddingTop: 4,
           textAlign: 'right',
           paddingRight: 6,
-          fontFamily: 'Consolas, monospace',
+          fontFamily: 'D2Coding, Consolas, monospace',
         }}>
           {lines.map((_, i) => (
             <div key={i}>{i + 1}</div>
@@ -652,7 +652,7 @@ function JSPEditor({
           onChange={(e) => onCodeChange(activeFile, e.target.value)}
           style={{
             flex: 1,
-            fontFamily: 'Consolas, monospace',
+            fontFamily: 'D2Coding, Consolas, monospace',
             fontSize: 13,
             lineHeight: '22px',
             padding: '4px 8px',
