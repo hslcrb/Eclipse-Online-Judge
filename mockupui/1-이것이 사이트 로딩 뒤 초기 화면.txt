@@ -1,0 +1,332 @@
+import React from "react";
+
+export default function EclipseMock() {
+  return (
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        background: "#ececec",
+        display: "flex",
+        flexDirection: "column",
+        fontFamily: "Segoe UI, sans-serif",
+        overflow: "hidden",
+      }}
+    >
+      {/* 메뉴 */}
+      <div
+        style={{
+          height: 26,
+          background: "#f5f5f5",
+          borderBottom: "1px solid #ccc",
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          padding: "0 10px",
+          fontSize: 13,
+        }}
+      >
+        <span>File</span>
+        <span>Edit</span>
+        <span>Navigate</span>
+        <span>Search</span>
+        <span>Project</span>
+        <span>Run</span>
+        <span>Window</span>
+        <span>Help</span>
+      </div>
+
+      {/* 툴바 */}
+      <div
+        style={{
+          height: 32,
+          background: "#f7f7f7",
+          borderBottom: "1px solid #d5d5d5",
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          paddingLeft: 8,
+        }}
+      >
+        {[
+          "📄",
+          "📂",
+          "💾",
+          "↩️",
+          "↪️",
+          "🔍",
+          "⚙️",
+          "▶️",
+          "⏹️",
+          "🐞",
+          "📦",
+          "☕",
+        ].map((x, i) => (
+          <span key={i}>{x}</span>
+        ))}
+      </div>
+
+      {/* 본문 */}
+      <div
+        style={{
+          flex: 1,
+          display: "grid",
+          gridTemplateColumns: "330px 1fr 260px",
+        }}
+      >
+        {/* 왼쪽 */}
+        <div
+          style={{
+            borderRight: "1px solid #ccc",
+            background: "#f5f5f5",
+          }}
+        >
+          <div
+            style={{
+              padding: 6,
+              borderBottom: "1px solid #ddd",
+              fontWeight: 600,
+            }}
+          >
+            📁 Project Explorer
+          </div>
+
+          <div style={{ padding: 8, fontSize: 13 }}>
+            <div>🖥️ Servers</div>
+
+            <div style={{ marginTop: 4 }}>
+              📂 test1
+              <div style={{ paddingLeft: 18 }}>
+                <div>📄 Deployment Descriptor</div>
+                <div>🌐 JAX-WS Web Services</div>
+                <div>☕ Java Resources</div>
+                <div>📁 build</div>
+
+                <div>
+                  📁 src
+                  <div style={{ paddingLeft: 18 }}>
+                    <div>📁 main</div>
+                    <div>☕ java</div>
+                    <div>🌍 webapp</div>
+                    <div>📄 index.jsp</div>
+                    <div>📄 join.jsp</div>
+                    <div>📄 list.jsp</div>
+                    <div>📄 sales.jsp</div>
+                    <div>📄 sql.sql</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 중앙 */}
+        <div
+          style={{
+            position: "relative",
+            background: "#efefef",
+          }}
+        >
+          {/* 모달 */}
+          <div
+            style={{
+              width: 440,
+              height: 520,
+              background: "#f8f8f8",
+              borderRadius: 12,
+              boxShadow: "0 15px 40px rgba(0,0,0,.25)",
+              border: "1px solid #ccc",
+              position: "absolute",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%,-50%)",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <div
+              style={{
+                height: 42,
+                borderBottom: "1px solid #ddd",
+                display: "flex",
+                alignItems: "center",
+                paddingLeft: 12,
+                fontWeight: 600,
+              }}
+            >
+              🗄️ New Connection Profile
+            </div>
+
+            <div
+              style={{
+                flex: 1,
+                padding: 20,
+                fontSize: 13,
+              }}
+            >
+              <b>Specify a Driver and Connection Details</b>
+
+              <div style={{ marginTop: 20 }}>
+                Driver
+                <input
+                  value="Oracle Thin Driver"
+                  readOnly
+                  style={{
+                    width: "100%",
+                    marginTop: 4,
+                  }}
+                />
+              </div>
+
+              <div style={{ marginTop: 12 }}>
+                Host
+                <input
+                  value="localhost"
+                  readOnly
+                  style={{
+                    width: "100%",
+                  }}
+                />
+              </div>
+
+              <div style={{ marginTop: 12 }}>
+                Port
+                <input
+                  value="1521"
+                  readOnly
+                  style={{
+                    width: "100%",
+                  }}
+                />
+              </div>
+
+              <div style={{ marginTop: 12 }}>
+                Username
+                <input
+                  value="system"
+                  readOnly
+                  style={{
+                    width: "100%",
+                  }}
+                />
+              </div>
+
+              <div style={{ marginTop: 12 }}>
+                Password
+                <input
+                  value="••••••••"
+                  readOnly
+                  style={{
+                    width: "100%",
+                  }}
+                />
+              </div>
+
+              <div style={{ marginTop: 20 }}>
+                ☑ Connect when wizard completes
+              </div>
+            </div>
+
+            <div
+              style={{
+                height: 60,
+                borderTop: "1px solid #ddd",
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                gap: 8,
+                paddingRight: 12,
+              }}
+            >
+              <button>{"< Back"}</button>
+              <button>Next ></button>
+              <button>Finish</button>
+              <button>Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        {/* 오른쪽 */}
+        <div
+          style={{
+            borderLeft: "1px solid #ccc",
+            background: "#f5f5f5",
+          }}
+        >
+          <div
+            style={{
+              padding: 6,
+              borderBottom: "1px solid #ddd",
+              fontWeight: 600,
+            }}
+          >
+            📋 Outline
+          </div>
+
+          <div
+            style={{
+              padding: 8,
+              fontSize: 13,
+              color: "#666",
+            }}
+          >
+            There is no active editor that provides an outline.
+          </div>
+        </div>
+      </div>
+
+      {/* 하단 */}
+      <div
+        style={{
+          height: 160,
+          borderTop: "1px solid #ccc",
+          background: "#f7f7f7",
+        }}
+      >
+        <div
+          style={{
+            height: 28,
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            paddingLeft: 10,
+            borderBottom: "1px solid #ddd",
+          }}
+        >
+          <span>⚠️ Problems</span>
+          <span>🖥️ Servers</span>
+          <span>💻 Terminal</span>
+          <span>🗄️ Data Source Explorer</span>
+          <span>📄 Properties</span>
+        </div>
+
+        <div style={{ padding: 10 }}>
+          📁 Database Connections
+          <br />
+          📁 ODA Data Sources
+          <br />
+          &nbsp;&nbsp;📄 Flat File Data Source
+          <br />
+          &nbsp;&nbsp;📄 Web Services Data Source
+          <br />
+          &nbsp;&nbsp;📄 XML Data Source
+        </div>
+      </div>
+
+      {/* 상태바 */}
+      <div
+        style={{
+          height: 22,
+          background: "#f0f0f0",
+          borderTop: "1px solid #ccc",
+          display: "flex",
+          alignItems: "center",
+          padding: "0 8px",
+        }}
+      >
+        <span>0 items selected</span>
+        <span style={{ marginLeft: "auto" }}>💡</span>
+      </div>
+    </div>
+  );
+}

@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function EclipseWorkbenchMock() {
+export default function EclipseWorkbench() {
   const projectLinks = [
     "Create a Maven project",
     "Create a Java EE EAR project",
@@ -14,6 +14,11 @@ export default function EclipseWorkbenchMock() {
     "Import projects..."
   ];
 
+  const toolbarIcons = [
+    "📄","📂","💾","↩","↪","✂","📋","📌","🔍","⚙",
+    "▶","⏹","🐞","📦","🛠","☕","📝","📚","🔧","🔎"
+  ];
+
   return (
     <div
       style={{
@@ -21,36 +26,37 @@ export default function EclipseWorkbenchMock() {
         height: "100vh",
         display: "flex",
         flexDirection: "column",
-        fontFamily: "Segoe UI,sans-serif",
-        background: "#ececec"
+        overflow: "hidden",
+        background: "#ECECEC",
+        fontFamily: "Segoe UI, sans-serif",
+        fontSize: 12,
+        color: "#000"
       }}
     >
-      {/* title */}
+      {/* TITLE BAR */}
       <div
         style={{
-          height: 30,
-          background: "#e6e6e6",
-          borderBottom: "1px solid #d2d2d2",
+          height: 24,
+          background: "#E6E6E6",
+          borderBottom: "1px solid #D0D0D0",
           display: "flex",
           alignItems: "center",
-          paddingLeft: 8,
-          fontSize: 13
+          paddingLeft: 8
         }}
       >
         hrdKorea - Eclipse IDE
       </div>
 
-      {/* menu */}
+      {/* MENU */}
       <div
         style={{
-          height: 26,
+          height: 24,
+          background: "#F3F3F3",
+          borderBottom: "1px solid #D8D8D8",
           display: "flex",
           alignItems: "center",
-          gap: 16,
-          paddingLeft: 8,
-          background: "#f3f3f3",
-          borderBottom: "1px solid #d9d9d9",
-          fontSize: 13
+          gap: 18,
+          paddingLeft: 8
         }}
       >
         {[
@@ -62,59 +68,63 @@ export default function EclipseWorkbenchMock() {
           "Run",
           "Window",
           "Help"
-        ].map(x => (
-          <span key={x}>{x}</span>
+        ].map(item => (
+          <span key={item}>{item}</span>
         ))}
       </div>
 
-      {/* toolbar */}
+      {/* TOOLBAR */}
       <div
         style={{
           height: 28,
+          background: "#F7F7F7",
+          borderBottom: "1px solid #D7D7D7",
           display: "flex",
           alignItems: "center",
-          gap: 8,
-          padding: "0 6px",
-          background: "#f7f7f7",
-          borderBottom: "1px solid #d8d8d8",
-          fontSize: 14
+          gap: 6,
+          paddingLeft: 6
         }}
       >
-        {[
-          "📁","💾","↩️","↪️","🔍","⚙️","▶️",
-          "⏹️","🐞","📦","📝","📋","🔧","📚"
-        ].map((i,n)=>(
-          <span key={n}>{i}</span>
+        {toolbarIcons.map((icon, i) => (
+          <span
+            key={i}
+            style={{
+              width: 18,
+              textAlign: "center",
+              cursor: "pointer"
+            }}
+          >
+            {icon}
+          </span>
         ))}
       </div>
 
-      {/* workspace */}
+      {/* MAIN AREA */}
       <div
         style={{
           flex: 1,
           display: "grid",
-          gridTemplateColumns: "330px 1fr 260px"
+          gridTemplateColumns: "335px 1fr 260px",
+          overflow: "hidden"
         }}
       >
-        {/* left */}
+        {/* PROJECT EXPLORER */}
         <div
           style={{
-            borderRight: "1px solid #cfcfcf",
-            background: "#f4f4f4",
+            borderRight: "1px solid #CFCFCF",
+            background: "#F4F4F4",
             display: "flex",
             flexDirection: "column"
           }}
         >
           <div
             style={{
-              height: 26,
-              borderBottom: "1px solid #d5d5d5",
-              background: "#fafafa",
+              height: 24,
+              borderBottom: "1px solid #D6D6D6",
               display: "flex",
               alignItems: "center",
-              paddingLeft: 8,
-              fontSize: 13,
-              fontWeight: 500
+              paddingLeft: 6,
+              background: "#FAFAFA"
             }}
           >
             📁 Project Explorer
@@ -123,81 +133,139 @@ export default function EclipseWorkbenchMock() {
           <div
             style={{
               padding: 8,
-              fontSize: 13
+              overflow: "auto",
+              lineHeight: 1.4
             }}
           >
-            <div>
-              There are no projects in your workspace.
-            </div>
+            <div>There are no projects in your workspace.</div>
+            <div>To add a project:</div>
 
-            <div style={{ marginBottom: 12 }}>
-              To add a project:
-            </div>
+            <div style={{ height: 10 }} />
 
             {projectLinks.map(link => (
               <div
                 key={link}
                 style={{
-                  color: "#1565c0",
+                  color: "#1565C0",
                   textDecoration: "underline",
-                  marginBottom: 8,
+                  marginBottom: 7,
                   cursor: "pointer"
                 }}
               >
-                {link}
+                📂 {link}
               </div>
             ))}
           </div>
         </div>
 
-        {/* center */}
+        {/* CENTER */}
         <div
           style={{
-            background: "#efefef",
-            position: "relative"
+            display: "flex",
+            flexDirection: "column",
+            background: "#EFEFEF"
           }}
         >
           <div
             style={{
-              position: "absolute",
-              left: "50%",
-              top: "45%",
-              transform: "translate(-50%,-50%)",
-              color: "#888",
-              textAlign: "center",
-              fontSize: 14,
-              lineHeight: 1.6
+              flex: 1,
+              position: "relative",
+              borderBottom: "1px solid #CFCFCF"
             }}
           >
-            Open a file or drop files here to open them.
-            <br />
-            Find Actions&nbsp;&nbsp;Ctrl+3
-            <br />
-            Show Key Assist&nbsp;&nbsp;Ctrl+Shift+L
-            <br />
-            New&nbsp;&nbsp;Ctrl+N
+            <div
+              style={{
+                position: "absolute",
+                left: "50%",
+                top: "52%",
+                transform: "translate(-50%, -50%)",
+                textAlign: "center",
+                color: "#888",
+                fontSize: 13,
+                lineHeight: 1.5
+              }}
+            >
+              Open a file or drop files here to open them.
+              <br />
+              Find Actions &nbsp; Ctrl+3
+              <br />
+              Show Key Assist &nbsp; Ctrl+Shift+L
+              <br />
+              New &nbsp; Ctrl+N
+            </div>
+          </div>
+
+          {/* BOTTOM VIEW */}
+          <div
+            style={{
+              height: 165,
+              background: "#F4F4F4",
+              display: "flex",
+              flexDirection: "column"
+            }}
+          >
+            <div
+              style={{
+                height: 26,
+                borderBottom: "1px solid #D8D8D8",
+                display: "flex",
+                alignItems: "center",
+                paddingLeft: 8,
+                gap: 10
+              }}
+            >
+              <span>⚠ Problems</span>
+              <span
+                style={{
+                  background: "#FFFFFF",
+                  border: "1px solid #CFCFCF",
+                  borderBottom: "none",
+                  padding: "2px 6px"
+                }}
+              >
+                🖥 Servers
+              </span>
+              <span>💻 Terminal</span>
+              <span>🗄 Data Source Explorer</span>
+              <span>📄 Properties</span>
+
+              <div style={{ marginLeft: "auto", marginRight: 8 }}>
+                ⚙ ▶ ⏹
+              </div>
+            </div>
+
+            <div
+              style={{
+                flex: 1,
+                background: "#FFF",
+                padding: 8,
+                color: "#1565C0",
+                textDecoration: "underline"
+              }}
+            >
+              No servers are available. Click this link to create a new
+              server...
+            </div>
           </div>
         </div>
 
-        {/* right */}
+        {/* OUTLINE */}
         <div
           style={{
-            borderLeft: "1px solid #cfcfcf",
-            background: "#f4f4f4",
+            borderLeft: "1px solid #CFCFCF",
+            background: "#F4F4F4",
             display: "flex",
             flexDirection: "column"
           }}
         >
           <div
             style={{
-              height: 26,
-              borderBottom: "1px solid #d5d5d5",
-              background: "#fafafa",
+              height: 24,
+              borderBottom: "1px solid #D6D6D6",
               display: "flex",
               alignItems: "center",
-              paddingLeft: 8,
-              fontSize: 13,
-              fontWeight: 500
+              paddingLeft: 6,
+              background: "#FAFAFA"
             }}
           >
             📋 Outline
@@ -206,65 +274,30 @@ export default function EclipseWorkbenchMock() {
           <div
             style={{
               padding: 8,
-              color: "#555",
-              fontSize: 13
+              color: "#444"
             }}
           >
-            There is no active editor that
-            provides an outline.
+            There is no active editor that provides an outline.
           </div>
         </div>
       </div>
 
-      {/* bottom tabs */}
-      <div
-        style={{
-          height: 165,
-          borderTop: "1px solid #cfcfcf",
-          background: "#f5f5f5",
-          display: "flex",
-          flexDirection: "column"
-        }}
-      >
-        <div
-          style={{
-            height: 30,
-            display: "flex",
-            alignItems: "center",
-            gap: 14,
-            paddingLeft: 8,
-            borderBottom: "1px solid #d8d8d8",
-            fontSize: 13
-          }}
-        >
-          <span>⚠️ Problems</span>
-          <span>🖥️ Servers</span>
-          <span>💻 Terminal</span>
-          <span>🗄️ Data Source Explorer</span>
-          <span>📄 Properties</span>
-        </div>
-
-        <div
-          style={{
-            flex: 1,
-            background: "#fff"
-          }}
-        />
-      </div>
-
-      {/* status */}
+      {/* STATUS BAR */}
       <div
         style={{
           height: 22,
-          background: "#f1f1f1",
-          borderTop: "1px solid #d0d0d0",
+          background: "#F2F2F2",
+          borderTop: "1px solid #D0D0D0",
           display: "flex",
           alignItems: "center",
-          paddingLeft: 6,
-          fontSize: 12
+          padding: "0 6px"
         }}
       >
-        0 items selected
+        <span>0 items selected</span>
+
+        <div style={{ marginLeft: "auto" }}>
+          🔔
+        </div>
       </div>
     </div>
   );

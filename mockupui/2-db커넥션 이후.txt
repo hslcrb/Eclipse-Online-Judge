@@ -1,0 +1,339 @@
+import React from "react";
+
+export default function EclipseLikeUI() {
+  return (
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        background: "#ececec",
+        display: "flex",
+        flexDirection: "column",
+        fontFamily: "Segoe UI, sans-serif",
+        fontSize: 12,
+        overflow: "hidden",
+        color: "#222",
+      }}
+    >
+      {/* MENU */}
+      <div
+        style={{
+          height: 26,
+          background: "#f4f4f4",
+          borderBottom: "1px solid #d6d6d6",
+          display: "flex",
+          alignItems: "center",
+          paddingLeft: 8,
+          gap: 16,
+        }}
+      >
+        <span>File</span>
+        <span>Edit</span>
+        <span>Navigate</span>
+        <span>Search</span>
+        <span>Project</span>
+        <span>Run</span>
+        <span>Window</span>
+        <span>Help</span>
+      </div>
+
+      {/* TOOLBAR */}
+      <div
+        style={{
+          height: 30,
+          background: "#f7f7f7",
+          borderBottom: "1px solid #d4d4d4",
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          paddingLeft: 6,
+        }}
+      >
+        {[
+          "📄",
+          "📂",
+          "💾",
+          "↩️",
+          "↪️",
+          "✂️",
+          "📋",
+          "📌",
+          "🔍",
+          "⚙️",
+          "▶️",
+          "⏹️",
+          "🐞",
+          "📦",
+          "☕",
+          "📝",
+          "🔧",
+          "📚",
+          "➡️",
+          "⬅️",
+        ].map((x, i) => (
+          <span key={i}>{x}</span>
+        ))}
+      </div>
+
+      {/* WORKBENCH */}
+      <div
+        style={{
+          flex: 1,
+          display: "grid",
+          gridTemplateColumns: "335px 1fr 260px",
+          overflow: "hidden",
+        }}
+      >
+        {/* LEFT */}
+        <div
+          style={{
+            borderRight: "1px solid #cfcfcf",
+            background: "#f6f6f6",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <div
+            style={{
+              height: 24,
+              borderBottom: "1px solid #d8d8d8",
+              background: "#fafafa",
+              display: "flex",
+              alignItems: "center",
+              paddingLeft: 6,
+              fontWeight: 600,
+            }}
+          >
+            📁 Project Explorer
+          </div>
+
+          <div
+            style={{
+              padding: 6,
+              overflow: "auto",
+              lineHeight: 1.45,
+            }}
+          >
+            <div>🖥️ Servers</div>
+
+            <div style={{ marginTop: 4 }}>
+              ▼ 📁 test1
+            </div>
+
+            <div style={{ paddingLeft: 18 }}>
+              <div>📄 Deployment Descriptor</div>
+              <div>🌐 JAX-WS Web Services</div>
+              <div>☕ Java Resources</div>
+              <div>📁 build</div>
+
+              <div>▼ 📁 src</div>
+
+              <div style={{ paddingLeft: 18 }}>
+                <div>▼ 📁 main</div>
+
+                <div style={{ paddingLeft: 18 }}>
+                  <div>☕ java</div>
+
+                  <div>▼ 🌍 webapp</div>
+
+                  <div style={{ paddingLeft: 18 }}>
+                    <div>📁 META-INF</div>
+
+                    <div>▼ 📁 WEB-INF</div>
+
+                    <div style={{ paddingLeft: 18 }}>
+                      <div>▼ 📁 lib</div>
+
+                      <div style={{ paddingLeft: 18 }}>
+                        📦 ojdbc6.jar
+                      </div>
+                    </div>
+
+                    <div>📄 check.jsp</div>
+                    <div>📄 footer.jsp</div>
+                    <div>📄 header.jsp</div>
+                    <div>📄 index.jsp</div>
+                    <div>📄 join.jsp</div>
+                    <div>📄 joinok.jsp</div>
+
+                    <div
+                      style={{
+                        background: "#cfe8ff",
+                        border: "1px solid #99c4ff",
+                        width: "fit-content",
+                        padding: "0 4px",
+                      }}
+                    >
+                      📄 list.jsp
+                    </div>
+
+                    <div>📄 sales.jsp</div>
+                    <div>📄 sql.sql</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* CENTER */}
+        <div
+          style={{
+            background: "#efefef",
+            position: "relative",
+            borderBottom: "1px solid #cfcfcf",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: "45%",
+              transform: "translate(-50%,-50%)",
+              textAlign: "center",
+              color: "#8b8b8b",
+              lineHeight: 1.6,
+              fontSize: 13,
+            }}
+          >
+            Open a file or drop files here to open them.
+            <br />
+            Find Actions &nbsp; Ctrl+3
+            <br />
+            Show Key Assist &nbsp; Ctrl+Shift+L
+            <br />
+            New &nbsp; Ctrl+N
+          </div>
+        </div>
+
+        {/* OUTLINE */}
+        <div
+          style={{
+            borderLeft: "1px solid #cfcfcf",
+            background: "#f6f6f6",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <div
+            style={{
+              height: 24,
+              borderBottom: "1px solid #d8d8d8",
+              background: "#fafafa",
+              display: "flex",
+              alignItems: "center",
+              paddingLeft: 6,
+              fontWeight: 600,
+            }}
+          >
+            📋 Outline
+          </div>
+
+          <div
+            style={{
+              padding: 8,
+              color: "#555",
+            }}
+          >
+            There is no active editor that provides an outline.
+          </div>
+        </div>
+      </div>
+
+      {/* BOTTOM PANEL */}
+      <div
+        style={{
+          height: 165,
+          borderTop: "1px solid #cfcfcf",
+          background: "#f7f7f7",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {/* TABS */}
+        <div
+          style={{
+            height: 28,
+            borderBottom: "1px solid #d7d7d7",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            paddingLeft: 8,
+          }}
+        >
+          <span>⚠️ Problems</span>
+          <span>🖥️ Servers</span>
+          <span>💻 Terminal</span>
+
+          <span
+            style={{
+              background: "#fff",
+              border: "1px solid #bbb",
+              borderBottom: "none",
+              padding: "2px 8px",
+            }}
+          >
+            🗄️ Data Source Explorer
+          </span>
+
+          <span>📄 Properties</span>
+
+          <div style={{ marginLeft: "auto", paddingRight: 10 }}>
+            ➕ 🔄 ⚙️
+          </div>
+        </div>
+
+        {/* CONTENT */}
+        <div
+          style={{
+            flex: 1,
+            background: "#fff",
+            overflow: "auto",
+            padding: 8,
+            lineHeight: 1.5,
+          }}
+        >
+          <div>▼ 📁 Database Connections</div>
+
+          <div style={{ paddingLeft: 20 }}>
+            <div>
+              ▼ 🗄️ New Oracle (Oracle v. 0.2.0.2.0 - 64bit Production)
+            </div>
+
+            <div style={{ paddingLeft: 20 }}>
+              📦 xe
+            </div>
+          </div>
+
+          <div style={{ marginTop: 4 }}>
+            ▼ 📁 ODA Data Sources
+          </div>
+
+          <div style={{ paddingLeft: 20 }}>
+            <div>📄 Flat File Data Source</div>
+            <div>📄 Web Services Data Source</div>
+            <div>📄 XML Data Source</div>
+          </div>
+        </div>
+      </div>
+
+      {/* STATUS BAR */}
+      <div
+        style={{
+          height: 22,
+          background: "#f1f1f1",
+          borderTop: "1px solid #d0d0d0",
+          display: "flex",
+          alignItems: "center",
+          padding: "0 6px",
+        }}
+      >
+        <span>0 items selected</span>
+
+        <span style={{ marginLeft: "auto" }}>
+          💡
+        </span>
+      </div>
+    </div>
+  );
+}
