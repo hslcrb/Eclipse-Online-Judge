@@ -267,246 +267,408 @@ export default function CatPet({ initialPosition = { x: 300, y: 100 }, onRemove 
     };
   }, []);
 
-  // 고양이 생성 함수
+  // 고양이 생성 함수 - 극도로 정교한 버전
   const createCat = (): THREE.Group => {
     const cat = new THREE.Group();
     
-    // 재질
-    const catMaterial = new THREE.MeshPhongMaterial({ 
-      color: 0xFF8C42, // 주황색 고양이
-      shininess: 50,
-      specular: 0x442211
+    // 최고급 재질 (부드럽고 포근한 털 느낌)
+    const catMaterial = new THREE.MeshStandardMaterial({ 
+      color: 0xFF8C42,
+      roughness: 0.6,
+      metalness: 0,
+      emissive: 0x331100,
+      emissiveIntensity: 0.02
     });
     
-    const whiteMaterial = new THREE.MeshPhongMaterial({ 
+    const whiteMaterial = new THREE.MeshStandardMaterial({ 
       color: 0xFFE6CC,
-      shininess: 40
+      roughness: 0.7,
+      metalness: 0
     });
     
-    const pinkMaterial = new THREE.MeshPhongMaterial({ 
+    const pinkMaterial = new THREE.MeshStandardMaterial({ 
       color: 0xFFB6C1,
-      shininess: 60
+      roughness: 0.3,
+      metalness: 0.1
     });
     
-    const eyeMaterial = new THREE.MeshPhongMaterial({ 
+    const eyeMaterial = new THREE.MeshStandardMaterial({ 
       color: 0xCCFF99,
-      shininess: 100
+      roughness: 0.2,
+      metalness: 0.3,
+      emissive: 0x336600,
+      emissiveIntensity: 0.1
     });
     
-    const pupilMaterial = new THREE.MeshPhongMaterial({ 
+    const pupilMaterial = new THREE.MeshStandardMaterial({ 
       color: 0x000000,
-      shininess: 100
+      roughness: 0.3,
+      metalness: 0.4
     });
 
-    // === 몸통 ===
-    const bodyGeometry = new THREE.SphereGeometry(0.6, 32, 32);
-    bodyGeometry.scale(1, 0.9, 1.3);
+    // === 몸통 (고해상도, 유연한 형태) ===
+    const bodyGeometry = new THREE.SphereGeometry(0.6, 48, 48);
+    bodyGeometry.scale(1, 0.9, 1.35);
     const body = new THREE.Mesh(bodyGeometry, catMaterial);
     body.position.y = 0.7;
     body.castShadow = true;
+    body.receiveShadow = true;
     cat.add(body);
 
-    // === 가슴 (흰색) ===
-    const chestGeometry = new THREE.SphereGeometry(0.4, 24, 24);
-    chestGeometry.scale(0.9, 1.1, 0.6);
+    // === 가슴 (흰색, 더 부드럽게) ===
+    const chestGeometry = new THREE.SphereGeometry(0.42, 32, 32);
+    chestGeometry.scale(0.92, 1.15, 0.62);
     const chest = new THREE.Mesh(chestGeometry, whiteMaterial);
-    chest.position.set(0, 0.7, 0.4);
+    chest.position.set(0, 0.72, 0.42);
+    chest.receiveShadow = true;
     cat.add(chest);
 
-    // === 머리 ===
-    const headGeometry = new THREE.SphereGeometry(0.45, 32, 32);
-    headGeometry.scale(1.1, 1, 1);
+    // === 머리 (초고해상도, 둥글고 귀여운 형태) ===
+    const headGeometry = new THREE.SphereGeometry(0.48, 48, 48);
+    headGeometry.scale(1.12, 1.02, 1.05);
     const head = new THREE.Mesh(headGeometry, catMaterial);
-    head.position.y = 1.2;
+    head.position.y = 1.22;
     head.userData.name = 'head';
     head.castShadow = true;
+    head.receiveShadow = true;
     cat.add(head);
 
-    // === 귀 (삼각형) ===
-    const earGeometry = new THREE.ConeGeometry(0.15, 0.3, 4);
+    // === 귀 (더 입체적인 삼각형, 고해상도) ===
+    const earGeometry = new THREE.ConeGeometry(0.17, 0.35, 6);
     
     const leftEar = new THREE.Mesh(earGeometry, catMaterial);
-    leftEar.position.set(-0.3, 1.5, 0);
-    leftEar.rotation.z = -0.3;
+    leftEar.position.set(-0.32, 1.55, 0);
+    leftEar.rotation.z = -0.35;
     leftEar.userData.name = 'leftEar';
+    leftEar.castShadow = true;
+    leftEar.receiveShadow = true;
     cat.add(leftEar);
     
-    // 귀 안쪽 (핑크)
-    const innerEarGeometry = new THREE.ConeGeometry(0.08, 0.18, 4);
+    // 귀 안쪽 (핑크, 더 사실적)
+    const innerEarGeometry = new THREE.ConeGeometry(0.09, 0.22, 6);
     const leftInnerEar = new THREE.Mesh(innerEarGeometry, pinkMaterial);
-    leftInnerEar.position.set(-0.3, 1.48, 0.05);
-    leftInnerEar.rotation.z = -0.3;
+    leftInnerEar.position.set(-0.32, 1.52, 0.06);
+    leftInnerEar.rotation.z = -0.35;
     cat.add(leftInnerEar);
     
+    // 귀 털 (안쪽)
+    const earFurGeo = new THREE.SphereGeometry(0.05, 12, 12);
+    const leftEarFur = new THREE.Mesh(earFurGeo, whiteMaterial);
+    leftEarFur.position.set(-0.32, 1.45, 0.08);
+    cat.add(leftEarFur);
+    
     const rightEar = new THREE.Mesh(earGeometry, catMaterial);
-    rightEar.position.set(0.3, 1.5, 0);
-    rightEar.rotation.z = 0.3;
+    rightEar.position.set(0.32, 1.55, 0);
+    rightEar.rotation.z = 0.35;
     rightEar.userData.name = 'rightEar';
+    rightEar.castShadow = true;
+    rightEar.receiveShadow = true;
     cat.add(rightEar);
     
     const rightInnerEar = new THREE.Mesh(innerEarGeometry, pinkMaterial);
-    rightInnerEar.position.set(0.3, 1.48, 0.05);
-    rightInnerEar.rotation.z = 0.3;
+    rightInnerEar.position.set(0.32, 1.52, 0.06);
+    rightInnerEar.rotation.z = 0.35;
     cat.add(rightInnerEar);
+    
+    const rightEarFur = new THREE.Mesh(earFurGeo, whiteMaterial);
+    rightEarFur.position.set(0.32, 1.45, 0.08);
+    cat.add(rightEarFur);
 
-    // === 주둥이 ===
-    const snoutGeometry = new THREE.SphereGeometry(0.25, 20, 20);
-    snoutGeometry.scale(0.8, 0.7, 0.6);
+    // === 주둥이 (더 입체적으로) ===
+    const snoutGeometry = new THREE.SphereGeometry(0.28, 32, 32);
+    snoutGeometry.scale(0.85, 0.75, 0.65);
     const snout = new THREE.Mesh(snoutGeometry, whiteMaterial);
-    snout.position.set(0, 1.05, 0.4);
+    snout.position.set(0, 1.08, 0.42);
+    snout.receiveShadow = true;
     cat.add(snout);
+    
+    // 주둥이 양쪽 볼록한 부분
+    const cheekGeo = new THREE.SphereGeometry(0.12, 24, 24);
+    const leftCheek = new THREE.Mesh(cheekGeo, whiteMaterial);
+    leftCheek.position.set(-0.15, 1.08, 0.52);
+    cat.add(leftCheek);
+    
+    const rightCheek = new THREE.Mesh(cheekGeo, whiteMaterial);
+    rightCheek.position.set(0.15, 1.08, 0.52);
+    cat.add(rightCheek);
 
-    // === 코 ===
-    const noseGeometry = new THREE.SphereGeometry(0.06, 12, 12);
-    noseGeometry.scale(1, 0.8, 0.8);
+    // === 코 (더 입체적이고 귀여운 형태) ===
+    const noseGeometry = new THREE.SphereGeometry(0.07, 16, 16);
+    noseGeometry.scale(1, 0.85, 0.85);
     const nose = new THREE.Mesh(noseGeometry, pinkMaterial);
-    nose.position.set(0, 1.15, 0.6);
+    nose.position.set(0, 1.18, 0.62);
+    nose.castShadow = true;
     cat.add(nose);
+    
+    // 코 아래 입선 (Y자 형태)
+    const mouthLineGeo = new THREE.CylinderGeometry(0.008, 0.008, 0.08, 8);
+    const centerMouthLine = new THREE.Mesh(mouthLineGeo, pinkMaterial);
+    centerMouthLine.position.set(0, 1.10, 0.60);
+    cat.add(centerMouthLine);
+    
+    const leftMouthLineGeo = new THREE.CylinderGeometry(0.008, 0.008, 0.06, 8);
+    const leftMouthLine = new THREE.Mesh(leftMouthLineGeo, pinkMaterial);
+    leftMouthLine.position.set(-0.04, 1.06, 0.58);
+    leftMouthLine.rotation.z = 0.5;
+    cat.add(leftMouthLine);
+    
+    const rightMouthLine = new THREE.Mesh(leftMouthLineGeo, pinkMaterial);
+    rightMouthLine.position.set(0.04, 1.06, 0.58);
+    rightMouthLine.rotation.z = -0.5;
+    cat.add(rightMouthLine);
 
-    // === 눈 ===
-    const eyeGeometry = new THREE.SphereGeometry(0.12, 20, 20);
-    eyeGeometry.scale(0.7, 1.2, 1);
+    // === 눈 (더 크고 반짝이는 고양이 눈) ===
+    const eyeGeometry = new THREE.SphereGeometry(0.14, 32, 32);
+    eyeGeometry.scale(0.75, 1.25, 1);
     
     // 왼쪽 눈
     const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-    leftEye.position.set(-0.25, 1.3, 0.35);
+    leftEye.position.set(-0.26, 1.32, 0.38);
+    leftEye.castShadow = true;
+    leftEye.receiveShadow = true;
     cat.add(leftEye);
     
-    const leftPupil = new THREE.Mesh(
-      new THREE.SphereGeometry(0.05, 16, 16),
-      pupilMaterial
-    );
-    leftPupil.position.set(-0.25, 1.65, 0.42);
+    // 왼쪽 동공 (고양이 세로 동공)
+    const pupilGeometry = new THREE.SphereGeometry(0.06, 24, 24);
+    pupilGeometry.scale(0.4, 1.2, 1);
+    const leftPupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
+    leftPupil.position.set(-0.26, 1.32, 0.48);
     leftPupil.userData.name = 'leftPupil';
     cat.add(leftPupil);
     
-    const leftHighlight = new THREE.Mesh(
-      new THREE.SphereGeometry(0.02, 12, 12),
+    // 왼쪽 하이라이트 (2개로 입체감)
+    const leftHighlight1 = new THREE.Mesh(
+      new THREE.SphereGeometry(0.025, 16, 16),
       new THREE.MeshBasicMaterial({ color: 0xFFFFFF })
     );
-    leftHighlight.position.set(-0.23, 1.35, 0.45);
-    cat.add(leftHighlight);
+    leftHighlight1.position.set(-0.24, 1.38, 0.50);
+    cat.add(leftHighlight1);
+    
+    const leftHighlight2 = new THREE.Mesh(
+      new THREE.SphereGeometry(0.015, 12, 12),
+      new THREE.MeshBasicMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0.6 })
+    );
+    leftHighlight2.position.set(-0.28, 1.28, 0.49);
+    cat.add(leftHighlight2);
     
     // 오른쪽 눈
     const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-    rightEye.position.set(0.25, 1.3, 0.35);
+    rightEye.position.set(0.26, 1.32, 0.38);
+    rightEye.castShadow = true;
+    rightEye.receiveShadow = true;
     cat.add(rightEye);
     
-    const rightPupil = new THREE.Mesh(
-      new THREE.SphereGeometry(0.05, 16, 16),
-      pupilMaterial
-    );
-    rightPupil.position.set(0.25, 1.65, 0.42);
+    // 오른쪽 동공
+    const rightPupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
+    rightPupil.position.set(0.26, 1.32, 0.48);
     rightPupil.userData.name = 'rightPupil';
     cat.add(rightPupil);
     
-    const rightHighlight = new THREE.Mesh(
-      new THREE.SphereGeometry(0.02, 12, 12),
+    // 오른쪽 하이라이트
+    const rightHighlight1 = new THREE.Mesh(
+      new THREE.SphereGeometry(0.025, 16, 16),
       new THREE.MeshBasicMaterial({ color: 0xFFFFFF })
     );
-    rightHighlight.position.set(0.27, 1.35, 0.45);
-    cat.add(rightHighlight);
-
-    // === 수염 ===
-    const whiskerMaterial = new THREE.LineBasicMaterial({ color: 0x333333, linewidth: 2 });
+    rightHighlight1.position.set(0.28, 1.38, 0.50);
+    cat.add(rightHighlight1);
     
-    for (let side of [-1, 1]) {
-      for (let i = 0; i < 3; i++) {
-        const points = [
-          new THREE.Vector3(side * 0.15, 1.1 - i * 0.08, 0.55),
-          new THREE.Vector3(side * 0.6, 1.12 - i * 0.08, 0.55)
-        ];
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const whisker = new THREE.Line(geometry, whiskerMaterial);
-        cat.add(whisker);
-      }
-    }
+    const rightHighlight2 = new THREE.Mesh(
+      new THREE.SphereGeometry(0.015, 12, 12),
+      new THREE.MeshBasicMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0.6 })
+    );
+    rightHighlight2.position.set(0.24, 1.28, 0.49);
+    cat.add(rightHighlight2);
 
-    // === 앞다리 ===
-    const frontLegGeometry = new THREE.CylinderGeometry(0.1, 0.08, 0.6, 16);
+    // === 수염 (더 자연스럽고 많이) ===
+    const whiskerMaterial = new THREE.LineBasicMaterial({ color: 0x222222, linewidth: 2 });
+    
+    // 왼쪽 수염 (4개)
+    const leftWhiskers = [
+      { start: [-0.16, 1.14, 0.58], end: [-0.68, 1.18, 0.58], curve: 0.02 },
+      { start: [-0.16, 1.10, 0.58], end: [-0.72, 1.12, 0.60], curve: 0.01 },
+      { start: [-0.16, 1.06, 0.57], end: [-0.70, 1.05, 0.58], curve: 0 },
+      { start: [-0.16, 1.02, 0.56], end: [-0.65, 0.98, 0.56], curve: -0.01 },
+    ];
+    
+    leftWhiskers.forEach(w => {
+      const points = [
+        new THREE.Vector3(w.start[0], w.start[1], w.start[2]),
+        new THREE.Vector3((w.start[0] + w.end[0]) / 2, (w.start[1] + w.end[1]) / 2 + w.curve, (w.start[2] + w.end[2]) / 2),
+        new THREE.Vector3(w.end[0], w.end[1], w.end[2])
+      ];
+      const curve = new THREE.CatmullRomCurve3(points);
+      const geometry = new THREE.BufferGeometry().setFromPoints(curve.getPoints(20));
+      const whisker = new THREE.Line(geometry, whiskerMaterial);
+      cat.add(whisker);
+    });
+    
+    // 오른쪽 수염 (4개)
+    const rightWhiskers = [
+      { start: [0.16, 1.14, 0.58], end: [0.68, 1.18, 0.58], curve: 0.02 },
+      { start: [0.16, 1.10, 0.58], end: [0.72, 1.12, 0.60], curve: 0.01 },
+      { start: [0.16, 1.06, 0.57], end: [0.70, 1.05, 0.58], curve: 0 },
+      { start: [0.16, 1.02, 0.56], end: [0.65, 0.98, 0.56], curve: -0.01 },
+    ];
+    
+    rightWhiskers.forEach(w => {
+      const points = [
+        new THREE.Vector3(w.start[0], w.start[1], w.start[2]),
+        new THREE.Vector3((w.start[0] + w.end[0]) / 2, (w.start[1] + w.end[1]) / 2 + w.curve, (w.start[2] + w.end[2]) / 2),
+        new THREE.Vector3(w.end[0], w.end[1], w.end[2])
+      ];
+      const curve = new THREE.CatmullRomCurve3(points);
+      const geometry = new THREE.BufferGeometry().setFromPoints(curve.getPoints(20));
+      const whisker = new THREE.Line(geometry, whiskerMaterial);
+      cat.add(whisker);
+    });
+
+    // === 앞다리 (더 유연하고 세밀하게) ===
+    const frontLegGeometry = new THREE.CylinderGeometry(0.11, 0.09, 0.65, 24);
     
     const leftFrontLeg = new THREE.Mesh(frontLegGeometry, catMaterial);
-    leftFrontLeg.position.set(-0.3, 0.3, 0.35);
+    leftFrontLeg.position.set(-0.32, 0.32, 0.38);
     leftFrontLeg.userData.name = 'leftFrontLeg';
     leftFrontLeg.castShadow = true;
+    leftFrontLeg.receiveShadow = true;
     cat.add(leftFrontLeg);
     
     const rightFrontLeg = new THREE.Mesh(frontLegGeometry, catMaterial);
-    rightFrontLeg.position.set(0.3, 0.3, 0.35);
+    rightFrontLeg.position.set(0.32, 0.32, 0.38);
     rightFrontLeg.userData.name = 'rightFrontLeg';
     rightFrontLeg.castShadow = true;
+    rightFrontLeg.receiveShadow = true;
     cat.add(rightFrontLeg);
     
-    // 앞발 (흰색 발)
-    const pawGeometry = new THREE.SphereGeometry(0.11, 16, 16);
-    pawGeometry.scale(1, 0.6, 1);
+    // 앞발 (흰색 발, 더 입체적)
+    const pawGeometry = new THREE.SphereGeometry(0.12, 24, 24);
+    pawGeometry.scale(1, 0.65, 1.05);
     
     const leftFrontPaw = new THREE.Mesh(pawGeometry, whiteMaterial);
-    leftFrontPaw.position.set(-0.3, 0.05, 0.35);
+    leftFrontPaw.position.set(-0.32, 0.06, 0.38);
+    leftFrontPaw.castShadow = true;
     cat.add(leftFrontPaw);
     
     const rightFrontPaw = new THREE.Mesh(pawGeometry, whiteMaterial);
-    rightFrontPaw.position.set(0.3, 0.05, 0.35);
+    rightFrontPaw.position.set(0.32, 0.06, 0.38);
+    rightFrontPaw.castShadow = true;
     cat.add(rightFrontPaw);
+    
+    // 발가락 패드 (분홍색, 3개)
+    for (let i = 0; i < 3; i++) {
+      const padGeo = new THREE.SphereGeometry(0.025, 12, 12);
+      const leftPad = new THREE.Mesh(padGeo, pinkMaterial);
+      leftPad.position.set(-0.32 + (i - 1) * 0.04, 0.04, 0.44);
+      cat.add(leftPad);
+      
+      const rightPad = new THREE.Mesh(padGeo, pinkMaterial);
+      rightPad.position.set(0.32 + (i - 1) * 0.04, 0.04, 0.44);
+      cat.add(rightPad);
+    }
 
-    // === 뒷다리 ===
-    const backLegGeometry = new THREE.CylinderGeometry(0.12, 0.1, 0.5, 16);
+    // === 뒷다리 (더 튼튼하고 자연스럽게) ===
+    const backLegGeometry = new THREE.CylinderGeometry(0.14, 0.11, 0.55, 24);
     
     const leftBackLeg = new THREE.Mesh(backLegGeometry, catMaterial);
-    leftBackLeg.position.set(-0.35, 0.4, -0.2);
+    leftBackLeg.position.set(-0.38, 0.42, -0.22);
     leftBackLeg.userData.name = 'leftBackLeg';
     leftBackLeg.castShadow = true;
+    leftBackLeg.receiveShadow = true;
     cat.add(leftBackLeg);
     
     const rightBackLeg = new THREE.Mesh(backLegGeometry, catMaterial);
-    rightBackLeg.position.set(0.35, 0.4, -0.2);
+    rightBackLeg.position.set(0.38, 0.42, -0.22);
     rightBackLeg.userData.name = 'rightBackLeg';
     rightBackLeg.castShadow = true;
+    rightBackLeg.receiveShadow = true;
     cat.add(rightBackLeg);
     
     // 뒷발
     const leftBackPaw = new THREE.Mesh(pawGeometry, whiteMaterial);
-    leftBackPaw.position.set(-0.35, 0.05, -0.2);
+    leftBackPaw.position.set(-0.38, 0.06, -0.22);
+    leftBackPaw.castShadow = true;
     cat.add(leftBackPaw);
     
     const rightBackPaw = new THREE.Mesh(pawGeometry, whiteMaterial);
-    rightBackPaw.position.set(0.35, 0.05, -0.2);
+    rightBackPaw.position.set(0.38, 0.06, -0.22);
+    rightBackPaw.castShadow = true;
     cat.add(rightBackPaw);
+    
+    // 뒷발 패드
+    for (let i = 0; i < 3; i++) {
+      const padGeo = new THREE.SphereGeometry(0.025, 12, 12);
+      const leftPad = new THREE.Mesh(padGeo, pinkMaterial);
+      leftPad.position.set(-0.38 + (i - 1) * 0.04, 0.04, -0.16);
+      cat.add(leftPad);
+      
+      const rightPad = new THREE.Mesh(padGeo, pinkMaterial);
+      rightPad.position.set(0.38 + (i - 1) * 0.04, 0.04, -0.16);
+      cat.add(rightPad);
+    }
 
-    // === 꼬리 (2단계) ===
-    const tailGeometry = new THREE.CylinderGeometry(0.08, 0.06, 0.5, 16);
-    const tail = new THREE.Mesh(tailGeometry, catMaterial);
-    tail.position.set(0, 0.8, -0.7);
-    tail.rotation.x = -0.5;
+    // === 꼬리 (훨씬 더 유연하고 자연스러운 3단계) ===
+    const tailBase = new THREE.CylinderGeometry(0.10, 0.08, 0.55, 24);
+    const tail = new THREE.Mesh(tailBase, catMaterial);
+    tail.position.set(0, 0.82, -0.75);
+    tail.rotation.x = -0.55;
     tail.userData.name = 'tail';
+    tail.castShadow = true;
+    tail.receiveShadow = true;
     cat.add(tail);
     
-    const tailTipGeometry = new THREE.CylinderGeometry(0.06, 0.03, 0.4, 16);
+    // 꼬리 중간
+    const tailMidGeometry = new THREE.CylinderGeometry(0.08, 0.06, 0.45, 24);
+    const tailMid = new THREE.Mesh(tailMidGeometry, catMaterial);
+    tailMid.position.set(0, 1.05, -1.02);
+    tailMid.rotation.x = -1.05;
+    tailMid.userData.name = 'tailTip';
+    tailMid.castShadow = true;
+    cat.add(tailMid);
+    
+    // 꼬리 끝 (가늘게)
+    const tailTipGeometry = new THREE.CylinderGeometry(0.06, 0.03, 0.35, 20);
     const tailTip = new THREE.Mesh(tailTipGeometry, catMaterial);
-    tailTip.position.set(0, 1.0, -1.0);
-    tailTip.rotation.x = -1.0;
-    tailTip.userData.name = 'tailTip';
+    tailTip.position.set(0, 1.22, -1.25);
+    tailTip.rotation.x = -1.3;
+    tailTip.castShadow = true;
     cat.add(tailTip);
 
-    // === 무늬 (줄무늬) ===
+    // === 무늬 (줄무늬, 더 사실적이고 많이) ===
     const stripePositions = [
-      { x: 0, y: 0.9, z: -0.3, scale: [0.8, 0.1, 0.4] },
-      { x: 0, y: 0.7, z: -0.35, scale: [0.7, 0.12, 0.35] },
-      { x: 0, y: 0.5, z: -0.3, scale: [0.6, 0.1, 0.3] },
+      { x: 0, y: 0.95, z: -0.35, scale: [0.85, 0.12, 0.42] },
+      { x: 0, y: 0.72, z: -0.38, scale: [0.75, 0.14, 0.38] },
+      { x: 0, y: 0.50, z: -0.32, scale: [0.65, 0.12, 0.32] },
+      { x: -0.15, y: 0.88, z: -0.28, scale: [0.22, 0.10, 0.28] },
+      { x: 0.15, y: 0.88, z: -0.28, scale: [0.22, 0.10, 0.28] },
+      { x: 0, y: 1.15, z: 0.02, scale: [0.28, 0.08, 0.20] }, // 머리
+      { x: -0.22, y: 1.20, z: 0.08, scale: [0.15, 0.06, 0.18] }, // 머리 옆
+      { x: 0.22, y: 1.20, z: 0.08, scale: [0.15, 0.06, 0.18] }, // 머리 옆
     ];
     
-    const stripeMaterial = new THREE.MeshPhongMaterial({ 
+    const stripeMaterial = new THREE.MeshStandardMaterial({ 
       color: 0xCC6622,
-      shininess: 50
+      roughness: 0.6,
+      metalness: 0,
+      transparent: true,
+      opacity: 0.75
     });
     
     stripePositions.forEach(stripe => {
-      const stripeGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+      const stripeGeometry = new THREE.SphereGeometry(0.12, 24, 24);
       stripeGeometry.scale(stripe.scale[0], stripe.scale[1], stripe.scale[2]);
       const stripeMesh = new THREE.Mesh(stripeGeometry, stripeMaterial);
       stripeMesh.position.set(stripe.x, stripe.y, stripe.z);
+      stripeMesh.receiveShadow = true;
       cat.add(stripeMesh);
     });
+    
+    // 꼬리 줄무늬 (4개)
+    for (let i = 0; i < 4; i++) {
+      const tailStripeGeo = new THREE.TorusGeometry(0.08 - i * 0.01, 0.02, 8, 16);
+      const tailStripe = new THREE.Mesh(tailStripeGeo, stripeMaterial);
+      tailStripe.position.set(0, 0.88 + i * 0.12, -0.82 - i * 0.15);
+      tailStripe.rotation.x = Math.PI / 2 - 0.55 - i * 0.15;
+      cat.add(tailStripe);
+    }
 
     return cat;
   };

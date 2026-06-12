@@ -344,310 +344,470 @@ export default function FrogPet({ initialPosition = { x: 100, y: 100 }, onRemove
       }
       renderer.dispose();
     };
-  }, [isVisible]);
+  }, []);
 
-  // 개구리 생성 함수 - 더 정교한 버전
+  // 개구리 생성 함수 - 극도로 정교한 버전
   const createFrog = (): THREE.Group => {
     const frog = new THREE.Group();
     
-    // 고급 재질 (더 부드럽고 사실적)
-    const frogMaterial = new THREE.MeshPhongMaterial({ 
+    // 최고급 재질 (스무스하고 촉촉한 느낌)
+    const frogMaterial = new THREE.MeshStandardMaterial({ 
       color: 0x7FFF00,
-      shininess: 60,
-      specular: 0x224422
+      roughness: 0.3,
+      metalness: 0.1,
+      emissive: 0x001100,
+      emissiveIntensity: 0.05
     });
     
-    const darkGreenMaterial = new THREE.MeshPhongMaterial({ 
+    const darkGreenMaterial = new THREE.MeshStandardMaterial({ 
       color: 0x228B22,
-      shininess: 40
+      roughness: 0.4,
+      metalness: 0.05
     });
     
-    const eyeMaterial = new THREE.MeshPhongMaterial({ 
+    const eyeMaterial = new THREE.MeshStandardMaterial({ 
       color: 0xFFFFFF,
-      shininess: 100,
-      specular: 0xFFFFFF
+      roughness: 0.1,
+      metalness: 0.2
     });
     
-    const pupilMaterial = new THREE.MeshPhongMaterial({ 
+    const pupilMaterial = new THREE.MeshStandardMaterial({ 
       color: 0x000000,
-      shininess: 100
+      roughness: 0.2,
+      metalness: 0.3
     });
     
-    const bellyMaterial = new THREE.MeshPhongMaterial({
+    const bellyMaterial = new THREE.MeshStandardMaterial({
       color: 0xFFFF99,
-      shininess: 30
+      roughness: 0.5,
+      metalness: 0
     });
 
-    // === 몸통 (더 유기적인 형태) ===
-    const bodyGeometry = new THREE.SphereGeometry(0.8, 32, 32);
+    // === 몸통 (매우 부드러운 형태, 고해상도) ===
+    const bodyGeometry = new THREE.SphereGeometry(0.8, 64, 64);
     bodyGeometry.scale(1, 1.3, 0.95);
     const body = new THREE.Mesh(bodyGeometry, frogMaterial);
     body.position.y = 1.5;
     body.castShadow = true;
+    body.receiveShadow = true;
     frog.add(body);
 
-    // === 머리 (더 둥글고 큼) ===
-    const headGeometry = new THREE.SphereGeometry(0.75, 32, 32);
-    headGeometry.scale(1.1, 1, 1.05);
+    // === 머리 (매우 큼, 초고해상도) ===
+    const headGeometry = new THREE.SphereGeometry(0.75, 64, 64);
+    headGeometry.scale(1.15, 1.05, 1.1);
     const head = new THREE.Mesh(headGeometry, frogMaterial);
     head.position.y = 2.6;
     head.userData.name = 'head';
     head.castShadow = true;
+    head.receiveShadow = true;
     frog.add(head);
 
-    // === 눈 베이스 (더 크고 튀어나옴) ===
-    const eyeBaseGeometry = new THREE.SphereGeometry(0.3, 20, 20);
-    eyeBaseGeometry.scale(0.9, 1.1, 1);
+    // === 눈 베이스 (크고 튀어나옴, 초고해상도) ===
+    const eyeBaseGeometry = new THREE.SphereGeometry(0.32, 48, 48);
+    eyeBaseGeometry.scale(0.95, 1.15, 1.05);
     
-    // 왼쪽 눈 베이스
+    // 왼쪽 눈 베이스 (약간 반짝임)
     const leftEyeBase = new THREE.Mesh(eyeBaseGeometry, frogMaterial);
-    leftEyeBase.position.set(-0.4, 2.8, 0.35);
+    leftEyeBase.position.set(-0.42, 2.85, 0.38);
     leftEyeBase.castShadow = true;
+    leftEyeBase.receiveShadow = true;
     frog.add(leftEyeBase);
     
-    // 왼쪽 눈 흰자
+    // 왼쪽 눈 흰자 (더 크고 반짝임)
     const leftEyeWhite = new THREE.Mesh(
-      new THREE.SphereGeometry(0.2, 20, 20),
+      new THREE.SphereGeometry(0.22, 32, 32),
       eyeMaterial
     );
-    leftEyeWhite.position.set(-0.4, 2.8, 0.55);
+    leftEyeWhite.position.set(-0.42, 2.85, 0.60);
+    leftEyeWhite.receiveShadow = true;
     frog.add(leftEyeWhite);
     
-    // 왼쪽 동공 (더 크고 반짝임)
+    // 왼쪽 동공 (크고 깊이감)
     const leftPupil = new THREE.Mesh(
-      new THREE.SphereGeometry(0.11, 20, 20),
+      new THREE.SphereGeometry(0.13, 32, 32),
       pupilMaterial
     );
-    leftPupil.position.set(-0.4, 2.8, 0.66);
+    leftPupil.position.set(-0.42, 2.85, 0.73);
     leftPupil.userData.name = 'leftPupil';
     frog.add(leftPupil);
     
-    // 왼쪽 눈 하이라이트
-    const leftHighlight = new THREE.Mesh(
-      new THREE.SphereGeometry(0.04, 16, 16),
+    // 왼쪽 눈 하이라이트 (두 개로 더 입체감)
+    const leftHighlight1 = new THREE.Mesh(
+      new THREE.SphereGeometry(0.05, 16, 16),
       new THREE.MeshBasicMaterial({ color: 0xFFFFFF })
     );
-    leftHighlight.position.set(-0.35, 2.85, 0.7);
-    frog.add(leftHighlight);
+    leftHighlight1.position.set(-0.38, 2.92, 0.76);
+    frog.add(leftHighlight1);
+    
+    const leftHighlight2 = new THREE.Mesh(
+      new THREE.SphereGeometry(0.03, 16, 16),
+      new THREE.MeshBasicMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0.7 })
+    );
+    leftHighlight2.position.set(-0.45, 2.80, 0.74);
+    frog.add(leftHighlight2);
 
     // 오른쪽 눈 베이스
     const rightEyeBase = new THREE.Mesh(eyeBaseGeometry, frogMaterial);
-    rightEyeBase.position.set(0.4, 2.8, 0.35);
+    rightEyeBase.position.set(0.42, 2.85, 0.38);
     rightEyeBase.castShadow = true;
+    rightEyeBase.receiveShadow = true;
     frog.add(rightEyeBase);
     
     // 오른쪽 눈 흰자
     const rightEyeWhite = new THREE.Mesh(
-      new THREE.SphereGeometry(0.2, 20, 20),
+      new THREE.SphereGeometry(0.22, 32, 32),
       eyeMaterial
     );
-    rightEyeWhite.position.set(0.4, 2.8, 0.55);
+    rightEyeWhite.position.set(0.42, 2.85, 0.60);
+    rightEyeWhite.receiveShadow = true;
     frog.add(rightEyeWhite);
     
     // 오른쪽 동공
     const rightPupil = new THREE.Mesh(
-      new THREE.SphereGeometry(0.11, 20, 20),
+      new THREE.SphereGeometry(0.13, 32, 32),
       pupilMaterial
     );
-    rightPupil.position.set(0.4, 2.8, 0.66);
+    rightPupil.position.set(0.42, 2.85, 0.73);
     rightPupil.userData.name = 'rightPupil';
     frog.add(rightPupil);
     
     // 오른쪽 눈 하이라이트
-    const rightHighlight = new THREE.Mesh(
-      new THREE.SphereGeometry(0.04, 16, 16),
+    const rightHighlight1 = new THREE.Mesh(
+      new THREE.SphereGeometry(0.05, 16, 16),
       new THREE.MeshBasicMaterial({ color: 0xFFFFFF })
     );
-    rightHighlight.position.set(0.45, 2.85, 0.7);
-    frog.add(rightHighlight);
-
-    // === 입 (더 정교하게) ===
-    // 입술 라인
-    const mouthGeometry = new THREE.TorusGeometry(0.15, 0.03, 8, 16, Math.PI);
-    const mouth = new THREE.Mesh(mouthGeometry, darkGreenMaterial);
-    mouth.position.set(0, 2.35, 0.65);
-    mouth.rotation.x = Math.PI / 2;
-    frog.add(mouth);
+    rightHighlight1.position.set(0.46, 2.92, 0.76);
+    frog.add(rightHighlight1);
     
-    // 콧구멍
-    const nostrilGeometry = new THREE.SphereGeometry(0.04, 12, 12);
+    const rightHighlight2 = new THREE.Mesh(
+      new THREE.SphereGeometry(0.03, 16, 16),
+      new THREE.MeshBasicMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0.7 })
+    );
+    rightHighlight2.position.set(0.39, 2.80, 0.74);
+    frog.add(rightHighlight2);
+
+    // === 입 (훨씬 더 정교한 미소) ===
+    // 윗입술
+    const upperLipGeometry = new THREE.TorusGeometry(0.18, 0.035, 16, 32, Math.PI);
+    const upperLip = new THREE.Mesh(upperLipGeometry, darkGreenMaterial);
+    upperLip.position.set(0, 2.40, 0.68);
+    upperLip.rotation.x = Math.PI / 2 + 0.1;
+    frog.add(upperLip);
+    
+    // 아랫입술 (약간 작음)
+    const lowerLipGeometry = new THREE.TorusGeometry(0.15, 0.03, 16, 32, Math.PI);
+    const lowerLip = new THREE.Mesh(lowerLipGeometry, darkGreenMaterial);
+    lowerLip.position.set(0, 2.32, 0.66);
+    lowerLip.rotation.x = Math.PI / 2 - 0.15;
+    lowerLip.rotation.y = Math.PI;
+    frog.add(lowerLip);
+    
+    // 입 가장자리 (더 자연스럽게)
+    const mouthCornerGeo = new THREE.SphereGeometry(0.04, 16, 16);
+    const leftMouthCorner = new THREE.Mesh(mouthCornerGeo, darkGreenMaterial);
+    leftMouthCorner.position.set(-0.17, 2.36, 0.66);
+    frog.add(leftMouthCorner);
+    
+    const rightMouthCorner = new THREE.Mesh(mouthCornerGeo, darkGreenMaterial);
+    rightMouthCorner.position.set(0.17, 2.36, 0.66);
+    frog.add(rightMouthCorner);
+    
+    // 콧구멍 (더 자연스럽게)
+    const nostrilGeometry = new THREE.SphereGeometry(0.045, 16, 16);
+    nostrilGeometry.scale(1, 0.8, 0.7);
+    
     const leftNostril = new THREE.Mesh(nostrilGeometry, darkGreenMaterial);
-    leftNostril.position.set(-0.15, 2.5, 0.68);
+    leftNostril.position.set(-0.16, 2.55, 0.70);
     frog.add(leftNostril);
     
     const rightNostril = new THREE.Mesh(nostrilGeometry, darkGreenMaterial);
-    rightNostril.position.set(0.15, 2.5, 0.68);
+    rightNostril.position.set(0.16, 2.55, 0.70);
     frog.add(rightNostril);
 
-    // === 배 (더 자연스러운 형태) ===
-    const bellyGeometry = new THREE.SphereGeometry(0.65, 32, 32);
-    bellyGeometry.scale(1.05, 1.4, 0.6);
+    // === 배 (매우 자연스러운 형태) ===
+    const bellyGeometry = new THREE.SphereGeometry(0.68, 48, 48);
+    bellyGeometry.scale(1.1, 1.45, 0.65);
     const belly = new THREE.Mesh(bellyGeometry, bellyMaterial);
-    belly.position.set(0, 1.5, 0.5);
+    belly.position.set(0, 1.5, 0.52);
+    belly.receiveShadow = true;
     frog.add(belly);
 
-    // === 목 (연결부 자연스럽게) ===
-    const neckGeometry = new THREE.CylinderGeometry(0.4, 0.5, 0.4, 20);
+    // === 목 (더 부드러운 연결) ===
+    const neckGeometry = new THREE.CylinderGeometry(0.45, 0.55, 0.45, 32);
     const neck = new THREE.Mesh(neckGeometry, frogMaterial);
     neck.position.y = 2.1;
+    neck.castShadow = true;
+    neck.receiveShadow = true;
     frog.add(neck);
 
-    // === 왼쪽 팔 (더 유기적) ===
-    // 상완
-    const upperArmGeometry = new THREE.CylinderGeometry(0.16, 0.14, 0.5, 16);
+    // === 왼쪽 팔 (훨씬 더 유기적, 고해상도) ===
+    // 상완 (어깨에서 팔꿈치)
+    const upperArmGeometry = new THREE.CylinderGeometry(0.18, 0.15, 0.55, 24);
     const leftUpperArm = new THREE.Mesh(upperArmGeometry, frogMaterial);
-    leftUpperArm.position.set(-0.75, 1.9, 0);
+    leftUpperArm.position.set(-0.78, 1.92, 0);
     leftUpperArm.rotation.z = 0.6;
     leftUpperArm.userData.name = 'leftUpperArm';
     leftUpperArm.castShadow = true;
+    leftUpperArm.receiveShadow = true;
     frog.add(leftUpperArm);
     
-    // 하완
-    const forearmGeometry = new THREE.CylinderGeometry(0.14, 0.11, 0.4, 16);
+    // 팔꿈치 관절 (더 둥글게)
+    const elbowJointGeo = new THREE.SphereGeometry(0.15, 20, 20);
+    const leftElbowJoint = new THREE.Mesh(elbowJointGeo, frogMaterial);
+    leftElbowJoint.position.set(-1.02, 1.55, 0);
+    leftElbowJoint.castShadow = true;
+    frog.add(leftElbowJoint);
+    
+    // 하완 (팔꿈치에서 손목)
+    const forearmGeometry = new THREE.CylinderGeometry(0.15, 0.12, 0.45, 24);
     const leftForearm = new THREE.Mesh(forearmGeometry, frogMaterial);
-    leftForearm.position.set(-1, 1.5, 0);
+    leftForearm.position.set(-1.05, 1.52, 0);
     leftForearm.rotation.z = 0.3;
     leftForearm.userData.name = 'leftForearm';
+    leftForearm.castShadow = true;
     frog.add(leftForearm);
 
-    // 왼손 (4개 손가락 표현)
-    const handGeometry = new THREE.SphereGeometry(0.2, 16, 16);
-    handGeometry.scale(1.2, 0.8, 1);
+    // 왼손 (더 자연스러운 형태)
+    const handGeometry = new THREE.SphereGeometry(0.22, 24, 24);
+    handGeometry.scale(1.25, 0.85, 1.05);
     const leftHand = new THREE.Mesh(handGeometry, frogMaterial);
-    leftHand.position.set(-1.2, 1.3, 0);
+    leftHand.position.set(-1.22, 1.30, 0);
     leftHand.userData.name = 'leftHand';
+    leftHand.castShadow = true;
     frog.add(leftHand);
     
-    // 손가락들
-    for (let i = 0; i < 3; i++) {
-      const fingerGeometry = new THREE.CylinderGeometry(0.03, 0.02, 0.15, 8);
+    // 왼손 손가락 (4개, 더 세밀하게)
+    const fingerPositions = [
+      { x: -1.30, y: 1.22, z: 0.12, rot: -0.6 },
+      { x: -1.35, y: 1.20, z: 0.04, rot: -0.5 },
+      { x: -1.38, y: 1.18, z: -0.04, rot: -0.4 },
+      { x: -1.35, y: 1.16, z: -0.12, rot: -0.3 },
+    ];
+    
+    fingerPositions.forEach(pos => {
+      const fingerGeometry = new THREE.CylinderGeometry(0.035, 0.025, 0.18, 12);
       const finger = new THREE.Mesh(fingerGeometry, darkGreenMaterial);
-      finger.position.set(-1.25 - i * 0.08, 1.2, 0.05);
-      finger.rotation.z = -0.5 + i * 0.2;
+      finger.position.set(pos.x, pos.y, pos.z);
+      finger.rotation.z = pos.rot;
+      finger.castShadow = true;
       frog.add(finger);
-    }
+      
+      // 손가락 끝 (둥글게)
+      const fingerTipGeo = new THREE.SphereGeometry(0.028, 12, 12);
+      const fingerTip = new THREE.Mesh(fingerTipGeo, darkGreenMaterial);
+      fingerTip.position.set(
+        pos.x - Math.cos(pos.rot) * 0.09, 
+        pos.y - Math.sin(pos.rot) * 0.09, 
+        pos.z
+      );
+      frog.add(fingerTip);
+    });
 
     // === 오른쪽 팔 ===
     const rightUpperArm = new THREE.Mesh(upperArmGeometry, frogMaterial);
-    rightUpperArm.position.set(0.75, 1.9, 0);
+    rightUpperArm.position.set(0.78, 1.92, 0);
     rightUpperArm.rotation.z = -0.6;
     rightUpperArm.userData.name = 'rightUpperArm';
     rightUpperArm.castShadow = true;
+    rightUpperArm.receiveShadow = true;
     frog.add(rightUpperArm);
     
+    const rightElbowJoint = new THREE.Mesh(elbowJointGeo, frogMaterial);
+    rightElbowJoint.position.set(1.02, 1.55, 0);
+    rightElbowJoint.castShadow = true;
+    frog.add(rightElbowJoint);
+    
     const rightForearm = new THREE.Mesh(forearmGeometry, frogMaterial);
-    rightForearm.position.set(1, 1.5, 0);
+    rightForearm.position.set(1.05, 1.52, 0);
     rightForearm.rotation.z = -0.3;
     rightForearm.userData.name = 'rightForearm';
+    rightForearm.castShadow = true;
     frog.add(rightForearm);
 
     const rightHand = new THREE.Mesh(handGeometry, frogMaterial);
-    rightHand.position.set(1.2, 1.3, 0);
+    rightHand.position.set(1.22, 1.30, 0);
     rightHand.userData.name = 'rightHand';
+    rightHand.castShadow = true;
     frog.add(rightHand);
     
-    for (let i = 0; i < 3; i++) {
-      const fingerGeometry = new THREE.CylinderGeometry(0.03, 0.02, 0.15, 8);
+    const rightFingerPositions = [
+      { x: 1.30, y: 1.22, z: 0.12, rot: 0.6 },
+      { x: 1.35, y: 1.20, z: 0.04, rot: 0.5 },
+      { x: 1.38, y: 1.18, z: -0.04, rot: 0.4 },
+      { x: 1.35, y: 1.16, z: -0.12, rot: 0.3 },
+    ];
+    
+    rightFingerPositions.forEach(pos => {
+      const fingerGeometry = new THREE.CylinderGeometry(0.035, 0.025, 0.18, 12);
       const finger = new THREE.Mesh(fingerGeometry, darkGreenMaterial);
-      finger.position.set(1.25 + i * 0.08, 1.2, 0.05);
-      finger.rotation.z = 0.5 - i * 0.2;
+      finger.position.set(pos.x, pos.y, pos.z);
+      finger.rotation.z = pos.rot;
+      finger.castShadow = true;
       frog.add(finger);
-    }
+      
+      const fingerTipGeo = new THREE.SphereGeometry(0.028, 12, 12);
+      const fingerTip = new THREE.Mesh(fingerTipGeo, darkGreenMaterial);
+      fingerTip.position.set(
+        pos.x + Math.cos(pos.rot) * 0.09, 
+        pos.y - Math.sin(pos.rot) * 0.09, 
+        pos.z
+      );
+      frog.add(fingerTip);
+    });
 
-    // === 왼쪽 다리 (더 튼튼하고 근육질) ===
-    // 허벅지
-    const thighGeometry = new THREE.CylinderGeometry(0.28, 0.24, 0.7, 20);
+    // === 왼쪽 다리 (매우 튼튼하고 근육질, 고해상도) ===
+    // 허벅지 (더 두껍고 근육질)
+    const thighGeometry = new THREE.CylinderGeometry(0.32, 0.28, 0.75, 32);
     const leftThigh = new THREE.Mesh(thighGeometry, frogMaterial);
-    leftThigh.position.set(-0.35, 0.85, 0);
+    leftThigh.position.set(-0.38, 0.88, 0);
     leftThigh.userData.name = 'leftThigh';
     leftThigh.castShadow = true;
+    leftThigh.receiveShadow = true;
     frog.add(leftThigh);
     
-    // 무릎
-    const kneeGeometry = new THREE.SphereGeometry(0.22, 16, 16);
+    // 무릎 (더 크고 튼튼하게)
+    const kneeGeometry = new THREE.SphereGeometry(0.26, 24, 24);
     const leftKnee = new THREE.Mesh(kneeGeometry, frogMaterial);
-    leftKnee.position.set(-0.35, 0.5, 0);
+    leftKnee.position.set(-0.38, 0.50, 0);
+    leftKnee.castShadow = true;
     frog.add(leftKnee);
     
-    // 종아리
-    const calfGeometry = new THREE.CylinderGeometry(0.22, 0.18, 0.5, 20);
+    // 종아리 (더 자연스러운 곡선)
+    const calfGeometry = new THREE.CylinderGeometry(0.25, 0.20, 0.55, 32);
     const leftCalf = new THREE.Mesh(calfGeometry, frogMaterial);
-    leftCalf.position.set(-0.35, 0.25, 0.1);
+    leftCalf.position.set(-0.38, 0.26, 0.12);
     leftCalf.userData.name = 'leftCalf';
+    leftCalf.castShadow = true;
     frog.add(leftCalf);
+    
+    // 발목 관절
+    const ankleGeo = new THREE.SphereGeometry(0.18, 20, 20);
+    const leftAnkle = new THREE.Mesh(ankleGeo, frogMaterial);
+    leftAnkle.position.set(-0.38, 0.02, 0.18);
+    leftAnkle.castShadow = true;
+    frog.add(leftAnkle);
 
-    // 왼발 (더 디테일하게)
-    const footGeometry = new THREE.BoxGeometry(0.35, 0.2, 0.6);
+    // 왼발 (더 자연스럽고 유기적)
+    const footGeometry = new THREE.BoxGeometry(0.40, 0.22, 0.68);
+    // 모서리를 둥글게
+    footGeometry.scale(1, 0.9, 1);
     const leftFoot = new THREE.Mesh(footGeometry, darkGreenMaterial);
-    leftFoot.position.set(-0.35, 0.05, 0.25);
+    leftFoot.position.set(-0.38, 0.06, 0.30);
     leftFoot.userData.name = 'leftFoot';
     leftFoot.castShadow = true;
+    leftFoot.receiveShadow = true;
     frog.add(leftFoot);
     
-    // 발가락들 (5개)
-    for (let i = 0; i < 5; i++) {
-      const toeGeometry = new THREE.CylinderGeometry(0.04, 0.03, 0.12, 8);
+    // 발가락들 (5개, 더 자연스럽게)
+    const toePositions = [
+      { x: -0.50, z: 0.58, size: 0.045 },
+      { x: -0.43, z: 0.62, size: 0.050 },
+      { x: -0.38, z: 0.64, size: 0.052 },
+      { x: -0.33, z: 0.62, size: 0.050 },
+      { x: -0.26, z: 0.58, size: 0.045 },
+    ];
+    
+    toePositions.forEach(pos => {
+      const toeGeometry = new THREE.CylinderGeometry(pos.size, pos.size * 0.8, 0.14, 12);
       const toe = new THREE.Mesh(toeGeometry, darkGreenMaterial);
-      toe.position.set(-0.45 + i * 0.08, 0.02, 0.5);
+      toe.position.set(pos.x, 0.02, pos.z);
       toe.rotation.x = Math.PI / 2;
+      toe.castShadow = true;
       frog.add(toe);
-    }
+      
+      // 발가락 끝 (둥글게)
+      const toeTipGeo = new THREE.SphereGeometry(pos.size * 0.85, 12, 12);
+      const toeTip = new THREE.Mesh(toeTipGeo, darkGreenMaterial);
+      toeTip.position.set(pos.x, 0.02, pos.z + 0.08);
+      frog.add(toeTip);
+    });
 
     // === 오른쪽 다리 ===
     const rightThigh = new THREE.Mesh(thighGeometry, frogMaterial);
-    rightThigh.position.set(0.35, 0.85, 0);
+    rightThigh.position.set(0.38, 0.88, 0);
     rightThigh.userData.name = 'rightThigh';
     rightThigh.castShadow = true;
+    rightThigh.receiveShadow = true;
     frog.add(rightThigh);
     
     const rightKnee = new THREE.Mesh(kneeGeometry, frogMaterial);
-    rightKnee.position.set(0.35, 0.5, 0);
+    rightKnee.position.set(0.38, 0.50, 0);
+    rightKnee.castShadow = true;
     frog.add(rightKnee);
     
     const rightCalf = new THREE.Mesh(calfGeometry, frogMaterial);
-    rightCalf.position.set(0.35, 0.25, 0.1);
+    rightCalf.position.set(0.38, 0.26, 0.12);
     rightCalf.userData.name = 'rightCalf';
+    rightCalf.castShadow = true;
     frog.add(rightCalf);
+    
+    const rightAnkle = new THREE.Mesh(ankleGeo, frogMaterial);
+    rightAnkle.position.set(0.38, 0.02, 0.18);
+    rightAnkle.castShadow = true;
+    frog.add(rightAnkle);
 
     const rightFoot = new THREE.Mesh(footGeometry, darkGreenMaterial);
-    rightFoot.position.set(0.35, 0.05, 0.25);
+    rightFoot.position.set(0.38, 0.06, 0.30);
     rightFoot.userData.name = 'rightFoot';
     rightFoot.castShadow = true;
+    rightFoot.receiveShadow = true;
     frog.add(rightFoot);
     
-    for (let i = 0; i < 5; i++) {
-      const toeGeometry = new THREE.CylinderGeometry(0.04, 0.03, 0.12, 8);
+    const rightToePositions = [
+      { x: 0.50, z: 0.58, size: 0.045 },
+      { x: 0.43, z: 0.62, size: 0.050 },
+      { x: 0.38, z: 0.64, size: 0.052 },
+      { x: 0.33, z: 0.62, size: 0.050 },
+      { x: 0.26, z: 0.58, size: 0.045 },
+    ];
+    
+    rightToePositions.forEach(pos => {
+      const toeGeometry = new THREE.CylinderGeometry(pos.size, pos.size * 0.8, 0.14, 12);
       const toe = new THREE.Mesh(toeGeometry, darkGreenMaterial);
-      toe.position.set(0.45 - i * 0.08, 0.02, 0.5);
+      toe.position.set(pos.x, 0.02, pos.z);
       toe.rotation.x = Math.PI / 2;
+      toe.castShadow = true;
       frog.add(toe);
-    }
+      
+      const toeTipGeo = new THREE.SphereGeometry(pos.size * 0.85, 12, 12);
+      const toeTip = new THREE.Mesh(toeTipGeo, darkGreenMaterial);
+      toeTip.position.set(pos.x, 0.02, pos.z + 0.08);
+      frog.add(toeTip);
+    });
 
-    // === 등 무늬 (더 많고 자연스럽게) ===
+    // === 등 무늬 (더 자연스럽고 다양하게) ===
     const spotPositions = [
-      { x: -0.3, y: 2.0, z: -0.5, size: 0.12 },
-      { x: 0.2, y: 2.1, z: -0.5, size: 0.1 },
-      { x: -0.1, y: 1.8, z: -0.6, size: 0.15 },
-      { x: 0.35, y: 1.6, z: -0.5, size: 0.08 },
-      { x: -0.4, y: 1.5, z: -0.55, size: 0.11 },
-      { x: 0.1, y: 1.4, z: -0.6, size: 0.09 },
-      { x: -0.2, y: 2.3, z: -0.4, size: 0.07 },
+      { x: -0.32, y: 2.05, z: -0.52, size: 0.13, opacity: 0.8 },
+      { x: 0.22, y: 2.15, z: -0.48, size: 0.11, opacity: 0.75 },
+      { x: -0.12, y: 1.85, z: -0.62, size: 0.16, opacity: 0.85 },
+      { x: 0.38, y: 1.62, z: -0.52, size: 0.09, opacity: 0.7 },
+      { x: -0.42, y: 1.52, z: -0.58, size: 0.12, opacity: 0.78 },
+      { x: 0.12, y: 1.42, z: -0.65, size: 0.10, opacity: 0.72 },
+      { x: -0.22, y: 2.35, z: -0.42, size: 0.08, opacity: 0.68 },
+      { x: 0.15, y: 2.28, z: -0.45, size: 0.07, opacity: 0.65 },
     ];
     
     spotPositions.forEach(spot => {
-      const spotMesh = new THREE.Mesh(
-        new THREE.SphereGeometry(spot.size, 12, 12),
-        darkGreenMaterial
-      );
+      const spotGeo = new THREE.SphereGeometry(spot.size, 20, 20);
+      const spotMat = new THREE.MeshStandardMaterial({
+        color: 0x228B22,
+        roughness: 0.4,
+        metalness: 0.05,
+        transparent: true,
+        opacity: spot.opacity
+      });
+      const spotMesh = new THREE.Mesh(spotGeo, spotMat);
       spotMesh.position.set(spot.x, spot.y, spot.z);
+      spotMesh.receiveShadow = true;
       frog.add(spotMesh);
     });
 
-    // === 꼬리 (작은 돌기) ===
-    const tailGeometry = new THREE.ConeGeometry(0.08, 0.15, 12);
+    // === 꼬리 (더 자연스러운 형태) ===
+    const tailGeometry = new THREE.ConeGeometry(0.10, 0.18, 16);
     const tail = new THREE.Mesh(tailGeometry, darkGreenMaterial);
-    tail.position.set(0, 1.2, -0.7);
+    tail.position.set(0, 1.18, -0.72);
     tail.rotation.x = Math.PI;
+    tail.castShadow = true;
     frog.add(tail);
 
     return frog;
