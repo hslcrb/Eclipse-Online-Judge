@@ -1,0 +1,321 @@
+import React from "react";
+
+export default function EclipseWelcomeMock() {
+  const leftItems = [
+    {
+      icon: "⚙️",
+      title: "Review IDE configuration settings",
+      desc: "Review the IDE's most fiercely contested preferences",
+    },
+    {
+      icon: "➕",
+      title: "Create a new Java Web Project",
+      desc: "Create a new project for Java and Web development",
+    },
+    {
+      icon: "🔀",
+      title: "Checkout projects from Git",
+      desc: "Checkout Eclipse projects hosted in a Git repository",
+    },
+    {
+      icon: "📥",
+      title: "Import existing projects",
+      desc: "Import existing Eclipse projects from the filesystem or an archive",
+    },
+    {
+      icon: "📦",
+      title: "Launch the Eclipse Marketplace",
+      desc: "Enhance your IDE with additional plugins and install your Marketplace favorites",
+    },
+    {
+      icon: "📄",
+      title: "Open an existing file",
+      desc: "Open a file from the filesystem",
+    },
+  ];
+
+  const rightItems = [
+    {
+      icon: "🗺️",
+      title: "Overview",
+      desc: "Get an overview of the features",
+    },
+    {
+      icon: "🎓",
+      title: "Tutorials",
+      desc: "Go through tutorials",
+    },
+    {
+      icon: "🪄",
+      title: "Samples",
+      desc: "Try out the samples",
+    },
+    {
+      icon: "⭐",
+      title: "What's New",
+      desc: "Find out what is new",
+    },
+  ];
+
+  return (
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        background: "#efefef",
+        fontFamily: "'Segoe UI', sans-serif",
+        overflow: "hidden",
+      }}
+    >
+      {/* Title Bar */}
+      <div
+        style={{
+          height: 32,
+          background: "#e8e8e8",
+          display: "flex",
+          alignItems: "center",
+          paddingLeft: 10,
+          fontSize: 13,
+          color: "#222",
+          borderBottom: "1px solid #d5d5d5",
+        }}
+      >
+        hrdKorea - Eclipse IDE
+      </div>
+
+      {/* Menu */}
+      <div
+        style={{
+          height: 28,
+          background: "#f4f4f4",
+          display: "flex",
+          alignItems: "center",
+          gap: 18,
+          paddingLeft: 10,
+          fontSize: 13,
+          borderBottom: "1px solid #ddd",
+        }}
+      >
+        {[
+          "File",
+          "Edit",
+          "Navigate",
+          "Search",
+          "Project",
+          "Run",
+          "Window",
+          "Help",
+        ].map((v) => (
+          <span key={v}>{v}</span>
+        ))}
+      </div>
+
+      {/* Toolbar */}
+      <div
+        style={{
+          height: 32,
+          background: "#f8f8f8",
+          borderBottom: "1px solid #ddd",
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          padding: "0 8px",
+          fontSize: 16,
+        }}
+      >
+        {[
+          "📁",
+          "💾",
+          "↩️",
+          "↪️",
+          "🔍",
+          "▶️",
+          "⏹️",
+          "🐞",
+          "⚒️",
+          "📦",
+          "☕",
+          "🔧",
+          "📋",
+          "📝",
+          "📚",
+        ].map((i, idx) => (
+          <span key={idx}>{i}</span>
+        ))}
+      </div>
+
+      {/* Welcome Tab */}
+      <div
+        style={{
+          height: 36,
+          background: "#fafafa",
+          borderBottom: "1px solid #d8d8d8",
+          display: "flex",
+          alignItems: "center",
+          paddingLeft: 10,
+        }}
+      >
+        <div
+          style={{
+            background: "#fff",
+            border: "1px solid #d8d8d8",
+            borderBottom: "none",
+            padding: "8px 14px",
+            borderTopLeftRadius: 3,
+            borderTopRightRadius: 3,
+            fontSize: 13,
+          }}
+        >
+          Welcome ✕
+        </div>
+      </div>
+
+      {/* Banner */}
+      <div
+        style={{
+          height: 62,
+          background:
+            "linear-gradient(90deg,#1c1737,#2a2148,#322759,#241c40)",
+          color: "#fff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 24px",
+          fontSize: 18,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ fontSize: 30 }}>🌘</div>
+          <div>Eclipse IDE for Enterprise Java and Web Developers</div>
+        </div>
+
+        <div
+          style={{
+            border: "2px solid #ff9b1f",
+            borderRadius: 6,
+            width: 24,
+            height: 24,
+            display: "grid",
+            placeItems: "center",
+            color: "#ff9b1f",
+          }}
+        >
+          ▶
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div
+        style={{
+          paddingTop: 70,
+          paddingLeft: 150,
+          paddingRight: 150,
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          columnGap: 180,
+        }}
+      >
+        <div>
+          {leftItems.map((item) => (
+            <div
+              key={item.title}
+              style={{
+                display: "flex",
+                gap: 26,
+                marginBottom: 36,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 28,
+                  color: "#ef8d1c",
+                  width: 34,
+                }}
+              >
+                {item.icon}
+              </div>
+
+              <div>
+                <div
+                  style={{
+                    color: "#ef8d1c",
+                    fontSize: 16,
+                    marginBottom: 3,
+                  }}
+                >
+                  {item.title}
+                </div>
+
+                <div
+                  style={{
+                    color: "#555",
+                    fontSize: 13,
+                  }}
+                >
+                  {item.desc}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div>
+          {rightItems.map((item) => (
+            <div
+              key={item.title}
+              style={{
+                display: "flex",
+                gap: 26,
+                marginBottom: 54,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 28,
+                  color: "#ef8d1c",
+                  width: 34,
+                }}
+              >
+                {item.icon}
+              </div>
+
+              <div>
+                <div
+                  style={{
+                    color: "#ef8d1c",
+                    fontSize: 16,
+                    marginBottom: 3,
+                  }}
+                >
+                  {item.title}
+                </div>
+
+                <div
+                  style={{
+                    color: "#555",
+                    fontSize: 13,
+                  }}
+                >
+                  {item.desc}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer Checkbox */}
+      <div
+        style={{
+          position: "absolute",
+          right: 28,
+          bottom: 14,
+          fontSize: 12,
+          color: "#555",
+        }}
+      >
+        ☐ Always show Welcome at start up
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,271 @@
+import React from "react";
+
+export default function EclipseWorkbenchMock() {
+  const projectLinks = [
+    "Create a Maven project",
+    "Create a Java EE EAR project",
+    "Create a Dynamic Web project",
+    "Create an EJB project",
+    "Create a Connector project",
+    "Create a Java EE application client project",
+    "Create a deployable web project",
+    "Create a JPA project",
+    "Create a project...",
+    "Import projects..."
+  ];
+
+  return (
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        fontFamily: "Segoe UI,sans-serif",
+        background: "#ececec"
+      }}
+    >
+      {/* title */}
+      <div
+        style={{
+          height: 30,
+          background: "#e6e6e6",
+          borderBottom: "1px solid #d2d2d2",
+          display: "flex",
+          alignItems: "center",
+          paddingLeft: 8,
+          fontSize: 13
+        }}
+      >
+        hrdKorea - Eclipse IDE
+      </div>
+
+      {/* menu */}
+      <div
+        style={{
+          height: 26,
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          paddingLeft: 8,
+          background: "#f3f3f3",
+          borderBottom: "1px solid #d9d9d9",
+          fontSize: 13
+        }}
+      >
+        {[
+          "File",
+          "Edit",
+          "Navigate",
+          "Search",
+          "Project",
+          "Run",
+          "Window",
+          "Help"
+        ].map(x => (
+          <span key={x}>{x}</span>
+        ))}
+      </div>
+
+      {/* toolbar */}
+      <div
+        style={{
+          height: 28,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "0 6px",
+          background: "#f7f7f7",
+          borderBottom: "1px solid #d8d8d8",
+          fontSize: 14
+        }}
+      >
+        {[
+          "📁","💾","↩️","↪️","🔍","⚙️","▶️",
+          "⏹️","🐞","📦","📝","📋","🔧","📚"
+        ].map((i,n)=>(
+          <span key={n}>{i}</span>
+        ))}
+      </div>
+
+      {/* workspace */}
+      <div
+        style={{
+          flex: 1,
+          display: "grid",
+          gridTemplateColumns: "330px 1fr 260px"
+        }}
+      >
+        {/* left */}
+        <div
+          style={{
+            borderRight: "1px solid #cfcfcf",
+            background: "#f4f4f4",
+            display: "flex",
+            flexDirection: "column"
+          }}
+        >
+          <div
+            style={{
+              height: 26,
+              borderBottom: "1px solid #d5d5d5",
+              background: "#fafafa",
+              display: "flex",
+              alignItems: "center",
+              paddingLeft: 8,
+              fontSize: 13,
+              fontWeight: 500
+            }}
+          >
+            📁 Project Explorer
+          </div>
+
+          <div
+            style={{
+              padding: 8,
+              fontSize: 13
+            }}
+          >
+            <div>
+              There are no projects in your workspace.
+            </div>
+
+            <div style={{ marginBottom: 12 }}>
+              To add a project:
+            </div>
+
+            {projectLinks.map(link => (
+              <div
+                key={link}
+                style={{
+                  color: "#1565c0",
+                  textDecoration: "underline",
+                  marginBottom: 8,
+                  cursor: "pointer"
+                }}
+              >
+                {link}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* center */}
+        <div
+          style={{
+            background: "#efefef",
+            position: "relative"
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: "45%",
+              transform: "translate(-50%,-50%)",
+              color: "#888",
+              textAlign: "center",
+              fontSize: 14,
+              lineHeight: 1.6
+            }}
+          >
+            Open a file or drop files here to open them.
+            <br />
+            Find Actions&nbsp;&nbsp;Ctrl+3
+            <br />
+            Show Key Assist&nbsp;&nbsp;Ctrl+Shift+L
+            <br />
+            New&nbsp;&nbsp;Ctrl+N
+          </div>
+        </div>
+
+        {/* right */}
+        <div
+          style={{
+            borderLeft: "1px solid #cfcfcf",
+            background: "#f4f4f4",
+            display: "flex",
+            flexDirection: "column"
+          }}
+        >
+          <div
+            style={{
+              height: 26,
+              borderBottom: "1px solid #d5d5d5",
+              background: "#fafafa",
+              display: "flex",
+              alignItems: "center",
+              paddingLeft: 8,
+              fontSize: 13,
+              fontWeight: 500
+            }}
+          >
+            📋 Outline
+          </div>
+
+          <div
+            style={{
+              padding: 8,
+              color: "#555",
+              fontSize: 13
+            }}
+          >
+            There is no active editor that
+            provides an outline.
+          </div>
+        </div>
+      </div>
+
+      {/* bottom tabs */}
+      <div
+        style={{
+          height: 165,
+          borderTop: "1px solid #cfcfcf",
+          background: "#f5f5f5",
+          display: "flex",
+          flexDirection: "column"
+        }}
+      >
+        <div
+          style={{
+            height: 30,
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+            paddingLeft: 8,
+            borderBottom: "1px solid #d8d8d8",
+            fontSize: 13
+          }}
+        >
+          <span>⚠️ Problems</span>
+          <span>🖥️ Servers</span>
+          <span>💻 Terminal</span>
+          <span>🗄️ Data Source Explorer</span>
+          <span>📄 Properties</span>
+        </div>
+
+        <div
+          style={{
+            flex: 1,
+            background: "#fff"
+          }}
+        />
+      </div>
+
+      {/* status */}
+      <div
+        style={{
+          height: 22,
+          background: "#f1f1f1",
+          borderTop: "1px solid #d0d0d0",
+          display: "flex",
+          alignItems: "center",
+          paddingLeft: 6,
+          fontSize: 12
+        }}
+      >
+        0 items selected
+      </div>
+    </div>
+  );
+}
